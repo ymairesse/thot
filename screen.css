@@ -1,0 +1,77 @@
+body {
+	background-color: #FED57B;
+	}
+
+.container {
+	background-color: #eed;
+	}
+
+.not-allowed {
+	cursor: not-allowed !important;
+	}
+	
+#accordion .panel-heading {
+	background: #ffa500;
+	
+}
+
+.navbar-fixed-bottom {
+	background: #FFDD86;
+	}
+	
+.vertical-align {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;	
+}
+
+.selecteur {
+	background: #FFDD86;	
+	}
+	
+.echec {
+	color: red;
+	font-weight: bold;
+}
+
+.urgence0 {
+	background-color: #9f9;
+	}
+.urgence1 {
+	background-color: #99f;
+	}
+.urgence2 {
+	background-color: #f99;
+	}
+
+.anniversaire {
+	color: red;
+	font-size: 2em;
+	list-style: none;
+	}
+
+.navbar .fa {
+	font-size:1.4em
+	}
+	
+.listeAnnonces ul {
+	padding-left: 0;	
+	}
+	
+.listeAnnonces li {
+	list-style-type: none;
+	margin:0.3em 0;
+	padding: 0.1em 0;
+	}
+
+.lesAnnonces {
+	border: 1px solid #555;
+	padding: 0.5em 0.5em 1.5em;
+	margin: 1em 0;
+	}
+
+.lesAnnonces .contact {
+	background-color: #ccc
+	}
