@@ -3,9 +3,7 @@ session_start();
 require_once('config.inc.php');
 include ('inc/entetes.inc.php');
 
-// définition de la class USER
-require_once (INSTALL_DIR."/inc/classes/classUser.inc.php");
-
+$matricule = $User->getMatricule();
 $smarty->assign('nom',$User->getNom());
 
 switch ($action) {

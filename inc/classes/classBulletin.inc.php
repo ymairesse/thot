@@ -5398,7 +5398,6 @@ class Bulletin {
 		if (!($fp = fopen ("eprExternes.csv", "w"))) die ("erreur à l'ouverture du fichier");
 		fwrite ($fp, $texte);
 		fclose ($fp);
-
 		return $liste;
 		}
 

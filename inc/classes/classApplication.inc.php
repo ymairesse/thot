@@ -65,7 +65,7 @@ class Application {
 				echo "</pre>";
 				echo "<hr />";
 			}
-	if ($die) die(); 
+	if ($die) die();
 	}
 
 	/**
@@ -123,8 +123,6 @@ class Application {
 		$connexion = Null;
 		}
 
-
-
 	/**
 	 * retourne le nom du répertoire actuel
 	 * @param void()
@@ -171,8 +169,8 @@ class Application {
 		$heure = implode(":",$sqlArray);
 		return $heure;
 		}
-		
-	/** 
+
+	/**
 	 * converir les heures au format PHP vers le format MySQL
 	 * @param string $heure
 	 * @return string
@@ -206,7 +204,7 @@ class Application {
 		  return $timestamp;
 		}
 
-	/** 
+	/**
 	 * date d'aujourd'hui
 	 * @param void()
 	 * @return string
@@ -216,69 +214,7 @@ class Application {
 		}
 
 
-	/**
-	* liste des derniers utilisateurs connectés
-	* @param $limite
-	* @return array
-	*/
-	public function derniersConnectes($limite) {
-	   $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-	   $sql = "SELECT distinct user, id,  heure, date, ip, host ";
-	   $sql .= "FROM ".PFX."parentLogins ";
-	   $sql .= "ORDER BY id desc limit 0,$limite ";
-	   $resultat = $connexion->query($sql);
-	   if ($resultat) {
-		   $resultat->setFetchMode(PDO::FETCH_ASSOC);
-		   $tableau = $resultat->fetchall();
-		   }
-		   else $tableau = Null;
-	   self::DeconnexionPDO($connexion);
-	   return $tableau;
-	   }
 
-	/**
-	 * renvoie "true" si l'adresse IP est déjà connue dans la table des logins pour cet utilisateur
-	 * @param $ip	: adresse IP
-	 * @param $user	: nom de l'utilisateur
-	 */
-	 public function checkIP ($ip, $user){
-		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT COUNT(*) AS nb ";
-		$sql .= "FROM ".PFX."logins ";
-		$sql .= "WHERE ip='$ip' AND UPPER(user)='$user' ";
-		$sql .= "ORDER BY date DESC, heure DESC";
-		$resultat = $connexion->query($sql);
-		$nb = 0;
-		if ($resultat) {
-			$ligne = $resultat->fetch();
-			$nb = $ligne['nb'];
-			}
-		Application::deconnexionPDO($connexion);
-		return $nb;
-		}
-
-	/**
-	 * retourne la liste des classes qui figurent dans la base de données (tables Users)
-	 * @param void()
-	 * @return array()
-	 */
-	public function listeClasses(){
-		$connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT DISTINCT classe FROM ".PFX."users ";
-		$sql .= "ORDER BY classe ";
-		$resultat = $connexion->query($sql);
-		$liste = array();
-		if ($resultat) {
-			$resultat->setFetchMode(PDO::FETCH_ASSOC);
-			while ($ligne = $resultat->fetch()) {
-				$classe = $ligne['classe'];
-				$liste[$classe]=$classe;
-			}
-		self::DeconnexionPDO ($connexion);
-		return $liste;
-		}
-	}
-	
 	/**
 	 * retourne la liste des élèves pour une classe donnée
 	 * @param string $classe
@@ -300,9 +236,53 @@ class Application {
 				}
 			}
 		self::DeconnexionPDO($connexion);
-		return $liste;					
+		return $liste;
 		}
-		
+
+		/**
+	     * liste structurée des profs liés à une liste de coursGrp (liste indexée par coursGrp)
+	     * @param string | array : $listeCoursGrp
+	     * @return array
+	     */
+	    public function listeProfsListeCoursGrp($listeCoursGrp, $type='string') {
+	        if (is_array($listeCoursGrp))
+	            $listeCoursGrpString = "'" . implode("','", array_keys($listeCoursGrp)) . "'";
+	            else $listeCoursGrpString = "'".$listeCoursGrp."'";
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+	        $sql = "SELECT coursGrp, nom, prenom, sexe, ".PFX."profsCours.acronyme ";
+	        $sql .= "FROM ".PFX."profsCours ";
+	        $sql .= "JOIN ".PFX."profs ON (".PFX."profsCours.acronyme = ".PFX."profs.acronyme) ";
+	        $sql .= "WHERE coursGrp IN ($listeCoursGrpString) ";
+			$sql .= "ORDER BY nom";
+
+	        $resultat = $connexion->query($sql);
+	        $liste = array();
+	        if ($resultat) {
+				$resultat->setFetchMode(PDO::FETCH_ASSOC);
+				while ($ligne = $resultat->fetch()) {
+					$coursGrp = $ligne['coursGrp'];
+					$acronyme = $ligne['acronyme'];
+					$sexe = $ligne['sexe'];
+					$ved = ($sexe=='M')?'M. ':'Mme';
+					if ($type == 'string') {
+						if (isset($liste[$coursGrp]))
+							$liste[$coursGrp] .= ', '.$ved.' '.$ligne['prenom'].' '.$ligne['nom'];
+							else $liste[$coursGrp] = $ved.' '.$ligne['prenom'].' '.$ligne['nom'];
+						}
+						else $liste[$coursGrp][$acronyme] = $ligne;
+					// on supprime le cours dont le prof a été trouvé
+					unset($listeCoursGrp[$coursGrp]);
+					}
+				}
+	        Application::DeconnexionPDO($connexion);
+			// on rajoute tous les cours dont les affectations de profs sont inconnues
+			if ($listeCoursGrp != Null)
+				foreach ($listeCoursGrp as $coursGrp=>$wtf) {
+					$liste[$coursGrp] = PROFNONDESIGNE;
+					}
+	        return $liste;
+	    }
+
 
 	/**
 	 * retourne la liste des utilisateurs uniques connectés depuis une date donnée
@@ -317,7 +297,7 @@ class Application {
 		$sql .= "JOIN ".PFX."users AS users ON users.userName = lo.user ";
 		$sql .= "WHERE date >= '$date' ";
 		$sql .= "ORDER by classe, nom, prenom ";
-		
+
 		$resultat = $connexion->query($sql);
 		$liste = array();
 		if ($resultat) {
@@ -330,54 +310,15 @@ class Application {
 		return $liste;
 		}
 	}
-	
-	
+
 	/**
      * liste structurée des profs liés à une liste de coursGrp (liste indexée par coursGrp)
      * @param string | array : $listeCoursGrp
      * @return array
      */
-    public function listeProfsListeCoursGrp($listeCoursGrp, $type='string') {
-        if (is_array($listeCoursGrp))
-            $listeCoursGrpString = "'" . implode("','", array_keys($listeCoursGrp)) . "'";
-            else $listeCoursGrpString = "'".$listeCoursGrp."'";
-		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = "SELECT coursGrp, nom, prenom, sexe, ".PFX."profsCours.acronyme ";
-        $sql .= "FROM ".PFX."profsCours ";
-        $sql .= "JOIN ".PFX."profs ON (".PFX."profsCours.acronyme = ".PFX."profs.acronyme) ";
-        $sql .= "WHERE coursGrp IN ($listeCoursGrpString) ";
-		$sql .= "ORDER BY nom";
-
-        $resultat = $connexion->query($sql);
-        $liste = array();
-        if ($resultat) {
-			$resultat->setFetchMode(PDO::FETCH_ASSOC);
-			while ($ligne = $resultat->fetch()) {
-				$coursGrp = $ligne['coursGrp'];
-				$acronyme = $ligne['acronyme'];
-				$sexe = $ligne['sexe'];
-				$ved = ($sexe=='M')?'M. ':'Mme';
-				if ($type == 'string') {
-					if (isset($liste[$coursGrp]))
-						$liste[$coursGrp] .= ', '.$ved.' '.$ligne['prenom'].' '.$ligne['nom'];
-						else $liste[$coursGrp] = $ved.' '.$ligne['prenom'].' '.$ligne['nom'];
-					}
-					else $liste[$coursGrp][$acronyme] = $ligne;
-				// on supprime le cours dont le prof a été trouvé
-				unset($listeCoursGrp[$coursGrp]);
-				}
-			}
-        Application::DeconnexionPDO($connexion);
-		// on rajoute tous les cours dont les affectations de profs sont inconnues
-		if ($listeCoursGrp != Null)
-			foreach ($listeCoursGrp as $coursGrp=>$wtf) {
-				$liste[$coursGrp] = PROFNONDESIGNE;
-				}
-        return $liste;
-    }
 
 	/**
-	 * retourne la liste des annonces destinées à l'élève dont on donne le matricule et la classe
+	 * retourne la liste structurée par type de destinataire des annonces destinées à l'élève dont on donne le matricule et la classe
 	 * @param $matricule
 	 * @param $classe
 	 * @return array
@@ -386,8 +327,8 @@ class Application {
 		$ajd = self::dateMysql(self::dateNow());
 		$niveau = substr($classe,0,1);
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT proprietaire, destinataire, objet, texte, dateDebut, dateFin, urgence, mail, lu, accuseReception ";
-		$sql .= "FROM ".PFX."thotNotifications ";
+		$sql = "SELECT dtn.id, proprietaire, destinataire, objet, texte, dateDebut, dateFin, urgence, mail, accuse ";
+		$sql .= "FROM ".PFX."thotNotifications AS dtn ";
 		$sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole') ";
 		$sql .= "AND (dateFin > '$ajd' AND dateDebut <= '$ajd') ";
 		$sql .= "ORDER BY urgence DESC, dateDebut ";
@@ -395,18 +336,155 @@ class Application {
 		$resultat = $connexion->query($sql);
 		$listeAnnonces = array();
 		if ($resultat) {
-			$resultat->setFetchMode(PDO::FETCH_ASSOC);			
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
 			while ($ligne = $resultat->fetch()) {
 				$destinataire = $ligne['destinataire'];
+				$id = $ligne['id'];
 				$ligne['dateDebut'] = self::datePHP($ligne['dateDebut']);
 				$ligne['dateFin'] = self::datePHP($ligne['dateFin']);
-				$listeAnnonces[$destinataire][]=$ligne;
+				$listeAnnonces[$destinataire][$id]=$ligne;
 				}
-		}
+			}
 		Application::DeconnexionPDO($connexion);
 		return $listeAnnonces;
-	}
+		}
 
+	/**
+	* Liste des accusés de lecture demandés à un élève dont on fournit le matricule
+	* @param $matricule : le matricule de l'élève
+	* @return array : la liste des accusés triés par id
+	*/
+	public function listeAccusesEleve($matricule){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT id, dateHeure ";
+		$sql .= "FROM ".PFX."thotAccuse ";
+		$sql .= "WHERE matricule = '$matricule' ";
+		$resultat = $connexion->query($sql);
+		$liste = array();
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$id = $ligne['id'];
+				$ligne['dateHeure'] = isset($ligne['dateHeure'])?$this->dateHeure($ligne['dateHeure']):Null;
+				$liste[$id]=$ligne;
+				}
+			}
+		Application::DeconnexionPDO($connexion);
+		return $liste;
+		}
+
+	/**
+	* Liste des annonces et des demandes d'accusés de lecture correspondant (si existant)
+	* @param $listeAnnonces : liste des annonces triées par id de l'annonce
+	* @param $listeAccuses : liste des demandes d'accusés de lecture triées par id
+	* @return array : combinaison des deux arrays de données
+	*/
+	public function listeAnnoncesAccuses($listeAnnonces, $listeAccuses){
+		foreach ($listeAnnonces as $type=>$listeType){
+			foreach ($listeType as $id=>$dataAnnonce){
+				$dateHeure = isset($listeAccuses[$id])?$listeAccuses[$id]['dateHeure']:Null;
+				$listeAnnonces[$type][$id]['dateHeure'] = $dateHeure;
+				}
+			}
+		return $listeAnnonces;
+		}
+
+	/**
+	* retourne une liste simple des accusés de lecture pour une liste d'annonces; la liste est classée par groupe d'annonces
+	* @param $listeAnnonces : la liste complète des annonces (voir la fonction listeAnnonces)
+	* @param $matricule : matricule de l'élève concerné
+	* @param $classe: classe de l'élève
+	* @return array : pour chaque type d'annonces, le nombre d'accusés de lecture demandés
+	*/
+	public function shortListeAccuses($listeAnnonces, $matricule, $classe) {
+		$niveau = substr($classe,0,1);
+		$listeAccuses = array('eleve' => 0, 'classe' => 0, 'niveau' => 0, 'ecole' => 0);
+		if (isset($listeAnnonces[$matricule])) {
+			$listeEleve = $listeAnnonces[$matricule];
+			foreach ($listeEleve as $id=>$uneAnnonce) {
+				if (($uneAnnonce['accuse'] == 1) && ($uneAnnonce['dateHeure'] == Null))
+					$listeAccuses['eleve']++;
+				}
+			}
+		if (isset($listeAnnonces[$classe])) {
+			$listeClasse = $listeAnnonces[$classe];
+			foreach ($listeClasse as $uneAnnonce) {
+				if (($uneAnnonce['accuse'] == 1) && ($uneAnnonce['dateHeure'] == Null))
+					$listeAccuses['classe']++;
+				}
+			}
+		if (isset($listeAnnonces[$niveau])) {
+			$listeNiveau = $listeAnnonces[$niveau];
+			foreach ($listeNiveau as $uneAnnonce) {
+				if (($uneAnnonce['accuse'] == 1) && ($uneAnnonce['dateHeure'] == Null))
+					$listeAccuses['niveau']++;
+				}
+			}
+		if (isset($listeAnnonces['ecole'])) {
+			$listeEcole = $listeAnnonces['ecole'];
+			foreach ($listeEcole as $uneAnnonce) {
+				if (($uneAnnonce['accuse'] == 1) && ($uneAnnonce['dateHeure'] == Null))
+					$listeAccuses['ecole']++;
+				}
+			}
+		return $listeAccuses;
+		}
+
+	/**
+	* renvoie le nombre d'accusés de lecture pour une liste de demande d'accusés fournie
+	* @param $listeAccuses : liste des accusés de lecture par type
+	* @return integer:  nombre total d'accusés de lecture demandés
+	*/
+	public function nbAccuses($listeAccuses){
+		$nb = 0;
+		foreach ($listeAccuses as $type=>$nombre){
+			$nb+= $nombre;
+			}
+		return $nb;
+		}
+
+	/**
+	* marque une notification lue pour un élève donné
+	* @param $matricule: identité de l'élève
+	* @param $id : id de la notification
+	* @return string: jour et heure de lecture
+	*/
+	public function marqueAccuse($matricule,$id) {
+		$dateHeure = '';
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "UPDATE ".PFX."thotAccuse ";
+		$sql .= "SET dateHeure = NOW() ";
+		$sql .= "WHERE id='$id' AND matricule='$matricule' ";
+		$resultat = $connexion->exec($sql);
+		if ($resultat) {
+			$sql = "SELECT dateHeure ";
+			$sql .= "FROM ".PFX."thotAccuse ";
+			$sql .= "WHERE id='$id' AND matricule='$matricule' ";
+
+			$resultat = $connexion->query($sql);
+			if ($resultat) {
+				$resultat->setFetchMode(PDO::FETCH_ASSOC);
+				$ligne = $resultat->fetch();
+				$dateHeure = $this->dateHeure($ligne['dateHeure']);
+				}
+			}
+		Application::DeconnexionPDO($connexion);
+		return $dateHeure;
+		}
+
+	/**
+	* conversion des dateHeures comprenant la date et l'heure au format "classique" pour les dates et
+	* en ajustant aux minutes pour les heures
+	* @param $dateHeure : combinaison de date et d'heure au format MySQL Ex: "2015-07-30 11:33:59"
+	* @return  string : la même chose au format "30/07/2015 11:33"
+	*/
+	private function dateHeure($dateHeure){
+		$dateHeure = explode(' ',$dateHeure);
+		$date = $dateHeure[0];
+		$date = self::datePHP($date);
+		$dateHeure = $date.' à '.substr($dateHeure[1],0,5);
+		return $dateHeure;
+	}
 
 }
 ?>
