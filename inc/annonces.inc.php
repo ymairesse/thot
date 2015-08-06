@@ -19,6 +19,7 @@ $smarty->assign('matricule',$matricule);
 $smarty->assign('classe',$classe);
 $smarty->assign('niveau',$niveau);
 $smarty->assign('nom',$User->getNom());
+$smarty->assign('nomEleve',$User->getNomEleve());
 
 $smarty->assign('corpsPage','annonces');
 ?>

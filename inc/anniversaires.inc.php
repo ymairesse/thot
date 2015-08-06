@@ -5,5 +5,4 @@ $anniversaires = $Ecole->anniversaires();
 $anniversaires = $anniversaires['listeAnniv'][1];
 $smarty->assign('anniversaires',$anniversaires);
 $smarty->assign('corpsPage','anniversaires');
-
 ?>

@@ -2,39 +2,55 @@
 
 class user {
 	private $userName;
+	private $userType;			// eleves ou parents
 	private $identite;			// données personnelles
 	private $identiteReseau;  	// données réseau IP,...
 
 
-	/** 
+	/**
 	 * constructeur de l'objet user
 	 */
-	function __construct($userName=Null) {
+	function __construct($userName=Null, $userType='eleve') {
 		$this->identiteReseau = $this->identiteReseau();
 		if (isset($userName)) {
 			$this->userName = $userName;
-			$this->setIdentite();
+			$this->userType = $userType;
+			$this->setIdentite($userType);
 			}
 	}
-	
+
 	/**
 	 * recherche toutes les informations de la table des utilisateurs pour l'utilisateur actif et les reporte dans l'objet User
-	 * @param
-	 * @return array
+	 * @param $userType : parent ou eleve
+	 * @return void()
 	 */
-	public function setIdentite (){
+	public function setIdentite ($userType){
 		$userName = $this->userName;
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT el.matricule, nom, prenom, classe, groupe, mailDomain, md5pwd ";
-		$sql .= "FROM ".PFX."eleves AS el ";
-		$sql .= "JOIN ".PFX."passwd AS ppw ON ppw.matricule = el.matricule ";
-		$sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";
+		switch ($userType) {
+			case 'eleves':
+				$sql = "SELECT el.matricule, nom, prenom, classe, groupe, mailDomain, md5pwd ";
+				$sql .= "FROM ".PFX."eleves AS el ";
+				$sql .= "JOIN ".PFX."passwd AS ppw ON ppw.matricule = el.matricule ";
+				$sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";
+				break;
+			case 'parents':
+				$sql = "SELECT formule, userName, tp.matricule, tp.nom, tp.prenom, lien, mail, classe, groupe, md5pwd, ";
+				$sql .= "de.nom AS nomEl, de.prenom AS prenomEl ";
+				$sql .= "FROM ".PFX."thotParents AS tp ";
+				$sql .= "JOIN ".PFX."eleves AS de ON de.matricule = tp.matricule ";
+				$sql .= "WHERE userName = '$userName' LIMIT 1 ";
+				break;
+			default:
+				die('invalid userType');
+				break;
+		}
 		$resultat = $connexion->query($sql);
 		$resultat->setFetchMode(PDO::FETCH_ASSOC);
 		$this->identite = $resultat->fetch();
 		Application::DeconnexionPDO($connexion);
 		}
-	
+
 	/**
 	 * renvoie toutes les informations d'identité présentes dans l'objet User
 	 * @param void()
@@ -43,7 +59,7 @@ class user {
 	public function getIdentite() {
 		return $this->identite;
 		}
-		
+
 	/**
 	 * renvoie le amtricule de l'utilisateur actif
 	 * @param void()
@@ -54,7 +70,7 @@ class user {
 		preg_match('/[0-9]+$/',$userName,$matches);
 		return($matches[0]);
 		}
-		
+
 	/**
 	 * renvoie le groupe dont fait partie l'utilisateur
 	 * @param void()
@@ -64,8 +80,8 @@ class user {
 		$identite = $this->identite;
 		$classe = $identite['groupe'];
 		return $classe;
-	}
-	
+		}
+
 	/**
 	 * retourne l'année d'étude de l'utilisateur
 	 * @param void()
@@ -77,15 +93,28 @@ class user {
 		return $annee;
 	}
 
-	/** 
+	/**
 	 * renvoie le prénom et le nom de l'utilisateur
-	 * @param 
+	 * @param
 	 * @return string
 	 */
 	public function getNom() {
 		$prenom = $this->identite['prenom'];
 		$nom = $this->identite['nom'];
 		return $prenom." ".$nom;
+		}
+
+	/**
+	* renvoie le nom de l'élève correspondant au parent
+	* @parem void()
+	* @return string
+	*/
+	public function getNomEleve(){
+		$prenom = isset($this->identite['prenomEl'])?$this->identite['prenomEl']:Null;
+		$nom = isset($this->identite['nomEl'])?$this->identite['nomEl']:Null;
+		if (($nom != Null) && ($prenom != Null))
+			return $prenom." ".$nom;
+			else return Null;
 		}
 
 	/**
@@ -96,7 +125,7 @@ class user {
 	public function getPasswd() {
 		return $this->identite['md5pwd'];
 	}
-	
+
 	/**
 	 * fournit le nom d'utilisateur de l'utilisateur actif
 	 * @param void()
@@ -106,10 +135,18 @@ class user {
 		return $this->userName;
 		}
 
+	/**
+	* retourne le type d'utilisateur (parent ou eleve)
+	* @param void()
+	* @return string
+	*/
+	public function getUserType(){
+		return $this->userType;
+	}
 
 	/**
 	 * retourne le nom de l'application; permet de ne pas confondre deux applications
-	 * fférentes qui utiliseraient la variable de SESSION pour retenir MDP et USERNAME
+	 * différentes qui utiliseraient la variable de SESSION pour retenir MDP et USERNAME
 	 * de la même façon.
 	 * @param
 	 * @return string
@@ -137,14 +174,14 @@ class user {
 		}
 
 
-	/** 
+	/**
 	 * vérifier que l'utilisateur dont on fournit le userName est signalé comme loggé depuis l'adresse ip dans la BD
 	 * @param $userName : string
 	 * @param $ip : string
 	 */
 	public function islogged($userName,$ip) {
 		$userName = $this->userName();
-		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);		
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 		$sql = "SELECT user, ip ";
 		$sql .= "FROM ".PFX."sessions ";
 		$sql .= "WHERE user='$userName' AND ip='$ip' ";
@@ -156,7 +193,7 @@ class user {
 		return (count($verif) > 0);
 		}
 
-	/** 
+	/**
 	 * convertir l'objet $user en tableau
 	 * @param void()
 	 * @return array
@@ -164,7 +201,7 @@ class user {
 	private function toArray () {
 		return (array) $this;
 		}
-	
+
 	/**
 	 * ajout de l'utilisateur dans le journal des logs
 	 * @param $userName	: userName de l'utilisateur
@@ -180,7 +217,7 @@ class user {
 		$sql = "INSERT INTO ".PFX."thotLogins ";
 		$sql .= "SET user='$userName', date='$date', heure='$heure', ip='$ip', host='$hostname'";
 		$n = $connexion->exec($sql);
-		
+
 		// indiquer une session ouverte depuis l'adresse IP correspondante
 		$sql = "INSERT INTO ".PFX."thotSessions ";
 		$sql .= "SET user='$userName', ip='$ip' ";
@@ -190,8 +227,8 @@ class user {
 		Application::DeconnexionPDO ($connexion);
 		return $n;
 	}
-	
-	/** 
+
+	/**
 	 * délogger l'utilisateur indiqué de la base de données (table des sessions actives)
 	 * @return integer : nombre d'effacement dans la BD
 	 */
@@ -203,7 +240,7 @@ class user {
 		$resultat = $connexion->exec($sql);
 		Application::DeconnexionPDO ($connexion);
 		return $resultat;
-		}	
+		}
 
 	/**
 	 * renvoie le userName de l'utilisateur courant
@@ -213,7 +250,7 @@ class user {
 	public function userName() {
 		return $this->userName;
 		}
-	
+
 
 	/**
 	 * renvoie le statut global de l'utlilisateur
@@ -303,9 +340,9 @@ class user {
 		Application::DeconnexionPDO ($connexion);
 		return $logins;
 		}
-		
 
-		
+
+
 	/**
 	 * liste les accès de l'utilisateur indiqué entre deux bornes
 	 * @param $user		nom de l'utilisateur concerné
@@ -333,9 +370,6 @@ class user {
 		}
 
 
-
-
-		
 }
 
 ?>

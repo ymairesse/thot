@@ -9,7 +9,7 @@
 					<button class="btn btn-danger pull-right lecture" id="button_{$id}" data-id="{$id}" data-type="eleve" type="button">J'ai lu cette annonce</button>
 				</span>
 				{elseif ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure != Null)}
-				<span class="pull-right">Lu le {$uneAnnonce.dateHeure}</span>
+				<span class="pull-right dateLecture">Lu le {$uneAnnonce.dateHeure}</span>
 				{/if}
 				<h4 class="urgence{$uneAnnonce.urgence}">{$uneAnnonce.dateDebut}: {$uneAnnonce.objet}</h4>
 				{$uneAnnonce.texte}
@@ -55,7 +55,7 @@
 					<button class="btn btn-danger pull-right lecture" data-id="{$id}" data-type="niveau" type="button">J'ai lu cette annonce</button>
 				</span>
 				{elseif ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure != Null)}
-				<span class="pull-right">Lu le {$uneAnnonce.dateHeure}</span>
+				<span class="pull-right dateLecture">Lu le {$uneAnnonce.dateHeure}</span>
 				{/if}
 				<h4 class="urgence{$uneAnnonce.urgence}">{$uneAnnonce.dateDebut}: {$uneAnnonce.objet}</h4>
 				{$uneAnnonce.texte}
@@ -78,7 +78,7 @@
 					<button class="btn btn-danger pull-right lecture" data-id="{$id}" data-type="ecole" type="button">J'ai lu cette annonce</button>
 				</span>
 				{elseif ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure != Null)}
-				<span class="pull-right">Lu le {$uneAnnonce.dateHeure}</span>
+				<span class="pull-right dateLecture">Lu le {$uneAnnonce.dateHeure}</span>
 				{/if}
 				<h4 class="urgence{$uneAnnonce.urgence}">{$uneAnnonce.dateDebut}: {$uneAnnonce.objet}</h4>
 				{$uneAnnonce.texte}

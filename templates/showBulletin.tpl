@@ -1,6 +1,6 @@
 {if isset($noBulletin)}
 
-	<h1>Bulletin n° {$noBulletin}</h1>
+	<h1>Bulletin n° {$noBulletin}{if isset($nomEleve)}: {$nomEleve}{/if}</h1>
 
 	{if isset($listeCoursGrp)}
 
@@ -209,7 +209,7 @@
 
 	$(document).ready(function(){
 
-		
+
 
 	})
 

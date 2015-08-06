@@ -3,7 +3,7 @@
     <div class="panel panel-default" id="panel-eleve">
       <div class="panel-heading">
         <h4 class="panel-title">
-          <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">{$nom}
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">{if isset($nomEleve)}{$nomEleve}{else}{$nom}{/if}
                 {if $shortListeAccuses.eleve > 0}
                     <i class="fa fa-warning pull-right"></i>
                 {/if}
@@ -18,7 +18,7 @@
 			{if isset($listeAnnonces.$matricule)}
 				<ul>
 				{foreach from=$listeAnnonces.$matricule key=id item=uneAnnonce}
-					<li class="urgence{$uneAnnonce.urgence}">
+					<li class="dymo urgence{$uneAnnonce.urgence}">
                         {if ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure == '')}
                         <i id="warning{$id}" class="fa fa-warning fa-lg faa-flash animated danger" style="color:red; padding-right:0.5em;"></i>
                         {/if}
@@ -55,7 +55,7 @@
 		{if isset($listeAnnonces.$classe)}
 			<ul>
 			{foreach from=$listeAnnonces.$classe key=id item=uneAnnonce}
-				<li class="urgence{$uneAnnonce.urgence}">
+				<li class="dymo urgence{$uneAnnonce.urgence}">
                     {if ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure == '')}
                     <i id="warning{$id}" class="fa fa-warning fa-lg faa-flash animated danger" style="color:red; padding-right:0.5em;"></i>
                     {/if}
@@ -93,7 +93,7 @@
 		{if isset($listeAnnonces.$niveau)}
 			<ul>
 				{foreach from=$listeAnnonces.$niveau key=id item=uneAnnonce}
-					<li class="urgence{$uneAnnonce.urgence}">
+					<li class="dymo urgence{$uneAnnonce.urgence}">
                         <a href="#note_{$id}" title="{$uneAnnonce.dateDebut}">{$uneAnnonce.objet|truncate:30}</a>
                         {if ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure == '')}
                         <i id="warning{$id}" class="fa fa-warning fa-lg faa-flash animated danger" style="color:red; padding-right:0.5em;"></i>
@@ -129,7 +129,7 @@
 		{if isset($listeAnnonces.ecole)}
 			<ul>
 				{foreach from=$listeAnnonces.ecole key=id item=uneAnnonce}
-					<li class="urgence{$uneAnnonce.urgence}">
+					<li class="dymo urgence{$uneAnnonce.urgence}">
                         <a href="#note_{$id}" title="{$uneAnnonce.dateDebut}">{$uneAnnonce.objet|truncate:30}</a>
                         {if ($uneAnnonce.accuse == 1) && ($uneAnnonce.dateHeure == '')}
                         <i id="warning{$id}" class="fa fa-warning fa-lg faa-flash animated danger" style="color:red; padding-right:0.5em;"></i>

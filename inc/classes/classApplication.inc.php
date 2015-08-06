@@ -213,6 +213,34 @@ class Application {
 		return date('d/m/Y');
 		}
 
+	/**
+	* filtrage des actions par utilisateur
+	* @param $action : action envisagée
+	* @param $userType : type d'utilisateur
+	* @return string : l'action permise ou Null
+	*/
+	public function filtreAction($action,$userType){
+		switch ($userType) {
+			case 'eleves':
+				$permis = array('bulletin','anniversaires','jdc','parents','logoff','annonces');
+				if (!(in_array($action,$permis)))
+					$action = Null;
+				break;
+			case 'parents':
+				$permis = array('bulletin','jdc','profil','logoff','annonces');
+				if (!(in_array($action,$permis)))
+					$action = Null;
+				break;
+			case 'admin':
+				break;
+			default:
+				// wtf
+				break;
+		}
+		if ($userType == 'eleves') {}
+
+		return $action;
+		}
 
 
 	/**
@@ -327,8 +355,9 @@ class Application {
 		$ajd = self::dateMysql(self::dateNow());
 		$niveau = substr($classe,0,1);
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT dtn.id, proprietaire, destinataire, objet, texte, dateDebut, dateFin, urgence, mail, accuse ";
+		$sql = "SELECT dtn.id, proprietaire, destinataire, objet, texte, dateDebut, dateFin, urgence, dtn.mail, accuse, dp.nom, dp.sexe ";
 		$sql .= "FROM ".PFX."thotNotifications AS dtn ";
+		$sql .= "LEFT JOIN ".PFX."profs AS dp ON dp.acronyme = dtn.proprietaire ";
 		$sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole') ";
 		$sql .= "AND (dateFin > '$ajd' AND dateDebut <= '$ajd') ";
 		$sql .= "ORDER BY urgence DESC, dateDebut ";
@@ -342,6 +371,16 @@ class Application {
 				$id = $ligne['id'];
 				$ligne['dateDebut'] = self::datePHP($ligne['dateDebut']);
 				$ligne['dateFin'] = self::datePHP($ligne['dateFin']);
+				if ($ligne['nom'] != '') {
+					switch ($ligne['sexe']) {
+						case 'M':
+							$ligne['proprietaire'] = 'M. '.$ligne['nom'];
+							break;
+						case 'F':
+							$ligne['proprietaire'] = 'Mme '.$ligne['nom'];
+							break;
+					}
+				}
 				$listeAnnonces[$destinataire][$id]=$ligne;
 				}
 			}
@@ -485,6 +524,100 @@ class Application {
 		$dateHeure = $date.' à '.substr($dateHeure[1],0,5);
 		return $dateHeure;
 	}
+
+	/**
+	* liste des parents déclarés pour un utilisateur "élève", d'après son matricule
+	* @param $matricule
+	* @return array
+	*/
+	public function listeParents($matricule){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT nom, prenom, formule, userName, mail, lien, md5pwd ";
+		$sql .= "FROM ".PFX."thotParents ";
+		$sql .= "WHERE matricule = '$matricule' ";
+		$sql .= "ORDER BY nom, prenom, userName ";
+		$resultat = $connexion->query($sql);
+		$liste = array();
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()) {
+				$userName = $ligne['userName'];
+				$liste[$userName] = $ligne;
+				}
+			}
+		Application::DeconnexionPDO($connexion);
+		return $liste;
+	}
+
+	/**
+	* Enregistre les informations relatives à un parent et provenant d'un formulaire
+	* @param $post : array le contenu du formulaire
+	* @return interger nombre d'enregistrement réussis
+	*/
+	public function saveParent($post){
+		$ok = true;
+		$formule = $post['formule']; if ($formule == '') $ok=false;
+		$nom = $post['nom']; if ($nom == '') $ok=false;
+		$prenom = $post['prenom']; if ($prenom =='') $ok=false;
+		$userName = $post['userName']; if ($userName == '') $ok=false;
+		$mail = $post['mail']; if ($mail == '') $ok=false;
+		$matricule = $post['matricule']; if ($matricule == '') $ok=false;
+		$lien = $post['lien']; if ($lien == '') $ok=false;
+		$passwd = $post['passwd'];
+		$passwd2 = $post['passwd2'];
+		if (($passwd == '') || ($passwd2 != $passwd))  $ok=false;
+		$resultat = 0;
+		if ($ok == true) {
+			$passwd = md5($passwd);
+			$userName = $userName.$matricule;
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+			$sql = "INSERT INTO ".PFX."thotParents ";
+			$sql .= "SET userName='$userName', matricule='$matricule', formule='$formule', nom='$nom', prenom='$prenom', ";
+			$sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
+			$sql .= "ON DUPLICATE KEY UPDATE ";
+			$sql .= "formule='$formule', nom='$nom', prenom='$prenom', ";
+			$sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
+			$resultat = $connexion->exec($sql);
+			if ($resultat) $resultat = 1;  // pour éviter 2 modifications si DUPLICATE KEY
+			Application::DeconnexionPDO($connexion);
+			}
+		return $resultat;
+		}
+
+	/**
+	* Enregistrement d'un profil modifié dans le formulaire ad-hoc
+	* @param $post : le contenu du formulaire
+	* @return boolean
+	*/
+	public function saveProfilParent($post,$userName){
+		$ok = true;
+		$formule = $post['formule']; if ($formule == '') $ok=false;
+		$nom = $post['nom']; if ($nom == '') $ok=false;
+		$prenom = $post['prenom']; if ($prenom =='') $ok=false;
+		$mail = $post['mail']; if ($mail == '') $ok=false;
+		$lien = $post['lien']; if ($lien == '') $ok=false;
+		$passwd = $post['passwd'];
+		$sqlPasswd = '';
+		if ($passwd != '') {
+			$passwd2 = $post['passwd2'];
+			if ($passwd == $passwd2) {
+				$passwd = md5($passwd);
+				$sqlPasswd = ",md5pwd='$passwd' ";
+				}
+				else $ok=false;
+			}
+
+		if ($ok == true) {
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+			$sql = "UPDATE ".PFX."thotParents ";
+			$sql .= "SET formule='$formule', nom='$nom', prenom='$prenom', mail='$mail', lien='$lien' ";
+			$sql .= $sqlPasswd;
+			$sql .= "WHERE userName = '$userName' ";
+			$resultat = $connexion->exec($sql);
+			Application::DeconnexionPDO($connexion);
+			}
+		return $resultat;
+		}
 
 }
 ?>

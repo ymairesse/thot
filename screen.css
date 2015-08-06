@@ -36,6 +36,10 @@ body {
 	font-weight: bold;
 }
 
+.dymo {
+	padding: 4px 1em !important;
+	}
+
 .urgence0 {
 	background-color: #9f9;
 	}
@@ -93,4 +97,18 @@ body {
 	-ms-transform: rotate(7deg); /* IE 9 */
 	-webkit-transform: rotate(7deg); /* Chrome, Safari, Opera */
 	transform: rotate(7deg);
-}
+	}
+
+.help {
+	background: #aaf;
+	padding: 1em;
+	border-radius: 5px;
+	}
+
+.fa-info-circle {
+	color: blue;
+	}
+
+.parents {
+	background: #ddf;
+	}

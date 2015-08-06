@@ -2,7 +2,7 @@
 session_start();
 
 require_once('config.inc.php');
-require_once('inc/fonctions.inc.php');
+// require_once('inc/fonctions.inc.php');
 
 // définition de la class Application
 require_once (INSTALL_DIR."/inc/classes/classApplication.inc.php");
@@ -15,11 +15,12 @@ require_once (INSTALL_DIR."/inc/classes/classUser.inc.php");
 // l'identifiant est passé en majuscules => casse sans importance
 $userName = (isset($_POST['userName']))?$_POST['userName']:Null;
 $mdp = (isset($_POST['mdp']))?$_POST['mdp']:Null;
+$userType = isset($_POST['userType'])?$_POST['userType']:Null;
 
 // Les données userName et mdp ont été postées dans le formulaire de la page accueil.php
-if (!empty($userName) && !empty($mdp)) {
+if (!empty($userName) && (!empty($mdp)) && !(empty($userType))) {
 	// recherche de toutes les informations sur l'utilisateur et les applications activées
-	$User = new user($userName);
+	$User = new user($userName, $userType);
 
 	// noter le passage de l'utilisateur dans les logs
 	$User->logger($User);
@@ -34,4 +35,4 @@ if (!empty($userName) && !empty($mdp)) {
 	else
 	// le nom d'utilisateur ou le mot de passe n'ont pas été donnés
 	header("Location: accueil.php?message=manque");
-?>    
+?>

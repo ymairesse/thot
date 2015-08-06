@@ -4,7 +4,13 @@ require_once('config.inc.php');
 include ('inc/entetes.inc.php');
 
 $matricule = $User->getMatricule();
+$userType = $User->getUserType();
 $smarty->assign('nom',$User->getNom());
+$smarty->assign('nomEleve',$User->getNomEleve());
+$smarty->assign('userType',$userType);
+
+// filtrer les actions possibles selon le type d'utilisateur
+$action = $Application->filtreAction($action,$userType);
 
 switch ($action) {
 	case 'admin':
@@ -24,6 +30,9 @@ switch ($action) {
 		break;
 	case 'parents':
 		require_once('inc/parents.inc.php');
+		break;
+	case 'profil':
+		require_once('inc/profil.inc.php');
 		break;
 	case 'logoff':
 		include_once('logout.php');

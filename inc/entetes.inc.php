@@ -34,5 +34,4 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:Null;
 $mode = isset($_REQUEST['mode'])?$_REQUEST['mode']:Null;
 $etape = isset($_REQUEST['etape'])?$_REQUEST['etape']:Null;
 
-
 /* pas de balise ?> finale, c'est volontaire */

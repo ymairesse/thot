@@ -3,6 +3,7 @@
 $matricule = $User->getMatricule();
 $anneeEtude = $User->getAnnee();
 $classe = $User->getClasse();
+$nomEleve = $User->getNomEleve();
 require_once (INSTALL_DIR."/inc/classes/classBulletin.inc.php");
 $Bulletin = new Bulletin();
 
@@ -43,6 +44,7 @@ if (($noBulletin <= $dernier) && ($noBulletin > 0) && ($matricule != '')) {
 		$noticeDirection = $Bulletin->noteDirection($anneeEtude, $noBulletin);
 
 		$smarty->assign('noBulletin',$noBulletin);
+		$smarty->assign('nomEleve',$nomEleve);
 		$smarty->assign('listeCoursGrp', $listeCoursGrp);
 		$smarty->assign('listeProfsCoursGrp', $listeProfsCoursGrp);
 		$smarty->assign('sitPrecedentes', $sitPrecedentes);
