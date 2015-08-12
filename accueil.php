@@ -25,6 +25,10 @@ $smarty = new Smarty();
 $smarty->assign ('identiteReseau', user::identiteReseau());
 $smarty->assign('message',$message);
 $smarty->assign('TITREGENERAL',TITREGENERAL);
+$smarty->assign('ECOLE',ECOLE);
+$smarty->assign('WEBECOLE',WEBECOLE);
+$smarty->assign('ADRESSEECOLE',ADRESSEECOLE);
+
 $smarty->assign('executionTime', round($chrono->stop(),6));
 $smarty->display('accueil.tpl');
 ?>

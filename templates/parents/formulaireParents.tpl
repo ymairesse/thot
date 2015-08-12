@@ -1,4 +1,4 @@
-<form name="parent" id="parent" method="POST" action="index.php" role="form" class="form-vertical">
+<form autocomplete="off" name="parent" id="parent" method="POST" action="index.php" role="form" class="form-vertical">
     <h4>Ajouter un parent</h4>
     <p>Veuillez remplir tous les champs.</p>
     <div class="row">
@@ -10,40 +10,40 @@
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
                 <select name="formule" id="formule" class="inputHelp form-control">
                     <option value="">Formule d'appel</option>
-                    <option value="Mme">Madame</option>
-                    <option value="M.">Monsieur</option>
+                    <option value="Mme"{if isset($formule) && ($formule == 'Mme')} selected{/if}>Madame</option>
+                    <option value="M."{if isset($formule) && ($formule == 'M.')} selected{/if}>Monsieur</option>
                 </select>
             </div>
 
             <div class="input-group">
                 <label for="nom" class="sr-only">Nom de famille</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="text" name="nom" id="nom" value="" maxlength="50" placeholder="Nom de famille" class="inputHelp  form-control">
+                <input type="text" name="nom" id="nom" value="{if (isset($nom))}{$nom}{/if}" maxlength="50" placeholder="Nom de famille" class="inputHelp  form-control">
             </div>
 
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
                 <label for="prenom" class="sr-only">Prénom</label>
-                <input type="text" name="prenom" id="prenom" value="" maxlength="50" placeholder="Prénom" class="inputHelp form-control">
+                <input type="text" name="prenom" id="prenom" value="{if (isset($prenom))}{$prenom}{/if}" maxlength="50" placeholder="Prénom" class="inputHelp form-control">
             </div>
 
             <div class="input-group">
                 <label for="userName" class="sr-only">Nom d'utilisateur</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="text" name="userName" id="userName" value="" maxlength="25" placeholder="Nom d'utilisateur" class="inputHelp form-control">
+                <input type="text" name="userName" id="userName" value="{if (isset($userName))}{$userName}{/if}" maxlength="25" placeholder="Nom d'utilisateur" class="inputHelp form-control">
                 <span class="input-group-addon">{$matricule}</span>
             </div>
 
             <div class="input-group">
                 <label for="mail" class="sr-only">Adresse mail</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="email" name="mail" id="mail" value="" maxlength="60" placeholder="Adresse mail" class="inputHelp form-control">
+                <input type="email" name="mail" id="mail" value="{if (isset($mail))}{$mail}{/if}" maxlength="60" placeholder="Adresse mail" class="inputHelp form-control">
             </div>
 
             <div class="input-group">
                 <label for="lien" class="sr-only">Lien de parenté</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-				<input  type="text" name="lien" id="lien" maxlength="20" value="" placeholder="Lien de parenté" class="inputHelp form-control">
+				<input  type="text" name="lien" id="lien" maxlength="20" value="{if isset($lien)}{$lien}{/if}" placeholder="Lien de parenté" class="inputHelp form-control">
 				<div class="input-group-btn">
 				    <button aria-expanded="false" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
 					    Choisir <span class="caret"></span>

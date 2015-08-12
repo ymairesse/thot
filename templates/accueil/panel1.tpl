@@ -19,7 +19,7 @@
 
                     <div class="col-md-6 col-sm12" style="background: #afa; border: 2px solid white; padding-bottom:1em;">
 
-                        <form autocomplete="off" role="form" class="form-vertical" method="POST" id="login" action="login.php" id="formLogin">
+                        <form autocomplete="off" role="form" class="form-vertical" method="POST" id="loginEleves" action="login.php" id="formLogin">
 
                             <h3>Elèves</h3>
 
@@ -27,6 +27,7 @@
                                 <p><img src="images/eleves.png" alt="eleves" style="float:left; padding: 0.5em">Nom d'utilisateur: contient la première lettre du prénom, sept lettres du nom et 4 chiffres.</p>
                                 <label for="userName" class="sr-only">Utilisateur</label>
                                 <input type="text"
+                                    required
                                     name="userName"
                                     id="userName"
                                     tabindex="1"
@@ -40,6 +41,7 @@
                             <div class="form-group">
                                 <label for="mdp" class="sr-only">Mot de passe</label>
                                 <input name="mdp"
+                                    required
                                     id="mdp"
                                     type="password"
                                     tabindex="2"
@@ -59,7 +61,7 @@
 
                 <div class="col-md-6 col-sm12" style="background:#aaf; border: 2px solid white; padding-bottom:1em;">
 
-                    <form autocomplete="off" role="form" class="form-vertical" method="POST" id="login" action="login.php" id="formLogin">
+                    <form autocomplete="off" role="form" class="form-vertical" method="POST" id="loginParents" action="login.php" id="formLogin">
 
                         <h3>Parents</h3>
 
@@ -67,6 +69,7 @@
                             <p><img src="images/parents.png" alt="eleves" style="float:right; padding: 0.5em">Le nom d'utilisateur choisi terminé par les 4 chiffres du matricule de l'élève.</p>
                             <label for="userName" class="sr-only">Utilisateur</label>
                             <input type="text"
+                                required
                                 name="userName"
                                 id="userNameParent"
                                 tabindex="3"
@@ -80,6 +83,7 @@
                         <div class="form-group">
                             <label for="mdp" class="sr-only">Mot de passe</label>
                             <input name="mdp"
+                                required
                                 id="mdpParent"
                                 type="password"
                                 tabindex="4"
@@ -89,6 +93,8 @@
                                 data-html="true"
                                 data-placement="top">
                         </div>  <!-- form-group -->
+
+                        <a href="mdp/index.php?mode=lostPasswd">Mot de passe oublié</a>
 
                         <button type="submit" class="btn btn-primary pull-right" tabindex="5">Connexion Parents</button>
                         <input type="hidden" name="userType" value="parents">
@@ -118,3 +124,15 @@
     </div>  <!-- panel-collapse -->
 
 </div>  <!-- panel 1 -->
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+    $("#loginParents").validate();
+
+    $("#loginEleves").validate();
+
+}
+</script>

@@ -1,4 +1,5 @@
 <form name="parent" id="parent" method="POST" action="index.php" role="form" class="form-vertical" autocomplete="off">
+
     <h4>Modifier votre profil</h4>
     <p>Veuillez compléter tous les champs.</p>
     <div class="row">
@@ -92,6 +93,34 @@
 
 </form>
 
+{if isset($motifRefus) && ($motifRefus != '')}
+<div id="motifRefus" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Problème</h4>
+            </div>
+
+            <div class="modal-body">
+                <p>{$motifRefus}</p>
+                <p>Veuillez corriger</p>
+                <p class="text-danger"><i class="fa fa-warning fa-lg"></i> Les données ne sont pas enregistrées</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer cette fenêtre</button>
+            </div>
+
+        </div>  <!-- modal-content  -->
+    </div>  <!-- modal-dialog -->
+</div>  <!-- motifRefus -->
+
+<script type="text/javascript">
+    $("#motifRefus").modal('show');
+</script>
+
+{/if}
 
 <script type="text/javascript">
 

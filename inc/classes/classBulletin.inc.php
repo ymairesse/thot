@@ -1788,7 +1788,6 @@ class Bulletin {
 	 * @return array : une table des erreurs dans les encodages des cotes
 	 */
 	public function enregistrerBulletin($dataBulletin, $coursGrp, $bulletin) {
-		// afficher($dataBulletin, true);
 		$tableErreurs = array();
 		$texteLicite = explode(',',COTEABS);
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);

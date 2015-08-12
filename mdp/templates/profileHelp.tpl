@@ -14,8 +14,7 @@
     Veuillez indiquer votre prénom
 </div>
 <div id="texte_userName" class="help">
-    Veuillez choisir un nom d'utilisateur.<br>Au nom que vous choisirez, le système informatique ajoutera les chiffres du matricule de l'élève.<br>Si vous choisissez le nom d'utilisaeur "pdupont" et que le matricule de l'élève est 1234, votre nom d'utilisateur sera, finalement, pdupont1234<br>
-    <strong>N'indiquez pas les les 4 chiffres; ils seront ajoutés automatiquement.</strong>
+    Veuillez choisir un nom d'utilisateur.<br>Au nom que vous choisirez, le système informatique ajoutera les chiffres du matricule de l'élève.<br>Si vous choisissez le nom d'utilisaeur "pdupont" et que le matricule de l'élève est 1234, votre nom d'utilisateur sera, finalement, pdupont1234
 </div>
 <div id="texte_mail" class="help">
     Veuillez indiquer une adresse mail valide. Un mail de demande de confirmation sera envoyé à cette adresse. Elle sera aussi régulièrement utilisée pour communiquer avec vous.

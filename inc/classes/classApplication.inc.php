@@ -547,7 +547,21 @@ class Application {
 			}
 		Application::DeconnexionPDO($connexion);
 		return $liste;
-	}
+		}
+
+	/**
+	* Vérification de l'existence éventuelle d'un utilisateur "parent"
+	* @param $userName
+	* @return boolean
+	*/
+	public function parentExiste($userName){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELCT * FROM ".PFX."thotParents ";
+		$sql .= "WHERE userName = '$userName' ";
+		$resultat = $connexion->query($sql);
+		Application::DeconnexionPDO($connexion);
+		return ($resultat > 0);
+		}
 
 	/**
 	* Enregistre les informations relatives à un parent et provenant d'un formulaire
@@ -606,7 +620,7 @@ class Application {
 				}
 				else $ok=false;
 			}
-
+		$resultat = 0;
 		if ($ok == true) {
 			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 			$sql = "UPDATE ".PFX."thotParents ";
@@ -617,6 +631,184 @@ class Application {
 			Application::DeconnexionPDO($connexion);
 			}
 		return $resultat;
+		}
+
+	/**
+	* recherche les informations sur les parents d'un élève dont on fournit le matricule
+	* @param $matricule : le matricule de l'élève (figure dans la fiche "parent")
+	* @return array
+	*/
+	public function infoParents($matricule){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT formule, nom, prenom, userName, mail, lien, md5pwd ";
+		$sql .= "FROM ".PFX."thotParents ";
+		$sql .= "WHERE matricule = '$matricule' ";
+		$resultat = $connexions->query($sql);
+		$liste = array();
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			while ($ligne = $resultat->fetch()){
+				$userName = $ligne['userName'];
+				$liste[$userName]=$ligne;
+				}
+			}
+		Application::DeconnexionPDO($connexion);
+		return $liste;
+		}
+
+	/**
+	* recherche les informations d'identité d'un parent dont on fournit le userName
+	* @param string $userName
+	* @return array
+	*/
+	public function identiteParent($userName){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT tp.matricule, userName, formule, tp.nom, tp.prenom, mail, lien, de.nom AS nomEl, de.prenom AS prenomEl ";
+		$sql .= "FROM ".PFX."thotParents AS tp ";
+		$sql .= "JOIN ".PFX."eleves AS de ON de.matricule = tp.matricule ";
+		$sql .= "WHERE userName = '$userName' ";
+		$resultat = $connexion->query($sql);
+		$ligne = array();
+		if ($resultat){
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			$ligne = $resultat->fetch();
+			}
+		Application::DeconnexionPDO($connexion);
+		return $ligne;
+		}
+
+	/**
+	* recherche la présence d'un token donné dans la BD pour un utilisateur donné
+	* @param $token : le token cherché
+	* @param $user : le nom d'utilisateur correspondant au token
+	* @return boolean
+	*/
+	public function chercheToken($token, $user){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT user, token, date ";
+		$sql .= "FROM ".PFX."lostPasswd ";
+		$sql .= "WHERE token='$token' AND user='$user' AND date >= NOW() ";
+		$sql .= "LIMIT 1 ";
+
+		$resultat = $connexion->query($sql);
+		$userName = '';
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			$ligne = $resultat->fetch();
+			$userName = $ligne['user'];
+			}
+		Application::DeconnexionPDO($connexion);
+		return $userName;
+		}
+
+	/**
+	* Enregistre le mot de passe provenant du formulaire et correspondant à l'utilisateur indiqué
+	* @param array $post : contenu du formulaire
+	* @param string $userName : nom d'utilisateur
+	* @return nombre d'enregistrements réussis (normalement 1)
+	*/
+	public function savePasswd($post, $userName){
+		$passwd = isset($post['passwd'])?$post['passwd']:Null;
+		$passwd2 = isset($post['passwd2'])?$post['passwd2']:Null;
+		$nb = 0;
+		if (($passwd == $passwd2) && ($passwd != '') && (strlen($passwd) >= 9)){
+			$passwd = md5($passwd);
+			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+			$sql = "UPDATE ".PFX."thotParents ";
+			$sql .= "SET md5pwd = '$passwd' ";
+			$sql .= "WHERE userName = '$userName' ";
+			$resultat = $connexion->exec($sql);
+			if ($resultat)
+				$nb=1;
+			// suppression de tous les tokens de cet utilisateur dans la table des mots de passe à récupérer
+			$sql = "DELETE FROM ".PFX."lostPasswd ";
+			$sql .= "WHERE user = '$userName' ";
+			$resultat = $connexion->exec($sql);
+			Application::DeconnexionPDO($connexion);
+			}
+		return $nb;
+		}
+
+	/**
+	* Vérification de l'existence d'un utilisateur dont on fournit l'identifiant ou l'adresse mail
+	* @param string $parametre : identifiant ou adresse mail
+	* @param string $critere : 'userName' ou 'mail'
+	* @return array : l'identité complète de l'utilisateur ou Null
+	*/
+	public function verifUser($parametre, $critere){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT matricule, formule, nom, prenom, userName, mail, lien ";
+		$sql .= "FROM ".PFX."thotParents ";
+
+		if ($critere == 'userName') {
+			$sql .= "WHERE userName = '$parametre' ";
+			$sql .= "LIMIT 1 ";
+			}
+			else {
+				$sql .= "WHERE mail = '$parametre' ";
+				$sql .= "LIMIT 1 ";
+				}
+
+		$resultat = $connexion->query($sql);
+		$identite = Null;
+		if ($resultat) {
+			$resultat->setFetchMode(PDO::FETCH_ASSOC);
+			$identite = $resultat->fetch();
+			}
+		Application::DeconnexionPDO($connexion);
+		return $identite;
+		}
+
+	/**
+	* Création d'un lien enregistré dans la base de données pour la récupération du mdp
+	* @param void()
+	* @return string
+	*/
+	public function createPasswdLink($userName){
+		$link = md5(microtime());
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "INSERT INTO ".PFX."lostPasswd ";
+		$sql .= "SET user='$userName', token='$link', date=NOW() + INTERVAL 2 DAY ";
+		$sql .= "ON DUPLICATE KEY UPDATE token='$link', date=NOW() + INTERVAL 2 DAY ";
+		$resultat = $connexion->exec($sql);
+		Application::DeconnexionPDO($connexion);
+		return $link;
+		}
+
+	/**
+	 * Envoie un mail de rappel de mot de passe à l'utlisateur dont on a l'adresse
+	 * @param $link : le lien de l'adresse où changer le mdp
+	 * @param $identite	: toutes les informations d'identité de l'utilisateur
+	 * @param $identiteReseau : informations relatives à la connexion (IP,...)
+	 * @return boolean
+	 */
+	public function mailPasswd($link, $identite, $identiteReseau){
+		$jSemaine = strftime('%A');
+		$date = date("d/m/Y");
+		$heure = date("H:i");
+
+		$smarty = new Smarty;
+		$smarty->assign('date',$date);
+		$smarty->assign('heure',$heure);
+		$smarty->assign('jour',$jSemaine);
+		$smarty->assign('expediteur',MAILADMIN);
+		$smarty->assign('identiteReseau',$identiteReseau);
+		$smarty->assign('identite',$identite);
+		$smarty->assign('ECOLE',ECOLE);
+		$smarty->assign('ADRESSETHOT',ADRESSETHOT);
+		$smarty->assign('link',$link);
+		$texteFinal =  $smarty->fetch('../mdp/templates/texteMailmdp.tpl');
+
+		require_once('../phpMailer/class.phpmailer.php');
+		$mail = new PHPmailer();
+		$mail->IsHTML(true);
+		$mail->CharSet = 'UTF-8';
+		$mail->From=MAILADMIN;
+		$mail->FromName=ADMINNAME;
+		$mail->AddAddress($identite['mail']);
+		$mail->Subject=RESET;
+		$mail->Body = $texteFinal;
+		return (!$mail->Send());
 		}
 
 }

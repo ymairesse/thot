@@ -8,8 +8,11 @@ $userType = $User->getUserType();
 $smarty->assign('nom',$User->getNom());
 $smarty->assign('nomEleve',$User->getNomEleve());
 $smarty->assign('userType',$userType);
+$smarty->assign('ECOLE',ECOLE);
+$smarty->assign('WEBECOLE',WEBECOLE);
+$smarty->assign('ADRESSEECOLE',ADRESSEECOLE);
 
-// filtrer les actions possibles selon le type d'utilisateur
+// filtrer les actions possibles selon le type d'utilisateur; si pas d'accès pour une "action", la fonction renvoie Null
 $action = $Application->filtreAction($action,$userType);
 
 switch ($action) {

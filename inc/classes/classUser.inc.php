@@ -13,7 +13,9 @@ class user {
 	function __construct($userName=Null, $userType='eleve') {
 		$this->identiteReseau = $this->identiteReseau();
 		if (isset($userName)) {
+			// pseudo
 			$this->userName = $userName;
+			// parents ou eleves
 			$this->userType = $userType;
 			$this->setIdentite($userType);
 			}
@@ -62,6 +64,7 @@ class user {
 
 	/**
 	 * renvoie le amtricule de l'utilisateur actif
+	 * ne fonctionne que pour les élèves. Sert à quoi?
 	 * @param void()
 	 * @return string
 	 */
@@ -72,7 +75,7 @@ class user {
 		}
 
 	/**
-	 * renvoie le groupe dont fait partie l'utilisateur
+	 * renvoie le groupe classe dont fait partie l'utilisateur
 	 * @param void()
 	 * @return string
 	 */
@@ -83,7 +86,7 @@ class user {
 		}
 
 	/**
-	 * retourne l'année d'étude de l'utilisateur
+	 * retourne l'année d'étude de l'utilisateur sur la base de son groupe classe
 	 * @param void()
 	 * @return integer
 	 */
@@ -160,17 +163,47 @@ class user {
 	 * @param $userName
 	 * @return array : le userName effectivement trouvé dans la BD ou rien si pas trouvé
 	 */
-	public static function userExists($userName) {
+	// public static function userExists($userName) {
+	// 	$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+	// 	$sql = "SELECT userName FROM ".PFX."users ";
+	// 	$sql .= "WHERE userName = '$userName'";
+	// 	$resultat = $connexion->query($sql);
+	// 	if ($resultat) {
+	// 		$resultat->setFetchMode(PDO::FETCH_ASSOC);
+	// 		$ligne = $resultat->fetch();
+	// 		}
+	// 	Application::DeconnexionPDO($connexion);
+	// 	return ($ligne['userName']);
+	// 	}
+
+	/**
+	* Vérifie si un nom d'utilisateur est déjà défini pour un parent
+	* @param string $userName
+	* @return boolean
+	*/
+	public function userExists($userName){
 		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-		$sql = "SELECT userName FROM ".PFX."users ";
-		$sql .= "WHERE userName = '$userName'";
+		$sql = "SELECT count(*) FROM ".PFX."thotParents ";
+		$sql .= "WHERE userName = '$userName' ";
 		$resultat = $connexion->query($sql);
-		if ($resultat) {
-			$resultat->setFetchMode(PDO::FETCH_ASSOC);
-			$ligne = $resultat->fetch();
-			}
+		$nb = $resultat->fetchColumn();
 		Application::DeconnexionPDO($connexion);
-		return ($ligne['userName']);
+		return ($nb > 0);
+		}
+
+	/**
+	* Vérifie si une adresse mail est déjà utilisée par un parent
+	* @param string $mail
+	* @return boolean
+	*/
+	public function mailExists($mail){
+		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+		$sql = "SELECT count(*) FROM ".PFX."thotParents ";
+		$sql .= "WHERE mail = '$mail' ";
+		$resultat = $connexion->query($sql);
+		$nb = $resultat->fetchColumn();
+		Application::DeconnexionPDO($connexion);
+		return ($nb > 0);
 		}
 
 
@@ -257,9 +290,9 @@ class user {
 	 * @param
 	 * @return string
 	 */
-	public function getStatut() {
-		return $this->identite['statut'];
-	}
+	// public function getStatut() {
+	// 	return $this->identite['statut'];
+	// }
 
 
 	/**
@@ -267,9 +300,9 @@ class user {
 	 * @param $statut
 	 * @return void()
 	 */
-	public function setStatut($statut) {
-		$this->identite['statut'] = $statut;
-		}
+	// public function setStatut($statut) {
+	// 	$this->identite['statut'] = $statut;
+	// 	}
 
 	/**
 	 * renvoie les informations d'identification réseau de l'utilisateur courant
@@ -316,11 +349,11 @@ class user {
 	 * si un avatar est présent, retourne l'userName de l'utilisateur; sinon, retourne Null
 	 * @param $userName
 	 */
-	public function photoExiste () {
-		if (file_exists(INSTALL_DIR."/avatars/".$this->getuserName().".jpg"))
-			return $this->userName;
-			else return Null;
-	}
+	// public function photoExiste () {
+	// 	if (file_exists(INSTALL_DIR."/avatars/".$this->getuserName().".jpg"))
+	// 		return $this->userName;
+	// 		else return Null;
+	// }
 
 
 	/**
@@ -340,8 +373,6 @@ class user {
 		Application::DeconnexionPDO ($connexion);
 		return $logins;
 		}
-
-
 
 	/**
 	 * liste les accès de l'utilisateur indiqué entre deux bornes
