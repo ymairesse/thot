@@ -7,6 +7,6 @@
 				{$titre}
 			</a>
 		</h2>
-	<p><a href="http://secondaire.isnd.be">ISND section Secondaire</a> | Rue de Veeweyde, 40 - 1070 Bruxelles</p></div>
-	<div class="col-md-2 col-sm-3 col-xs-4"><img src="../images/logoEcole.png" alt="ISND" class="pull-right"></div>
+	<p><a href="{$WEBECOLE}">{$ECOLE}</a> | {$ADRESSEECOLE}</p></div>
+	<div class="col-md-2 col-sm-3 col-xs-4"><img src="../images/logoEcole.png" alt="LOGO" class="pull-right"></div>
 </div>
