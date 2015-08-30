@@ -94,7 +94,7 @@
                                 data-placement="top">
                         </div>  <!-- form-group -->
 
-                        <a href="mdp/index.php?mode=lostPasswd">Mot de passe oublié</a>
+                        <a href="mdp/index.php">Mot de passe oublié</a>
 
                         <button type="submit" class="btn btn-primary pull-right" tabindex="5">Connexion Parents</button>
                         <input type="hidden" name="userType" value="parents">

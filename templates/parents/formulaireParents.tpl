@@ -18,13 +18,13 @@
             <div class="input-group">
                 <label for="nom" class="sr-only">Nom de famille</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="text" name="nom" id="nom" value="{if (isset($nom))}{$nom}{/if}" maxlength="50" placeholder="Nom de famille" class="inputHelp  form-control">
+                <input type="text" name="nomParent" id="nomParent" value="{if (isset($nomParent))}{$nomParent}{/if}" maxlength="50" placeholder="Nom de famille" class="inputHelp  form-control">
             </div>
 
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
                 <label for="prenom" class="sr-only">Prénom</label>
-                <input type="text" name="prenom" id="prenom" value="{if (isset($prenom))}{$prenom}{/if}" maxlength="50" placeholder="Prénom" class="inputHelp form-control">
+                <input type="text" name="prenomParent" id="prenomParent" value="{if (isset($prenomParent))}{$prenomParent}{/if}" maxlength="50" placeholder="Prénom" class="inputHelp form-control">
             </div>
 
             <div class="input-group">

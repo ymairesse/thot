@@ -6,13 +6,25 @@ include (INSTALL_DIR."/inc/entetesMin.inc.php");
 // les paramètres peuvent éventuellement servir; autant les passer à Smarty
 $smarty->assign('action',$action);
 $smarty->assign('mode',$mode);
-// Application::afficher($_REQUEST);
+
 // le $userName est passé en POST dans le formulaire de reset du passwd; $_REQUEST englobe $_POST et $_GET
 $token = isset($_REQUEST['token'])?$_REQUEST['token']:Null;
 // le $userName est passé en POST dans le formulaire de reset du passwd; $_REQUEST englobe $_POST et $_GET
 $userName = isset($_REQUEST['userName'])?$_REQUEST['userName']:Null;
 
 switch ($mode) {
+    case 'savePasswd':
+        // étape finale: tout s'est bien passé et le mot de passe peut être enregistré
+        // on vérifie que le $userName provenant du formulaire correspond bien à celui du token
+        $userName = $Application->chercheToken($token, $userName);
+        // le $userName est maintenant garanti car provenant de la BD
+        $nb = $Application->savePasswd($_POST,$userName);
+        if ($nb == 0)
+            $texte = "Pas de modification enregistrée";  // n'importe quel texte fait l'affaire...
+        $smarty->assign('texte',$texte);
+        $smarty->assign('corpsPage','passwdChange');
+        break;
+
     case 'getPasswd':
         // on vérifie dans la BD si le userName correspond à un token non périmé;
         // $userName revient avec '' si token périmé ou introuvable dans la BD
@@ -32,17 +44,10 @@ switch ($mode) {
                 $smarty->assign('corpsPage','tokenIncorrect');
                 }
         break;
-    case 'savePasswd':
-        $userName = $Application->chercheToken($token, $userName);
-        // le $userName est garanti car provenant de la BD
-        $nb = $Application->savePasswd($_POST,$userName);
-        if ($nb == 0)
-            $texte = "Pas de modification enregistrée";
-        $smarty->assign('texte',$texte);
-        $smarty->assign('corpsPage','passwdChange');
-        break;
+
     case 'sendMail':
         // on va essayer de trouver l'identité sur base de l'adresse mail fournie
+        // si pas possible, on se basera sur le nom d'utilisateur fourni
         $mail = isset($_POST['mail'])?$_POST['mail']:Null;
         $problemeMail = !($User->mailExists($mail));
         // si on n'a pas trouvé l'adresse mail, on tente de trouver le userName éventuellement fourni
@@ -64,14 +69,11 @@ switch ($mode) {
             else {
                 // génération du message adéquat selon la cause de l'erreur
                 if ($problemeMail)
-                    $motifRefus = "L'adresse mail $mail est inconnue.";
-                    else $motifRefus = "Le nom d'utilisateur $userName est inconnu.";
+                    $motifRefus = sprintf("L'adresse mail %s est inconnue.",$mail);
+                    else $motifRefus = sprintf("Le nom d'utilisateur %s est inconnu.", $userName);
                 $smarty->assign('motifRefus',$motifRefus);
                 }
         $smarty->assign('corpsPage','sendMail');
-        break;
-    case 'lostPasswd':
-        $smarty->assign('corpsPage','userOrMail');
         break;
 
     default:
@@ -84,7 +86,6 @@ switch ($mode) {
             }
             // sinon, on présent la page "normale" pour l'indication du mail ou du userName
             else {
-
                 $smarty->assign('corpsPage','userOrMail');
                 }
         break;

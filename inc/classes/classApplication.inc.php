@@ -123,6 +123,35 @@ class Application {
 		$connexion = Null;
 		}
 
+
+	/**
+	* filtrage des actions par utilisateur
+	* @param $action : action envisagée
+	* @param $userType : type d'utilisateur
+	* @return string : l'action permise ou Null
+	*/
+	// public function filtreAction($action,$userType){
+	// 	switch ($userType) {
+	// 		case 'eleves':
+	// 			$permis = array('bulletin','anniversaires','jdc','parents','logoff','annonces');
+	// 			if (!(in_array($action,$permis)))
+	// 				$action = Null;
+	// 			break;
+	// 		case 'parents':
+	// 			$permis = array('bulletin','jdc','profil','logoff','annonces');
+	// 			if (!(in_array($action,$permis)))
+	// 				$action = Null;
+	// 			break;
+	// 		case 'admin':
+	// 			break;
+	// 		default:
+	// 			// wtf
+	// 			break;
+	// 		}
+	// 	return $action;
+	// 	}
+
+
 	/**
 	 * retourne le nom du répertoire actuel
 	 * @param void()
@@ -237,7 +266,6 @@ class Application {
 				// wtf
 				break;
 		}
-		if ($userType == 'eleves') {}
 
 		return $action;
 		}
@@ -571,8 +599,8 @@ class Application {
 	public function saveParent($post){
 		$ok = true;
 		$formule = $post['formule']; if ($formule == '') $ok=false;
-		$nom = $post['nom']; if ($nom == '') $ok=false;
-		$prenom = $post['prenom']; if ($prenom =='') $ok=false;
+		$nomParent = $post['nomParent']; if ($nomParent == '') $ok=false;
+		$prenomParent = $post['prenomParent']; if ($prenomParent =='') $ok=false;
 		$userName = $post['userName']; if ($userName == '') $ok=false;
 		$mail = $post['mail']; if ($mail == '') $ok=false;
 		$matricule = $post['matricule']; if ($matricule == '') $ok=false;
@@ -586,10 +614,10 @@ class Application {
 			$userName = $userName.$matricule;
 			$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
 			$sql = "INSERT INTO ".PFX."thotParents ";
-			$sql .= "SET userName='$userName', matricule='$matricule', formule='$formule', nom='$nom', prenom='$prenom', ";
+			$sql .= "SET userName='$userName', matricule='$matricule', formule='$formule', nom='$nomParent', prenom='$prenomParent', ";
 			$sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
 			$sql .= "ON DUPLICATE KEY UPDATE ";
-			$sql .= "formule='$formule', nom='$nom', prenom='$prenom', ";
+			$sql .= "formule='$formule', nom='$nomParent', prenom='$prenomParent', ";
 			$sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
 			$resultat = $connexion->exec($sql);
 			if ($resultat) $resultat = 1;  // pour éviter 2 modifications si DUPLICATE KEY

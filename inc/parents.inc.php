@@ -1,5 +1,4 @@
 <?php
-
 switch ($mode) {
     case 'addParent':
         // vérifier que l'adresse mail net le nom d'utilisateur ne sont pas déjà utilisés
@@ -29,8 +28,8 @@ switch ($mode) {
             else {
                 // sinon, on renvoie toutes les informations dans le formulaire
                 $smarty->assign('formule',$_POST['formule']);
-                $smarty->assign('nom',$_POST['nom']);
-                $smarty->assign('prenom',$_POST['prenom']);
+                $smarty->assign('nomParent',$_POST['nomParent']);
+                $smarty->assign('prenomParent',$_POST['prenomParent']);
                 if ($problemeUserName == false) {
                     // supprimer le matricule du nom d'utilisateur à présenter
                     $to=strrpos($userName,$matricule,-1);
