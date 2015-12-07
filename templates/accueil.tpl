@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 	<title>{$TITREGENERAL}</title>
 	<meta charset="utf-8" />
@@ -14,12 +15,11 @@
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/jquery.validate.js"></script>
 </head>
+
 <body>
 	<div class="container">
 
-		{include file="entete.tpl"}
-
-		{if (isset($message) && $message == 'faux')}
+		{include file="entete.tpl"} {if (isset($message) && $message == 'faux')}
 		<div class="alert alert-dismissable alert-danger">
 			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 			<p>Nom d'utilisateur ou mot de passe incorrect</p>
@@ -31,45 +31,46 @@
 
 			<div class="panel-group" id="accordion">
 
-				{include file="accueil/panel1.tpl"}
+				{include file="accueil/panel1.tpl"} {include file="accueil/panel2.tpl"} {include file="accueil/panel3.tpl"}
 
-				{include file="accueil/panel2.tpl"}
+			</div>
+			<!-- panel-group -->
 
-				{include file="accueil/panel3.tpl"}
+		</div>
+		<!-- row -->
 
-			</div>  <!-- panel-group -->
+	</div>
+	<!-- container -->
 
-		</div>  <!-- row -->
-
-	</div>  <!-- container -->
-
-{include file="footer.tpl"}
-</div>
+	{include file="footer.tpl"}
+	</div>
 
 </body>
 
 <script type="text/javascript">
+	$(document).ready(function() {
 
-$(document).ready (function() {
+		$("input:enabled").eq(0).focus();
 
-	$("input:enabled").eq(0).focus();
-
-	$("#login").validate({
-		rules: {
-			userName: { required:true },
-			mdp: { required:true }
+		$("#login").validate({
+			rules: {
+				userName: {
+					required: true
+				},
+				mdp: {
+					required: true
+				}
 			},
-		errorElement: "span"
+			errorElement: "span"
 		});
 
-	$("*[title]").tooltip();
+		$("*[title]").tooltip();
 
-	$(".pop").popover({
-		trigger:'hover'
+		$(".pop").popover({
+			trigger: 'hover'
 		});
 
-})
-
+	})
 </script>
 
 </html>

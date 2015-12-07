@@ -11,7 +11,8 @@
 
 		<a class="navbar-brand" href="index.php"><i class="fa fa-home"></i></a>
 
-	</div>  <!-- navbar-header -->
+	</div>
+	<!-- navbar-header -->
 
 	<div class="collapse navbar-collapse" id="barreNavigation">
 
@@ -24,27 +25,34 @@
 			<li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> J. de classe</a></li>
 			{if $userType == 'eleves'}
 			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>
-			{/if}
-			{if $userType == 'parents'}
+			{/if} {if $userType == 'parents'}
 			<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil</a></li>
-			{/if}
-			{if $userType == 'eleves'}
+			<li><a href="index.php?action=contact"><i class="fa fa-pencil" style="color:#ff0000"></i> Contact</a></li>
+			{/if} {if $userType == 'eleves'}
 			<li><a href="http://mail.isnd-edu.be" target="_blank"><i class="fa fa-paper-plane"></i> Mails</a></li>
-			<li><a href="http://isnd.be/claroline" target="_blank"><img src="images/clarolineIco.png" alt="Cc"> Claroline</a></li>
+			<li>
+				<a href="http://isnd.be/claroline" target="_blank">
+					<img src="images/clarolineIco.png" alt="Cc"> Claroline</a>
+			</li>
 			{/If}
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">
 
 			<li class="dropdown">
-				<a href="#" data-toggle="dropdown"> <span id="leNom">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b></a>
+				<a href="#" data-toggle="dropdown">
+					<span id="leNom">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b></a>
 				<ul class="dropdown-menu">
-					<li><a href="index.php?action=logoff"><span class="glyphicon glyphicon-off">&nbsp;</span>Se déconnecter</a></li>
+					<li>
+						<a href="index.php?action=logoff">
+							<span class="glyphicon glyphicon-off">&nbsp;</span>Se déconnecter</a>
+					</li>
 				</ul>
 			</li>
 
 		</ul>
 
-	</div>  <!-- #barreNavigation -->
+	</div>
+	<!-- #barreNavigation -->
 
 </nav>

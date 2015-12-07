@@ -1,4 +1,3 @@
 <?php
 
-$smarty->assign('corpsPage','default');
-?>
+$smarty->assign('corpsPage', 'default');

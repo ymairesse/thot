@@ -6,13 +6,13 @@
 
         <div class="col-md-4 col-sm-12">
 
-             <div class="input-group">
+            <div class="input-group">
                 <label for="Formule"></label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
                 <select name="formule" id="formule" class="inputHelp form-control">
                     <option value="">Formule d'appel</option>
-                    <option value="Mme"{if $identite.formule=='Mme'} selected{/if}>Madame</option>
-                    <option value="M."{if $identite.formule=='M.'} selected{/if}>Monsieur</option>
+                    <option value="Mme" {if $identite.formule=='Mme' } selected{/if}>Madame</option>
+                    <option value="M." {if $identite.formule=='M.' } selected{/if}>Monsieur</option>
                 </select>
             </div>
 
@@ -44,32 +44,31 @@
             <div class="input-group">
                 <label for="lien" class="sr-only">Lien de parenté</label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-				<input  type="text" name="lien" id="lien" maxlength="20" value="{$identite.lien}" placeholder="Lien de parenté" class="inputHelp form-control">
-				<div class="input-group-btn">
-				    <button aria-expanded="false" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-					    Choisir <span class="caret"></span>
-				    </button>
-    				<ul class="dropdown-menu pull-right" id="choixLien">
-    					<li><a href="javascript:void(0)" data-value="Mère">Mère</a></li>
+                <input type="text" name="lien" id="lien" maxlength="20" value="{$identite.lien}" placeholder="Lien de parenté" class="inputHelp form-control">
+                <div class="input-group-btn">
+                    <button aria-expanded="false" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Choisir
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu pull-right" id="choixLien">
+                        <li><a href="javascript:void(0)" data-value="Mère">Mère</a></li>
                         <li><a href="javascript:void(0)" data-value="Père">Père</a></li>
-    					<li><a href="javascript:void(0)" data-value="Autre (merci de préciser)">Autre</a></li>
-    				</ul>
-	    		</div>
-    		</div>
+                        <li><a href="javascript:void(0)" data-value="Autre (merci de préciser)">Autre</a></li>
+                    </ul>
+                </div>
+            </div>
 
             <div class="input-group">
                 <label for="passwd" class="sr-only"></label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="password" name="passwd" id="passwd" value="" maxlength="20" placeholder="Mot de passe souhaité"
-                    class="inputHelp form-control goodPwd">
+                <input type="password" name="passwd" id="passwd" value="" maxlength="20" placeholder="Mot de passe souhaité" class="inputHelp form-control goodPwd">
                 <p class="help-block">Laisser vide si vous ne souhaitez pas le modifier</p>
             </div>
 
             <div class="input-group">
                 <label for="password2" class="sr-only"></label>
                 <span class="input-group-addon"><i class="fa fa-info-circle fa-lg fa-help"></i></span>
-                <input type="password" name="passwd2" id="passwd2" value="" maxlength="20" placeholder="Veuillez répéter le mot de passe"
-                    class="inputHelp form-control ">
+                <input type="password" name="passwd2" id="passwd2" value="" maxlength="20" placeholder="Veuillez répéter le mot de passe" class="inputHelp form-control ">
                 <p class="help-block">Laisser vide si vous ne souhaitez pas le modifier</p>
             </div>
 
@@ -81,15 +80,18 @@
             <input type="hidden" name="matricule" value="{$identite.matricule}">
             <input type="hidden" name="action" value="{$action}">
             <input type="hidden" name="mode" value="editProfil">
-        </div> <!-- col-md-... -->
+        </div>
+        <!-- col-md-... -->
 
         <div class="col-md-8 col-sm-12">
 
             {include file="parents/profileHelp.tpl"}
 
-        </div>  <!-- div-md-... -->
+        </div>
+        <!-- div-md-... -->
 
-    </div>  <!-- row -->
+    </div>
+    <!-- row -->
 
 </form>
 
@@ -112,9 +114,12 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Fermer cette fenêtre</button>
             </div>
 
-        </div>  <!-- modal-content  -->
-    </div>  <!-- modal-dialog -->
-</div>  <!-- motifRefus -->
+        </div>
+        <!-- modal-content  -->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- motifRefus -->
 
 <script type="text/javascript">
     $("#motifRefus").modal('show');
@@ -123,12 +128,12 @@
 {/if}
 
 <script type="text/javascript">
-
     function countLettres(chaine) {
-        return (chaine.match(/[a-zA-Z]/g) == null)?0:chaine.match(/[a-zA-Z]/g).length;
-        }
+        return (chaine.match(/[a-zA-Z]/g) == null) ? 0 : chaine.match(/[a-zA-Z]/g).length;
+    }
+
     function countChiffres(chaine) {
-        return (chaine.match(/[0-9]/g) == null)?0:chaine.match(/[0-9]/g).length;
+        return (chaine.match(/[0-9]/g) == null) ? 0 : chaine.match(/[0-9]/g).length;
     }
 
     jQuery.validator.addMethod('goodPwd', function(value, element) {
@@ -136,74 +141,74 @@
         var condLength = (value.length >= 9);
         // validation 2 chiffres min
         var condChiffres = (countChiffres(value) >= 2)
-        // validation 2 lettres min
+            // validation 2 lettres min
         var condLettres = (countLettres(value) >= 2)
 
         var testOK = (condLength && condChiffres && condLettres);
         return this.optional(element) || testOK;
-        }, "Complexité insuffisante");
+    }, "Complexité insuffisante");
 
 
-$(document).ready(function(){
+    $(document).ready(function() {
 
-    $(".help").hide();
-    $(".fa-help").css('cursor','pointer');
-
-    $(".inputHelp").focus(function(){
-        var id=$(this).attr('id');
         $(".help").hide();
-        $("#texte_"+id).fadeIn();
-    })
+        $(".fa-help").css('cursor', 'pointer');
 
-    $(".inputHelp").blur(function(){
-        $(".help").hide();
-    })
-
-    $(".fa-help").hover(function(){
-        var id=$(this).closest('.input-group').find('.inputHelp').attr('id');
-        $(".help").hide();
-        $("#texte_"+id).fadeIn();
-    })
-
-    $("#choixLien li a").click(function(){
-        $("#lien").val($(this).data('value'));
-        $("#lien").select();
+        $(".inputHelp").focus(function() {
+            var id = $(this).attr('id');
+            $(".help").hide();
+            $("#texte_" + id).fadeIn();
         })
 
-    $("#parent").validate({
-      rules: {
-        formule: {
-            required: true
-            },
-        nom: {
-            required:true
-            },
-        prenom: {
-            required: true
-            },
-        userName: {
-            required: true
-            },
-        mail: {
-            required: true,
-            email: true
-            },
-        lien: {
-            required: true
-            },
-        passwd: {
-            goodPwd:true
-            },
-        passwd2: {
-            equalTo: "#passwd"
-            }
-        },
-        messages: {
-            lien: {
-                maxlength: 'Veuillez préciser s.v.p.'
-            }
-        }
-    });
+        $(".inputHelp").blur(function() {
+            $(".help").hide();
+        })
 
-})
+        $(".fa-help").hover(function() {
+            var id = $(this).closest('.input-group').find('.inputHelp').attr('id');
+            $(".help").hide();
+            $("#texte_" + id).fadeIn();
+        })
+
+        $("#choixLien li a").click(function() {
+            $("#lien").val($(this).data('value'));
+            $("#lien").select();
+        })
+
+        $("#parent").validate({
+            rules: {
+                formule: {
+                    required: true
+                },
+                nom: {
+                    required: true
+                },
+                prenom: {
+                    required: true
+                },
+                userName: {
+                    required: true
+                },
+                mail: {
+                    required: true,
+                    email: true
+                },
+                lien: {
+                    required: true
+                },
+                passwd: {
+                    goodPwd: true
+                },
+                passwd2: {
+                    equalTo: "#passwd"
+                }
+            },
+            messages: {
+                lien: {
+                    maxlength: 'Veuillez préciser s.v.p.'
+                }
+            }
+        });
+
+    })
 </script>

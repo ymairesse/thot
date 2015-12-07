@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-	<title>{$titre}</title>
+	<title>{$TITREGENERAL}</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -15,58 +16,46 @@
 	<script type="text/javascript" src="../bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../js/jquery.validate.js"></script>
 </head>
+
 <body>
 	<div class="container">
 
-		{include file="templates/entete.tpl"}
-
-		{* include file="menu.tpl" *}
-
-		{if isset($selecteur)}
-			{include file="$selecteur.tpl"}
-		{/if}
-
-		{if (isset($message))}
+		{include file="templates/entete.tpl"} {* include file="menu.tpl" *} {if isset($selecteur)} {include file="$selecteur.tpl"} {/if} {if (isset($message))}
 		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">
 			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 			<h4>{$message.title}</h4>
 			<p>{$message.texte}</p>
 		</div>
-		{/if}
-
-		{* La valeur de $corpsPage est définie dans index.php ou les sous-modules php *}
+		{/if} {* La valeur de $corpsPage est définie dans index.php ou les sous-modules php *}
 		<div id="corpsPage">
-		{if isset($corpsPage)}
-			{include file="$corpsPage.tpl"}
-		{/if}
+			{if isset($corpsPage)} {include file="$corpsPage.tpl"} {/if}
 		</div>
 
-	</div>  <!-- container -->
+	</div>
+	<!-- container -->
 
-{include file="../../templates/footer.tpl"}
+	{include file="../../templates/footer.tpl"}
 
-<script type="text/javascript">
+	<script type="text/javascript">
+		window.setTimeout(function() {
+			$(".auto-fadeOut").fadeTo(500, 0).slideUp(500, function() {
+				$(this).remove();
+			});
+		}, 3000);
 
-window.setTimeout(function() {
-	$(".auto-fadeOut").fadeTo(500, 0).slideUp(500, function(){
-		$(this).remove();
-		});
-	}, 3000);
+		$(document).ready(function() {
 
-$(document).ready (function() {
+			$("input:enabled").eq(0).focus();
 
-	$("input:enabled").eq(0).focus();
+			$("*[title]").tooltip();
 
-	$("*[title]").tooltip();
+			$(".pop").popover({
+				trigger: 'hover'
+			});
 
-	$(".pop").popover({
-		trigger:'hover'
-		});
-
-})
-
-</script>
+		})
+	</script>
 
 </body>
 

@@ -1,9 +1,9 @@
-<h3>Aujourd'hui le {$smarty.now|date_format:'%d/%m	'}, Joyeux Anniversaire à</h3>
+<h3>Aujourd'hui le {$smarty.now|date_format:'%d/%m '}, Joyeux Anniversaire à</h3>
 {if $anniversaires|@count > 0}
 <ul>
-{foreach from=$anniversaires key=matricule item=unEleve}
+	{foreach from=$anniversaires key=matricule item=unEleve}
 	<li class="anniversaire">{$unEleve.nomPrenom} [{$unEleve.groupe}]</li>
-{/foreach}
+	{/foreach}
 </ul>
 {else}
 <p>Pas d'anniversaire aujourd'hui ;o(</p>

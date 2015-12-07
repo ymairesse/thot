@@ -2,11 +2,13 @@
 
 <div class="col-md-9 col-sm-6">
 
-{if isset($motifRefus)}
+    {if isset($motifRefus)}
 
     <p>Malgré tous nos efforts, il n'a pas été possible de vous identifier.</p>
     <p>La raison est la suivante:</p>
-    <p><strong>{$motifRefus}</strong></p>
+    <p>
+        <strong>{$motifRefus}</strong>
+    </p>
 
     <p>Conseils:</p>
     <ul>
@@ -17,7 +19,7 @@
     <p>En cas de problème persistant, contactez <a href="mailto:{$MAILADMIN}">{$MAILADMIN}</a></p>
 
     <p class="pull-right">Pour retourner à la page d'accueil, <a href="../index.php">Cliquez ici</a>.</p>
-    
+
     {else}
 
     <p>Un mail vient d'être envoyé à votre adresse <a href="mailot:{$identite.mail}">{$identite.mail}</a> (cette adresse est-elle correcte?). Si vous ne recevez pas ce mail, vérifiez dans les "Indésirables".</p>
@@ -26,9 +28,10 @@
     <p>En cas de problème persistant, contactez <a href="mailto:{$MAILADMIN}">{$MAILADMIN}</a></p>
 
     <p class="pull-right">Pour retourner à la page d'accueil, <a href="../index.php">Cliquez ici</a>.</p>
-{/if}
+    {/if}
 
-</div>  <!-- col-md-...-->
+</div>
+<!-- col-md-...-->
 
 <div class="col-md-3 col-sm-6">
     <img src="../images/hautThot.png" alt="Thot">

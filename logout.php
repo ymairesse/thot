@@ -7,13 +7,13 @@ session_destroy();
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Déconnexion</title>
 	<link type="text/css" rel="stylesheet" media="all" href="screen.css">
-	<link type="text/css" rel="stylesheet" media="screen" href="js/blockUI.css">	
+	<link type="text/css" rel="stylesheet" media="screen" href="js/blockUI.css">
 	<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 
 <script type="text/javascript">
 
-	window.location = "index.php";  
+	window.location = "index.php";
 
 </script>
 </head>

@@ -1,28 +1,31 @@
 <?php
 
-class chrono {
+class chrono
+{
+    public $ini;
 
-    var $ini;
-
-    function __construct() {
+    public function __construct()
+    {
         $this->start();
     }
 
-    function getMicrotime(){
-		$temps = explode(' ', microtime());
-		return $temps[0]+$temps[1];
+    public function getMicrotime()
+    {
+        $temps = explode(' ', microtime());
+
+        return $temps[0] + $temps[1];
     }
 
-    function start() {
-		$this->ini = $this->getMicrotime();
+    public function start()
+    {
+        $this->ini = $this->getMicrotime();
     }
 
-    function stop() {
+    public function stop()
+    {
         $temps = $this->getMicrotime();
-        $this->duree  = $temps - $this->ini;
+        $this->duree = $temps - $this->ini;
+
         return $this->duree;
     }
-
 }
-
-?>

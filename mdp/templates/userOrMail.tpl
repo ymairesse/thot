@@ -4,13 +4,17 @@
 
     <form name="mdp" role="form" style="margin-bottom: 2em">
         <p>Choisissez l'option qui convient</p>
-        <input id="nonInscrit" class="mdp" type="checkbox" name="radio1"> <label for="nonInscrit">Je n'ai pas encore été inscrit-e sur la plate-forme</label><br>
-        <input id="oubli" class="mdp" type="checkbox" name="radio1"> <label for="oubli">Je suis inscrit-e, mais j'ai un trou de mémoire</label>
+        <input id="nonInscrit" class="mdp" type="checkbox" name="radio1">
+        <label for="nonInscrit">Je n'ai pas encore été inscrit-e sur la plate-forme</label>
+        <br>
+        <input id="oubli" class="mdp" type="checkbox" name="radio1">
+        <label for="oubli">Je suis inscrit-e, mais j'ai un trou de mémoire</label>
     </form>
 
     <p class="pull-right">Pour retourner à la page d'accueil, <a href="../index.php">Cliquez ici</a>.</p>
 
-</div>  <!--col-md-... -->
+</div>
+<!--col-md-... -->
 
 <div class="col-md-3 col-sm-6">
     <img src="../images/hautThot.png" alt="Thot">
@@ -32,9 +36,11 @@
             <p>donnés lors de votres inscription.</p>
             <p>Si vous avez aussi oublié ces informations, votre enfant peut les trouver dans la section "élèves" de la plate-forme. Mais elle/il ne peut pas changer ou connaître votre mot de passe.</p>
 
-        </div>  <!-- alert-info -->
+        </div>
+        <!-- alert-info -->
 
-    </div>  <!-- col-md-... -->
+    </div>
+    <!-- col-md-... -->
 
     <div class="col-md-6 col-sm-12">
         <h4>Obtenir le lien pour changer mon mot de passe</h4>
@@ -48,7 +54,8 @@
 
             <div class="input-group">
                 <label for="userName" class="sr-only">Nom d'utilisateur</label>
-                OU <input type="text" name="userName" id="userName" value="" placeholder="Nom d'utilisateur" class="form-control">
+                OU
+                <input type="text" name="userName" id="userName" value="" placeholder="Nom d'utilisateur" class="form-control">
                 <div class="help-block">N'oubliez pas les 4 chiffres pour terminer</div>
             </div>
 
@@ -58,9 +65,11 @@
 
         </form>
 
-    </div>  <!-- col-md-... -->
+    </div>
+    <!-- col-md-... -->
 
-</div>  <!-- row -->
+</div>
+<!-- row -->
 
 <div class="row blabla" id="row_nonInscrit" style="display: none">
 
@@ -68,68 +77,68 @@
 
         <div class="alert alert-danger fade in" id="alert_nonInscrit">
             <h4><i class="fa fa-warning fa-lg"></i> Vous n'avez jamais été inscrit sur la plate-forme Thot?</h4>
-            <p>Si vous n'avez jamais été inscrit-e <strong>sur la plate-forme Thot</strong>, demandez à votre enfant de réaliser l'inscription dans la section "élèves" (menu "Parents").</p>
+            <p>Si vous n'avez jamais été inscrit-e
+                <strong>sur la plate-forme Thot</strong>, demandez à votre enfant de réaliser l'inscription dans la section "élèves" (menu "Parents").</p>
             <p>Pour y entrer, elle/il utilisera son propre nom d'utilisateur et son propre mot de passe fournis au début de l'année scolaire.</p>
         </div>
 
-    </div> <!-- col-md-... -->
+    </div>
+    <!-- col-md-... -->
 
     <div class="col-md-6 col-sm-12">
         <!-- vide -->
     </div>
 
-</div>  <!-- row -->
+</div>
+<!-- row -->
 
 <script type="text/javascript">
+    $(document).ready(function() {
 
-$(document).ready(function(){
-
-    $('.mdp').click(function(){
-        $(".mdp").not(this).attr('checked',false);
-        var id=$(this).attr('id');
-        $(".blabla").hide();
-        $("#row_"+id).show();
-    })
+        $('.mdp').click(function() {
+            $(".mdp").not(this).attr('checked', false);
+            var id = $(this).attr('id');
+            $(".blabla").hide();
+            $("#row_" + id).show();
+        })
 
 
-    $("#mail").keydown(function(e){
-        var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
-        if (key >=32 )
-            $("#userName").val('');
-    })
+        $("#mail").keydown(function(e) {
+            var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+            if (key >= 32)
+                $("#userName").val('');
+        })
 
-    $("#userName").keydown(function(e){
-        var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
-        if (key >=32 )
-            $("#mail").val('');
-    })
+        $("#userName").keydown(function(e) {
+            var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+            if (key >= 32)
+                $("#mail").val('');
+        })
 
-    // $("#userOrMail").validate({
-    //     rules: {
-    //         mail: {
-    //             email: true
-    //         }
-    //     }
-    // });
+        // $("#userOrMail").validate({
+        //     rules: {
+        //         mail: {
+        //             email: true
+        //         }
+        //     }
+        // });
 
-    $("#userOrMail").validate({
-        rules: {
-            mail: {
-                required: function(element) {
-                    return ($("#userName").val()== '');
+        $("#userOrMail").validate({
+            rules: {
+                mail: {
+                    required: function(element) {
+                        return ($("#userName").val() == '');
+                    },
+                    email: true
                 },
-                email: true
-            },
-            userName: {
-                required: function(element) {
-                    return ($("#mail").val()== '');
+                userName: {
+                    required: function(element) {
+                        return ($("#mail").val() == '');
+                    }
                 }
             }
-        }
+
+        })
 
     })
-
-})
-
-
 </script>
