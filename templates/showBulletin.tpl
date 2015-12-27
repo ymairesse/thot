@@ -98,7 +98,7 @@
 					<th style="vertical-align:bottom; text-align:center;">Attitudes</th>
 					{foreach from=$attitudes.$noBulletin.$matricule key=coursGrp item=uneBranche}
 					<th>
-						<img src="imagesCours/{$uneBranche.cours}.png" alt="{$cours}">
+						<img src="imagesCours/{$uneBranche.cours}.png" alt="{$uneBranche.cours}">
 					</th>
 					{/foreach}
 				</tr>
