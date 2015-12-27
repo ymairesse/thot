@@ -42,16 +42,21 @@
 
             <div class="row">
 
-                <div class="col-md-10">
+                <div class="col-md-8">
 
                     <select name="acronyme" id="acronyme" class="form-control fa-select">
                         <option value="">Veuillez choisir le destinataire</option>
-                        {foreach from=$listeProfs key=acronyme item=data}
+                        {foreach from=$listeProfs key=coursGrp item=data}
+                        {assign var=acronyme value=$data.acronyme}
                         <option value="{$acronyme}">
                             {if in_array($acronyme,array_keys($titus))}&#xf19d;&nbsp;&nbsp;{else}&#xf007;&nbsp;&nbsp;{/if}{$data.adresse} {$data.prenom} {$data.nom} -> {$data.libelle} {$data.nbheures}h
                         </option>
                         {/foreach}
                     </select>
+                </div>
+
+                <div class="col-md-2">
+                    <i class="fa fa-graduation-cap"></i> Titulaire
                 </div>
 
                 <div class="col-md-2">

@@ -660,26 +660,25 @@ class Bulletin
             $listeCoursGrpString = "'".$listeCoursGrp."'";
         }
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT pc.acronyme, sexe, nom, prenom, libelle, nbheures ';
+        $sql = 'SELECT pc.acronyme, sexe, nom, prenom, coursGrp, libelle, nbheures ';
         $sql .= 'FROM '.PFX.'profsCours AS pc ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = pc.acronyme ';
         $sql .= 'JOIN '.PFX."cours AS dc ON dc.cours = SUBSTR(coursGrp,1,LOCATE('-',coursGrp)-1) ";
         $sql .= "WHERE coursGrp IN ($listeCoursGrpString) ";
-        $sql .= 'ORDER BY libelle, nom ';
+        $sql .= 'ORDER BY nbheures DESC, libelle, nom ';
         $resultat = $connexion->query($sql);
         $liste = array();
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
-                $acronyme = $ligne['acronyme'];
+                $coursGrp = $ligne['coursGrp'];
                 $sexe = $ligne['sexe'];
                 $ligne['prenom'] = substr($ligne['prenom'], 0, 1).'. ';
                 $ligne['adresse'] = ($sexe == 'M') ? 'M. ' : 'Mme';
-                $liste[$acronyme] = $ligne;
+                $liste[$coursGrp] = $ligne;
             }
         }
         Application::DeconnexionPDO($connexion);
-
         return $liste;
     }
 

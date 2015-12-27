@@ -1,5 +1,4 @@
 <?php
-
 switch ($mode) {
     case 'envoyer':
         $acronyme = isset($_POST['acronyme']) ? $_POST['acronyme'] : null;
@@ -77,7 +76,6 @@ foreach ($listeCours as $cours => $data) {
     $coursGrp = $data[$matricule]['coursGrp'];
     $listeCoursGrp[$coursGrp] = $coursGrp;
 }
-
 $smarty->assign('titus', $titus);
 
 $user = (array) $User->getIdentite();

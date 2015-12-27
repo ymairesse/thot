@@ -29,7 +29,7 @@ class user
      */
     public function setIdentite($userType)
     {
-        $userName = $this->userName;
+        $userName = addslashes($this->userName);
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         switch ($userType) {
             case 'eleves':
@@ -50,8 +50,10 @@ class user
                 break;
         }
         $resultat = $connexion->query($sql);
-        $resultat->setFetchMode(PDO::FETCH_ASSOC);
-        $this->identite = $resultat->fetch();
+        if ($resultat) {
+            $resultat->setFetchMode(PDO::FETCH_ASSOC);
+            $this->identite = $resultat->fetch();
+            }
         Application::DeconnexionPDO($connexion);
     }
 
@@ -282,15 +284,19 @@ class user
         $userName = $user->getuserName();
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'INSERT INTO '.PFX.'thotLogins ';
-        $sql .= "SET user='$userName', date='$date', heure='$heure', ip='$ip', host='$hostname'";
-        $n = $connexion->exec($sql);
+        $sql .= "SET user=:userName, date='$date', heure='$heure', ip='$ip', host=:hostname ";
+        $requete = $connexion->prepare($sql);
+        $data = array(':userName'=>$userName, ':hostname'=>$hostname);
+        $n = $requete->execute($data);
 
         // indiquer une session ouverte depuis l'adresse IP correspondante
         $sql = 'INSERT INTO '.PFX.'thotSessions ';
-        $sql .= "SET user='$userName', ip='$ip' ";
+        $sql .= "SET user=:userName, ip='$ip' ";
         $sql .= "ON DUPLICATE KEY UPDATE ip='$ip' ";
+        $requete2 = $connexion->prepare($sql);
 
-        $n = $connexion->exec($sql);
+        $data = array(':userName'=>$userName);
+        $n = $requete2->execute($data);
         Application::DeconnexionPDO($connexion);
 
         return $n;
