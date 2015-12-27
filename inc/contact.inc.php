@@ -24,8 +24,8 @@ switch ($mode) {
             $mailParent = new PHPmailer();
             $mailParent->IsHTML(true);
             $mailParent->CharSet = 'UTF-8';
-            $mailParent->From = $User->getMail();
-            $mailParent->FromName = $User->getNom();
+            $mailParent->From = NOANSWER;
+            $mailParent->FromName = NAMENOANSWER;
             $mailParent->AddAddress($User->getMail());
             $mailParent->Subject = $objet;
             $avertissement = file_get_contents('templates/contact/avertissementMail.tpl');
