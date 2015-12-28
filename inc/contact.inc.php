@@ -1,4 +1,5 @@
 <?php
+
 switch ($mode) {
     case 'envoyer':
         $acronyme = isset($_POST['acronyme']) ? $_POST['acronyme'] : null;

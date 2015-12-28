@@ -46,8 +46,9 @@
 
                     <select name="acronyme" id="acronyme" class="form-control fa-select">
                         <option value="">Veuillez choisir le destinataire</option>
-                        {foreach from=$listeProfs key=coursGrp item=data}
+                        {foreach from=$listeProfs item=data}
                         {assign var=acronyme value=$data.acronyme}
+                        {assign var=coursGrp value=$data.coursGrp}
                         <option value="{$acronyme}">
                             {if in_array($acronyme,array_keys($titus))}&#xf19d;&nbsp;&nbsp;{else}&#xf007;&nbsp;&nbsp;{/if}{$data.adresse} {$data.prenom} {$data.nom} -> {$data.libelle} {$data.nbheures}h
                         </option>

@@ -668,6 +668,7 @@ class Bulletin
         $sql .= 'ORDER BY nbheures DESC, libelle, nom ';
         $resultat = $connexion->query($sql);
         $liste = array();
+        $i = 0;
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
@@ -675,7 +676,8 @@ class Bulletin
                 $sexe = $ligne['sexe'];
                 $ligne['prenom'] = substr($ligne['prenom'], 0, 1).'. ';
                 $ligne['adresse'] = ($sexe == 'M') ? 'M. ' : 'Mme';
-                $liste[$coursGrp] = $ligne;
+                $liste[$i] = $ligne;
+                $i++;
             }
         }
         Application::DeconnexionPDO($connexion);
