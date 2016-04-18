@@ -19,7 +19,8 @@
 <body>
 	<div class="container">
 
-		{include file="entete.tpl"} {if (isset($message) && $message == 'faux')}
+		{include file="entete.tpl"}
+		{if (isset($message) && $message == 'faux')}
 		<div class="alert alert-dismissable alert-danger">
 			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 			<p>Nom d'utilisateur ou mot de passe incorrect</p>
@@ -31,7 +32,9 @@
 
 			<div class="panel-group" id="accordion">
 
-				{include file="accueil/panel1.tpl"} {include file="accueil/panel2.tpl"} {include file="accueil/panel3.tpl"}
+				{include file="accueil/panel1.tpl"}
+				{include file="accueil/panel2.tpl"}
+				{include file="accueil/panel3.tpl"}
 
 			</div>
 			<!-- panel-group -->

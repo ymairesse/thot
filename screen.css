@@ -1,5 +1,8 @@
 body {
     background-color: #FED57B;
+    background: url('images/background.jpg') no-repeat;
+    background-size: cover;
+    padding-top: 2em;
 }
 .container {
     background-color: #eed;
@@ -263,4 +266,48 @@ p.event-inverse, a.event-inverse {
 .cat_7 {
     background: #fff !important;
     color: #000 !important;
+}
+
+.indisponible {
+    background-color: rgb(175, 175, 175)
+}
+
+.attente1 {
+    background-color: rgb(242, 193, 239)
+}
+.attente2 {
+    background-color: rgb(195, 230, 179)
+}
+.attente3 {
+    background-color: rgb(174, 218, 224)
+}
+
+.panel-info > .panel-heading  {
+    background-color: #99f !important;
+    border-color: #bce8f1;
+    color: #333 !important;
+}
+
+.panel-success > .panel-heading {
+    background-color: #9f9 !important;
+    border-color: #bce8f1;
+    color: #333 !important;
+}
+
+.panel-danger > .panel-heading {
+    background-color: #f99 !important;
+    border-color: #bce8f1;
+    color: #333 !important;
+}
+
+.statutSpecial {
+    background-color: #b0dce0;
+}
+
+.selected {
+	background: orange;
+}
+
+.wait * {
+    cursor: wait;
 }

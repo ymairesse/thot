@@ -38,6 +38,9 @@ switch ($action) {
     case 'contact':
         require_once 'inc/contact.inc.php';
         break;
+    case 'reunionParents':
+        require_once 'inc/reunionParents.inc.php';
+        break;
     case 'logoff':
         include_once 'logout.php';
         break;

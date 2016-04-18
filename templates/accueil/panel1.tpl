@@ -15,7 +15,7 @@
 
                 <fieldset>
                     <legend>Veuillez vous identifier</legend>
-                    <p>Cette plate-forme est strictement réservée aux élèves de l'<a href="http://secondaire.isnd.be" target="_blank">ISND</a> et leurs parents.</p>
+                    <!-- <p>Cette plate-forme est strictement réservée aux élèves de l'<a href="http://secondaire.isnd.be" target="_blank">ISND</a> et leurs parents.</p> -->
 
                     <div class="col-md-6 col-sm12" style="background: #afa; border: 2px solid white; padding-bottom:1em;">
 

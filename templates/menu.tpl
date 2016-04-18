@@ -28,13 +28,17 @@
 			{/if} {if $userType == 'parents'}
 			<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil</a></li>
 			<li><a href="index.php?action=contact"><i class="fa fa-pencil" style="color:#ff0000"></i> Contact</a></li>
-			{/if} {if $userType == 'eleves'}
+			<li><a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a></li>
+			{/if}
+<!--
+			{if $userType == 'eleves'}
 			<li><a href="http://mail.isnd-edu.be" target="_blank"><i class="fa fa-paper-plane"></i> Mails</a></li>
 			<li>
 				<a href="http://isnd.be/claroline" target="_blank">
 					<img src="images/clarolineIco.png" alt="Cc"> Claroline</a>
 			</li>
-			{/If}
+			{/if}
+-->
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">

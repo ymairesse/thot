@@ -13,6 +13,8 @@ $User = new User();
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
 
+
+
 // définition de la class Chrono
 require_once INSTALL_DIR.'/inc/classes/classChrono.inc.php';
 $chrono = new chrono();
@@ -21,7 +23,7 @@ $Application->Normalisation();
 
 require_once INSTALL_DIR.'/smarty/Smarty.class.php';
 $smarty = new Smarty();
-$smarty->assign('titre', TITREGENERAL);
+$smarty->assign('TITREGENERAL', TITREGENERAL);
 $smarty->assign('ECOLE', ECOLE);
 $smarty->assign('WEBECOLE', WEBECOLE);
 $smarty->assign('ADRESSEECOLE', ADRESSEECOLE);

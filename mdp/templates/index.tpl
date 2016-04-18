@@ -20,14 +20,20 @@
 <body>
 	<div class="container">
 
-		{include file="templates/entete.tpl"} {* include file="menu.tpl" *} {if isset($selecteur)} {include file="$selecteur.tpl"} {/if} {if (isset($message))}
+		{include file="templates/entete.tpl"}
+
+		{if isset($selecteur)}
+			{include file="$selecteur.tpl"}
+		{/if}
+		{if (isset($message))}
 		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">
 			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 			<h4>{$message.title}</h4>
 			<p>{$message.texte}</p>
 		</div>
-		{/if} {* La valeur de $corpsPage est définie dans index.php ou les sous-modules php *}
+		{/if}
+		{* La valeur de $corpsPage est définie dans index.php ou les sous-modules php *}
 		<div id="corpsPage">
 			{if isset($corpsPage)} {include file="$corpsPage.tpl"} {/if}
 		</div>

@@ -32,9 +32,9 @@
         <div id="collapse2" class="panel-collapse collapse">
             <div class="panel-body">
 
-                {if $listeParents|count
-                < 2} {include file="parents/formulaireParents.tpl" } {else} <p>Tu as déjà invité deux parents.</p>
-                    {/if}
+                {if $listeParents|count < 2}
+                    {include file="parents/formulaireParents.tpl" } {else} <p>Tu as déjà invité deux parents.</p>
+                {/if}
 
             </div>
         </div>
