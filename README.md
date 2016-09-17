@@ -10,9 +10,9 @@ En début de production, elle permet déjà:
 - aux enseignants / coordinateurs / direction de déposer des notifications dans l'interface web des élèves; ces notifications peuvent être adressées à un élève en particulier, à toute une classe, à tout un niveau d'étude, à tous les élèves
 - d'envoyer (ou pas) un avertissement par mail lors du dépôt d'une notification à un élève ou à une classe
 - de connaître les dates d'anniversaires du jour (parmi les élèves de l'école)
-
-L'application permettra bientôt:
 - l'accès au journal de classe en ligne contenant les activités de chaque cours et les travaux à effectuer
+- l'accès à des documents et des répertoires partagés par les professeurs et les éducateurs
 - la consultation par les parents de l'élève
+- l'inscription aux réunions de parents par les parents de l'élève
 
 VERSION ALPHA 0.001 en cours de construction
