@@ -20,6 +20,9 @@ switch ($action) {
     case 'annonces':
         require_once 'inc/annonces.inc.php';
         break;
+    case 'documents':
+        require_once 'inc/documents.inc.php';
+        break;
     case 'bulletin':
         require_once 'inc/bulletin.inc.php';
         break;
@@ -40,6 +43,9 @@ switch ($action) {
         break;
     case 'reunionParents':
         require_once 'inc/reunionParents.inc.php';
+        break;
+    case 'form':
+        require_once 'inc/formulaires.inc.php';
         break;
     case 'logoff':
         include_once 'logout.php';

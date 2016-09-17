@@ -6,7 +6,9 @@
         <table class="table table-condensed">
             <tr>
                 <th>Heure</th>
+                {if $typeRP == 'profs'}
                 <th>Cours</th>
+                {/if}
                 <th>Professeur</th>
                 <th>Demandé par</th>
                 <th>Local</th>
@@ -15,8 +17,11 @@
             {foreach from=$listeRV key=heure item=unRV}
             <tr>
                 <td>{$unRV.heure}</td>
-                {assign var=acronyme value=$unRV.acronyme} {assign var=sexe value=$listeEncadrement.$acronyme.sexe}
+                {assign var=acronyme value=$unRV.acronyme}
+                {assign var=sexe value=$listeEncadrement.$acronyme.sexe}
+                {if $typeRP == 'profs'}
                 <td>{$listeEncadrement.$acronyme.libelle}</td>
+                {/if}
                 <td>{if $sexe == 'F'}Mme{else}M.{/if} {$listeEncadrement.$acronyme.prenom} {$listeEncadrement.$acronyme.nom}</td>
                 <td>{if $unRV.userParent != Null}{$unRV.formule} {$unRV.prenomParent} {$unRV.nomParent}{else} - {/if}</td>
                 <td>{$unRV.local|default:'???'}</td>

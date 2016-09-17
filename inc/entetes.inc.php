@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config.inc.php';
+// require_once INSTALL_DIR.'/config.inc.php';
 
 // définition de la class Application, y compris la lecture de config.ini
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';

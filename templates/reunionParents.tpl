@@ -29,11 +29,15 @@
 
     </div>
 
-    {include file="reunionParents/panneauListeRV.tpl"} {include file="reunionParents/panneauListeAttente.tpl"} {else}
+    {include file="reunionParents/panneauListeRV.tpl"}
+    {include file="reunionParents/panneauListeAttente.tpl"}
+
+    {else}
 
     <div class="panel panel-info">
+
         <div class="panel-heading">
-            <h3 class="panel-title">Prochaine réunion de parent</h3>
+            <h3 class="panel-title">Prochaine réunion de parents</h3>
         </div>
         <div class="panel-body">
             <p>Le formulaire d'inscription à la prochaine réunion de parents est généralement disponible trois à quatre semaines avant la date de la réunion de parents.</p>
@@ -50,29 +54,16 @@
 <div class="col-md-5 col-sm-12">
 
     {if ($ACTIVE == 1) && ($OUVERT == 1) }
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-thumbs-up"></i> Je souhaite un RV avec le professeur suivant</h3>
-        </div>
-        <div class="panel-body">
-            {include file="reunionParents/selectRV.tpl"}
-        </div>
-        <div class="panel-footer">
-            Si le professeur n'est pas disponible, veuillez éventuellement vous inscrire en liste d'attente, ci-dessous.
-        </div>
-    </div>
 
-    <div class="panel panel-success">
-        <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-calendar"></i> Je m'inscris en liste d'attente (professeur indisponible)</h3>
-        </div>
-        <div class="panel-body">
-            {include file="reunionParents/selectAttente.tpl"}
-        </div>
-        <div class="panel-footer">
+        {if $typeRP == 'profs'}
 
-        </div>
-    </div>
+            {include file='reunionParents/selectRVRpProfs.tpl'}
+
+        {else}
+
+            {include file='reunionParents/selectRVRpTitus.tpl'}
+
+        {/if}
 
     {else}
 
@@ -89,7 +80,11 @@
     {/if}
 </div>
 
-{include file="reunionParents/modalRV.tpl"} {include file="reunionParents/modalAttente.tpl"} {include file="reunionParents/modalDelRv.tpl"} {include file="reunionParents/modalDelAttente.tpl"} {include file="reunionParents/modalPrintRV.tpl"}
+{include file="reunionParents/modalRV.tpl"}
+{include file="reunionParents/modalAttente.tpl"}
+{include file="reunionParents/modalDelRv.tpl"}
+{include file="reunionParents/modalDelAttente.tpl"}
+{include file="reunionParents/modalPrintRV.tpl"}
 
 <script type="text/javascript">
     $(document).ready(function() {

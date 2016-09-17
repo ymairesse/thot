@@ -21,6 +21,22 @@ class Application
         foreach ($constantes as $key => $value) {
             define("$key", $value);
         }
+
+        // lecture dans la table PFX."config" de la BD
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT parametre,valeur ';
+        $sql .= 'FROM '.PFX.'config ';
+        $resultat = $connexion->query($sql);
+        if ($resultat) {
+            while ($ligne = $resultat->fetch()) {
+                $key = $ligne['parametre'];
+                $valeur = $ligne['valeur'];
+                define("$key", $valeur);
+            }
+        } else {
+            die('config table not present');
+        }
+        self::DeconnexionPDO($connexion);
     }
 
     /**
@@ -273,13 +289,13 @@ class Application
     {
         switch ($userType) {
             case 'eleves':
-                $permis = array('bulletin', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact');
+                $permis = array('bulletin', 'documents', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
             case 'parents':
-                $permis = array('bulletin', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents');
+                $permis = array('bulletin', 'documents', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -372,6 +388,37 @@ class Application
                     $liste[$coursGrp] = PROFNONDESIGNE;
                 }
             }
+
+        return $liste;
+    }
+
+    /**
+     * retourne la liste des profs titulaires pour un élève dont on fourni le matricule.
+     *
+     * @param $matricule
+     *
+     * @return array
+     */
+    public function listeTitulaires($matricule)
+    {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT DISTINCT dt.acronyme, dt.classe, dp.nom, dp.prenom, dp.sexe ';
+        $sql .= 'FROM '.PFX.'eleves AS de ';
+        $sql .= 'LEFT JOIN '.PFX.'titus AS dt ON dt.classe = de.groupe ';
+        $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = dt.acronyme ';
+        $sql .= "WHERE matricule = '$matricule' ";
+        $sql .= 'ORDER BY nom, prenom ';
+
+        $liste = array();
+        $resultat = $connexion->query($sql);
+        if ($resultat) {
+            $resultat->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $resultat->fetch()) {
+                $acronyme = $ligne['acronyme'];
+                $liste[$acronyme] = $ligne;
+            }
+        }
+        self::DeconnexionPDO($connexion);
 
         return $liste;
     }
@@ -1078,7 +1125,7 @@ class Application
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
                 $date = $ligne['date'];
-                $liste['date'] = $date;
+                $liste[$date] = $date;
             }
         }
 
@@ -1164,7 +1211,7 @@ class Application
         $sql .= 'FROM '.PFX.'thotRpAttente AS at ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = at.acronyme ';
         $sql .= 'LEFT JOIN '.PFX.'thotParents AS tp ON tp.userName = at.userName ';
-        $sql .= "WHERE date = '$date' AND at.matricule='$matricule' ";
+        $sql .= "WHERE date='$date' AND at.matricule='$matricule' ";
         $sql .= 'ORDER BY periode, acronyme ';
 
         $liste = array();
@@ -1424,7 +1471,7 @@ class Application
         $date = self::dateMysql($date);
         $heuresLimites = $this->heuresLimite($date);
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT rp.date, ouvert, active, notice, ';
+        $sql = 'SELECT rp.date, ouvert, active, notice, typeRP, ';
         $sql .= "DATE_FORMAT(minPer1,'%H:%i') AS minPer1, DATE_FORMAT(maxPer1,'%H:%i') AS maxPer1, ";
         $sql .= "DATE_FORMAT(minPer2,'%H:%i') AS minPer2, DATE_FORMAT(maxPer2,'%H:%i') AS maxPer2, ";
         $sql .= "DATE_FORMAT(minPer3,'%H:%i') AS minPer3, DATE_FORMAT(maxPer3,'%H:%i') AS maxPer3 ";
@@ -1442,6 +1489,7 @@ class Application
         $tableau = array(
             'date' => $date,
             'heuresLimites' => $heuresLimites,
+            'typeRP' => $ligne['typeRP'],
             'generalites' => array('ouvert' => $ligne['ouvert'], 'active' => $ligne['active'], 'notice' => $ligne['notice']),
             'heures' => array(
                 'minPer1' => $ligne['minPer1'],
@@ -1567,7 +1615,6 @@ class Application
         $listeBrute = array();
         $resultat = $connexion->query($sql);
 
-        // Application::afficher($resultat);
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
@@ -1836,7 +1883,6 @@ class Application
 
 // Fonctions pour la gestion des RV hors des réunions de parents **************************
 
-
     /**
      * retourne les dates pour lesquelles un RV est encore possible avec le membre du personnel mentionné.
      *
@@ -2052,4 +2098,58 @@ class Application
         $connexion->exec($sql);
         self::deconnexionPDO($connexion);
     }
+
+    // fonctions pour la gestion des e-docs
+
+    /**
+    * retourne la liste des e-docs disponibles pour un élève dont on fournit le matricules
+    * @param $matricule
+    *
+    * @return array
+    */
+    public function listeEdocs($matricule){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT matricule, edoc, date ';
+        $sql .= 'FROM '.PFX.'thotEdocs ';
+        $sql .= "WHERE matricule = '$matricule' ";
+
+        $liste = array();
+        $resultat = $connexion->query($sql);
+        if ($resultat) {
+            $resultat->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $resultat->fetch()) {
+                $matricule = $ligne['matricule'];
+                $edoc = $ligne['edoc'];
+                $date = $this->datePhp($ligne['date']);
+                $liste[$matricule][] = array('date'=>$date, 'doc'=>$edoc);
+                }
+        }
+        self::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+    * retourne la date déclarée pour un e-doc donné pour un élève donné
+    *
+    * @param $matricule
+    * @param $typeEdoc (pia, competences)
+    *
+    * @return string
+    */
+    public function getDocDate($matricule, $typeDoc){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT date FROM '.PFX.'thotEdocs ';
+        $sql .= "WHERE matricule='$matricule' AND edoc='$typeDoc' ";
+        $resultat = $connexion->query($sql);
+        $date = Null;
+        if ($resultat) {
+            $ligne = $resultat->fetch();
+            $date = $ligne['date'];
+        }
+        self::deconnexionPDO($connexion);
+
+        return self::datePHP($date);
+    }
+
 }

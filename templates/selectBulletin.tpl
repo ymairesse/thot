@@ -1,3 +1,4 @@
+{if isset($noBulletin)}
 <div class="selecteur">
 
 	<form name="selectBulletin" id="selectBulletin" action="index.php" method="POST" class="form-inline" role="form">
@@ -9,3 +10,4 @@
 	</form>
 
 </div>
+{/if}

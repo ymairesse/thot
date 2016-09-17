@@ -47,16 +47,7 @@ switch ($mode) {
         break;
 
     case 'sendMail':
-        // on va essayer de trouver l'identité sur base de l'adresse mail fournie
-        // si pas possible, on se basera sur le nom d'utilisateur fourni
-        $mail = isset($_POST['mail']) ? $_POST['mail'] : null;
-        $problemeMail = !($User->mailExists($mail));
-        // si on n'a pas trouvé l'adresse mail, on tente de trouver le userName éventuellement fourni
-        if ($problemeMail) {
-            $identite = $Application->verifUser($userName, 'userName');
-        } else {
-                $identite = $Application->verifUser($mail, 'mail');
-            }
+        $identite = $Application->verifUser($userName, 'userName');
 
         // cela peut toujours servir
         $smarty->assign('MAILADMIN', MAILADMIN);
@@ -69,12 +60,7 @@ switch ($mode) {
             // envoi effectif du mail
             $Application->mailPasswd($link, $identite, $User->identiteReseau());
         } else {
-                // génération du message adéquat selon la cause de l'erreur
-                if ($problemeMail) {
-                    $motifRefus = sprintf("L'adresse mail %s est inconnue.", $mail);
-                } else {
-                    $motifRefus = sprintf("Le nom d'utilisateur %s est inconnu.", $userName);
-                }
+                $motifRefus = sprintf("Le nom d'utilisateur %s est inconnu.", $userName);
                 $smarty->assign('motifRefus', $motifRefus);
             }
         $smarty->assign('corpsPage', 'sendMail');

@@ -21,16 +21,18 @@
 				<h4 class="modal-title">Accusé de lecture</h4>
 			</div>
 
-			<div class="modal-body">
+			<div class="modal-body" style="height:30em; overflow:auto;">
 				<p>Je confirme que j'ai lu l'annonce</p>
-				{foreach from=$listeAnnonces key=wtf item=sousListe} {foreach from=$sousListe key=id item=data}
-				<div class="resumes" id="annonce_{$id}">
-					<p>
-						<strong>Objet:</strong> {$data.objet}</p>
-					<p>
-						<strong>Texte:</strong> {$data.texte}</p>
-				</div>
-				{/foreach} {/foreach}
+				{foreach from=$listeAnnonces key=wtf item=sousListe}
+					{foreach from=$sousListe key=id item=data}
+					<div class="resumes" id="annonce_{$id}">
+						<p>
+							<strong>Objet:</strong> {$data.objet}</p>
+						<p>
+							<strong>Texte:</strong> {$data.texte}</p>
+					</div>
+					{/foreach}
+				{/foreach}
 			</div>
 
 			<div class="modal-footer">
@@ -99,7 +101,7 @@
 			$(".resumes").hide();
 			$("#annonce_" + id).show();
 			$("#confirmation").data("id", id);
-			$("#confirmation").data("type", type)
+			$("#confirmation").data("type", type);
 			$("#accuseLecture").modal('show');
 		})
 

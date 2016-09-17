@@ -12,8 +12,8 @@ $bulletinAccessible = $Bulletin->accesBulletin($matricule);
 if ($bulletinAccessible != 0) {
     $dernier = $bulletinAccessible;
 } else {
-        $dernier = 0;
-    }
+    $dernier = 0;
+}
 // quel est le bulletin demandé? Si rien demandé, on prend le dernier accessible par cet élève
 $noBulletin = isset($_POST['noBulletin']) ? $_POST['noBulletin'] : $dernier;
 
@@ -66,10 +66,10 @@ if (($noBulletin <= $dernier) && ($noBulletin >= 0) && ($matricule != '')) {
         $smarty->assign('corpsPage', 'showBulletin');
     }
 } else {
-            // POUR PARER À UNE TENTATIVE D'ACCES À UN BULLETIN NON PUBLIÉ ;O)
-        $smarty->assign('noBulletin', $dernier);
-            $smarty->assign('corpsPage', 'default');
-        }
+    // POUR PARER À UNE TENTATIVE D'ACCES À UN BULLETIN NON PUBLIÉ ;O)
+    $smarty->assign('noBulletin', $dernier);
+    $smarty->assign('corpsPage', 'default');
+}
 $smarty->assign('matricule', $matricule);
 $smarty->assign('DERNIERBULLETIN', $dernier);
 $smarty->assign('listeBulletins', range(0, $dernier));

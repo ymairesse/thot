@@ -1,13 +1,13 @@
 <?php
 
 require_once '../config.inc.php';
-session_start();
 
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
 
 // définition de la class USER utilisée en variable de SESSION
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
+session_start();
 $User = isset($_SESSION[APPLICATION]) ? unserialize($_SESSION[APPLICATION]) : null;
 
 $listeCoursEleve = $User->listeCoursEleve();
@@ -38,6 +38,7 @@ if ($resultat) {
             'className' => 'cat_'.$ligne['idCategorie'],
             'start' => $ligne['startDate'],
             'end' => $ligne['endDate'],
+            'allDay' => ($ligne['allDay'] != 0)
             );
     }
 }

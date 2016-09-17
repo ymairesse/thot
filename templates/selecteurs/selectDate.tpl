@@ -1,4 +1,3 @@
-
 <div id="selecteur" class="selecteur noprint" style="clear:both; {if ($listeDates|@count) <= 1}display:none;{/if}">
 
 	<form name="selecteur" id="formSelecteur" method="POST" action="index.php" role="form" class="form-inline">

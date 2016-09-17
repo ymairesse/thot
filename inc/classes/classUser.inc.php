@@ -53,7 +53,7 @@ class user
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             $this->identite = $resultat->fetch();
-            }
+        }
         Application::DeconnexionPDO($connexion);
     }
 
@@ -147,6 +147,32 @@ class user
     }
 
     /**
+     * Renvoie la liste des coursGrp suivis par l'utilisateur.
+     *
+     * @param void()
+     *
+     * @return array
+     */
+    public function listeCoursEleve()
+    {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $matricule = $this->getMatricule();
+        $sql = 'SELECT coursGrp FROM '.PFX.'elevesCours ';
+        $sql .= "WHERE matricule = '$matricule' ";
+        $resultat = $connexion->query($sql);
+        $liste = array();
+        if ($resultat) {
+            $resultat->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $resultat->fetch()) {
+                $liste[] = $ligne['coursGrp'];
+            }
+        }
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
      * fournit le mot de passe MD5 de l'utilisateur.
      *
      * @param
@@ -180,6 +206,32 @@ class user
     public function getUserType()
     {
         return $this->userType;
+    }
+
+    /**
+     * retourne toutes les informations concernant l'élève utilisateur (ou le parent).
+     *
+     * @param void()
+     *
+     * @return array
+     */
+    public function getTousDetailsEleve()
+    {
+        $matricule = $this->getMatricule();
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT * FROM '.PFX.'eleves ';
+        $sql .= "WHERE matricule = '$matricule ' ";
+        $resultat = $connexion->query($sql);
+        $eleve = null;
+        if ($resultat) {
+            $resultat->setFetchMode(PDO::FETCH_ASSOC);
+            $eleve = $resultat->fetch();
+            $eleve['DateNaiss'] = Application::datePHP($eleve['DateNaiss']);
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $eleve;
     }
 
     /**
@@ -286,7 +338,7 @@ class user
         $sql = 'INSERT INTO '.PFX.'thotLogins ';
         $sql .= "SET user=:userName, date='$date', heure='$heure', ip='$ip', host=:hostname ";
         $requete = $connexion->prepare($sql);
-        $data = array(':userName'=>$userName, ':hostname'=>$hostname);
+        $data = array(':userName' => $userName, ':hostname' => $hostname);
         $n = $requete->execute($data);
 
         // indiquer une session ouverte depuis l'adresse IP correspondante
@@ -295,7 +347,7 @@ class user
         $sql .= "ON DUPLICATE KEY UPDATE ip='$ip' ";
         $requete2 = $connexion->prepare($sql);
 
-        $data = array(':userName'=>$userName);
+        $data = array(':userName' => $userName);
         $n = $requete2->execute($data);
         Application::DeconnexionPDO($connexion);
 
@@ -435,31 +487,5 @@ class user
         Application::deconnexionPDO($connexion);
 
         return $acces;
-    }
-
-    /**
-     * Renvoie la liste des cours suivis par l'utilisateur.
-     *
-     * @param void()
-     *
-     * @return array
-     */
-    public function listeCoursEleve()
-    {
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $matricule = $this->getMatricule();
-        $sql = 'SELECT coursGrp FROM '.PFX.'elevesCours ';
-        $sql .= "WHERE matricule = '$matricule' ";
-        $resultat = $connexion->query($sql);
-        $liste = array();
-        if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
-                $liste[] = $ligne['coursGrp'];
-            }
-        }
-        Application::deconnexionPDO($connexion);
-
-        return $liste;
     }
 }

@@ -12,11 +12,10 @@
 
     <p>Conseils:</p>
     <ul>
-        <li>demandez à votre enfant de vérifier sous quel nom d'utilisateur et avec quelle adresse mail vous êtes inscrit-e sur la plate-forme.</li>
-        <li>Si vous avez tenté de récupérer votre mot de passe en donnant une adresse mail, essayez d'indiquer votre nom d'utilisateur.</li>
+        <li>Demandez à votre enfant de vérifier sous quel nom d'utilisateur vous êtes inscrit-e sur la plate-forme.</li>
+        <li>Peut-être avez-vous simplement fait une faute de frappe en indiquant cet identifiant? Dans ce cas, tentez encore une fois votre chance en cliquant sur le lien <a href="index.php">Changer mon mot de passe</a>.</li>
+        <li>En cas de problème persistant, contactez <a href="mailto:{$MAILADMIN}">{$MAILADMIN}</a></li>
     </ul>
-    <p>Peut-être avez-vous simplement fait une faute de frappe en indiquant cet indice d'identification? Dans ce cas, tentez encore une fois votre chance en cliquant sur le lien <a href="index.php">Changer mon mot de passe</a>.</p>
-    <p>En cas de problème persistant, contactez <a href="mailto:{$MAILADMIN}">{$MAILADMIN}</a></p>
 
     <p class="pull-right">Pour retourner à la page d'accueil, <a href="../index.php">Cliquez ici</a>.</p>
 

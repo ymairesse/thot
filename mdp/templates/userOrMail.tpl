@@ -28,13 +28,9 @@
 
             <h4><i class="fa fa-info-circle"></i> Vous êtes inscrit-e sur la plate-forme, mais vous avez un trou de mémoire</h4>
             <p>Nous n'avons aucun moyen de connaître votre mot de passe. Mais nous allons vous envoyer un mail qui vous permettra de changer ce mot de passe.</p>
-            <p>Pour vous identifier, veuillez indiquer </p>
-            <ul>
-                <li>l'adresse mail OU</li>
-                <li>le nom d'utilisateur</li>
-            </ul>
-            <p>donnés lors de votres inscription.</p>
-            <p>Si vous avez aussi oublié ces informations, votre enfant peut les trouver dans la section "élèves" de la plate-forme. Mais elle/il ne peut pas changer ou connaître votre mot de passe.</p>
+            <p>Pour vous identifier, veuillez indiquer le nom d'utilisateur que vous avez choisi lors de votre inscription. Il se termine par les quatre chiffres du matricule de votre enfant à l'école.</p>
+
+            <p>Si vous avez aussi oublié cette information, votre enfant peut la trouver dans la section "élèves" de la plate-forme. Mais elle/il ne peut pas changer ni connaître votre mot de passe.</p>
 
         </div>
         <!-- alert-info -->
@@ -44,17 +40,11 @@
 
     <div class="col-md-6 col-sm-12">
         <h4>Obtenir le lien pour changer mon mot de passe</h4>
-        <p>Il nous faut votre adresse mail ou le nom d'utilisateur que vous avez choisi.</p>
+        <p>Il nous faut le nom d'utilisateur que vous avez choisi.</p>
 
         <form name="userOrMail" id="userOrMail" method="POST" action="index.php" autocomplete="off" role="form" class="form-vertical">
             <div class="input-group">
-                <label for="mail" class="sr-only">Adresse mail</label>
-                <input type="text" name="mail" id="mail" value="" placeholder="Adresse mail" class="form-control">
-            </div>
-
-            <div class="input-group">
                 <label for="userName" class="sr-only">Nom d'utilisateur</label>
-                OU
                 <input type="text" name="userName" id="userName" value="" placeholder="Nom d'utilisateur" class="form-control">
                 <div class="help-block">N'oubliez pas les 4 chiffres pour terminer</div>
             </div>

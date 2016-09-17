@@ -18,27 +18,22 @@
 
 		<ul class="nav navbar-nav">
 			<li><a href="index.php?action=annonces"><i class="fa fa-info-circle" style="color:orange"></i> Annonces</a></li>
+			<li><a href="index.php?action=documents"><i class="fa fa-folder-open-o" style="color:red"></i> ISND Docs</a></li>
 			<li><a href="index.php?action=bulletin"><i class="fa fa-graduation-cap" style="color:blue"></i> Bulletins</a></li>
 			{if $userType == 'eleves'}
 			<li><a href="index.php?action=anniversaires"><i class="fa fa-birthday-cake" style="color:red"></i> Anniversaires</a></li>
 			{/if}
-			<li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> J. de classe</a></li>
+			<li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> Jdc</a></li>
 			{if $userType == 'eleves'}
 			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>
-			{/if} {if $userType == 'parents'}
+			{/if}
+			<li><a href="index.php?action=form"><i class="fa fa-pencil" style="color:#55aaaa"></i> Formulaires</a></li>
+			{if $userType == 'parents'}
 			<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil</a></li>
-			<li><a href="index.php?action=contact"><i class="fa fa-pencil" style="color:#ff0000"></i> Contact</a></li>
+			<li><a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a></li>
 			<li><a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a></li>
 			{/if}
-<!--
-			{if $userType == 'eleves'}
-			<li><a href="http://mail.isnd-edu.be" target="_blank"><i class="fa fa-paper-plane"></i> Mails</a></li>
-			<li>
-				<a href="http://isnd.be/claroline" target="_blank">
-					<img src="images/clarolineIco.png" alt="Cc"> Claroline</a>
-			</li>
-			{/if}
--->
+
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">

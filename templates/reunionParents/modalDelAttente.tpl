@@ -20,6 +20,7 @@
                     </div>
                 </div>
             </div>
+            <input type="hidden" name="date" value="{$date}">
             <input type="hidden" name="acronyme" id="modalAcronymeAttente" value="">
             <input type="hidden" name="periode" id="modalPeriode" value="">
             <input type="hidden" name="action" value="{$action}">

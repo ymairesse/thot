@@ -21,6 +21,7 @@
                     </div>
                 </div>
             </div>
+            <input type="hidden" name="date" value="{$date}">
             <input type="hidden" name="id" value="" id="modalId">
             <input type="hidden" name="action" value="{$action}">
             <input type="hidden" name="mode" value="delRv">
