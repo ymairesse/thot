@@ -15,4 +15,17 @@ En début de production, elle permet déjà:
 - la consultation par les parents de l'élève
 - l'inscription aux réunions de parents par les parents de l'élève
 
-VERSION ALPHA 0.001 en cours de construction
+# Installation de l’application Thot
+
+Télécharger l’archive .zip depuis https://github.com/ymairesse/thot  et extraire dans un répertoire local.
+Configurer le fichier /config.inc.php comme dans l’application parente Zeus. Celle-ci doit avoir également été configurée, y compris les paramètres généraux dans l’interface web d’administration.
+
+Personnaliser le fichier /config.ini
+
+Changer l’image de fond /images/background.jpg
+
+Personnaliser le logo de l’école /images/logoEcole.png (image png environ 100x100)
+
+Déployer l’ensemble sur le serveur web par FTP.
+
+Les utilisateurs (élèves uniquement) sont définis dans l’application parente Zeus. Il n’existe pas d’interface d’administration dans l’application Thot. Il n'existe pas d'utilisateur "prof".
