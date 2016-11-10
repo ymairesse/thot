@@ -7,7 +7,7 @@
             <tr>
                 <th>Heure</th>
                 {if $typeRP == 'profs'}
-                <th>Cours / fonction</th>
+                <th>Cours ou fonction</th>
                 {/if}
                 <th>Professeur</th>
                 <th>Demandé par</th>

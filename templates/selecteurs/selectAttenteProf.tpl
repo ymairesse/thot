@@ -8,7 +8,7 @@
         </option>
     {/foreach}
     {foreach from=$listeStatutsSpeciaux key=acronyme item=data}
-        <option class="statutSpecial"
+        <option class="statutSpecial test"
             value="{$acronyme}"
             data-nomprof="{$data.nom} {$data.prenom}">
             {($data.sexe=='F')?'Mme':'M.'} {$data.nom} {$data.prenom} => {$data.titre}
