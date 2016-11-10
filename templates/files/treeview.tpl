@@ -20,7 +20,7 @@
                 data-size='{$file.size}'
                 data-date='{$file.date}'
                 class='file ext_{$file.ext} level{$level}'>
-                <a href="download.php?type=pfN&amp;file={$file.path|escape:'htmlall'}/{$file.name|escape:'htmlall'}&amp;f={$fileId}">
+                <a href="download.php?type=pfN&amp;fileName={$file.path|escape:'htmlall'}/{$file.name|escape:'htmlall'}&amp;fileId={$fileId}">
                     {$file.name|escape:'htmlall'}
                 </a>
 

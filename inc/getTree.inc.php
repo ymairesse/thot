@@ -30,7 +30,7 @@ if (in_array($fileId, $listeSharedFiles)) {
     $ds = DIRECTORY_SEPARATOR;
     require_once INSTALL_DIR.'/inc/classes/class.Treeview.php';
     $Treeview = new Treeview(INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$path);
-
+    
     require_once(INSTALL_DIR."/smarty/Smarty.class.php");
     $smarty = new Smarty();
     $smarty->template_dir = "../templates";

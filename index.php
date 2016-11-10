@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+
 require_once 'config.inc.php';
 include 'inc/entetes.inc.php';
 
@@ -22,6 +23,9 @@ switch ($action) {
         break;
     case 'documents':
         require_once 'inc/documents.inc.php';
+        break;
+    case 'casiers':
+        require_once 'inc/casiers.inc.php';
         break;
     case 'bulletin':
         require_once 'inc/bulletin.inc.php';

@@ -23,14 +23,14 @@ $Files = new Files();
 // téléchargement sur base du fileId ou du nom du fichier et du path?
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
 // éventuellement, le $fileId
-$fileId = isset($_REQUEST['f']) ? $_REQUEST['f'] : null;
+$fileId = isset($_REQUEST['fileId']) ? $_REQUEST['fileId'] : null;
+// éventuellement le idTravail
+$idTravail = isset($_REQUEST['idTravail']) ? $_REQUEST['idTravail'] : null;
 // éventuellement, le nom du fichier et son path depuis le répertoire partagé
-$file = isset($_REQUEST['file']) ? $_REQUEST['file'] : null;
+$fileName = isset($_REQUEST['fileName']) ? $_REQUEST['fileName'] : null;
 
 $fileNotFound = 'Document non identifié';
-if ($fileId == null) {
-    die($fileNotFound);
-}
+$noAccess = 'Vous n\'avez pas accès à ce document';
 
 // vérifier dans la table des shares si l'utilisateur courant a accès au fichier
 $matricule = $User->getMatricule();
@@ -39,39 +39,66 @@ $niveau = substr($classe, 0, 1);
 $listeCoursEleve = $User->listeCoursEleve();
 $listeCoursString = "'".implode("','", $listeCoursEleve)."'";
 
-$listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
-
-if (in_array($fileId, $listeDocs)) {
-    // récupérer les données du fichier
-    $fileData = $Files->getFileData($fileId);
-} else {
-    die('Vous n\'avez pas accès à ce document.');
-}
-
 $ds = DIRECTORY_SEPARATOR;
 
-if ($type == 'pfN') {
-    $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'];
-    if (file_exists($download_path.$file)) {
-        $args = array(
-                'download_path' => $download_path,
-                'file' => $file,
-                'extension_check' => true,
-                'referrer_check' => false,
-                'referrer' => null,
-                );
-    }
-    else die('Fichier inexistant');
-} else {
-    $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$ds;
+switch ($type) {
+    case 'pfN':  // par fileName, pour les documents partagés par répertoires
+        // il nous faut le fileName et le fileId
+        if (($fileName == null) || ($fileId == null)) {
+            die($fileNotFound);
+        }
+        $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
+        // si le répertoire $fileId est dans les documents partagés avec cet élève
+        if (in_array($fileId, $listeDocs)) {
+            $fileData = $Files->getFileData($fileId);
+            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'];
+        } else {
+            die($noAccess);
+        }
+        break;
+    case 'tr':  // récupération d'un travail personnel
+        // il nous faut un idTravail et un fileName
+        if (($idTravail == null) || ($fileName == null)) {
+            die($fileNotFound);
+        }
+        $travailData = $Files->getDetailsTravail($idTravail, $matricule);
+        $acronyme = $travailData['acronyme'];
+        $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule.$ds;
+        break;
+
+    case 'pId':   // lecture d'un fichier partagé par fileId
+        if ($fileId == null) {
+            die($fileNotFound);
+        }
+        $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
+        // si le fichier figure parmi les documents partagés avec cet élève
+        if (in_array($fileId, $listeDocs)) {
+            // récupérer les données du fichier
+            $fileData = $Files->getFileData($fileId);
+            $fileName = $fileData['fileName'];
+            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$ds;
+
+        } else {
+            die($noAccess);
+        }
+        break;
+    default:
+        die('unknown type');
+        break;
+}
+
+if (file_exists($download_path.$fileName)) {
     $args = array(
             'download_path' => $download_path,
-            'file' => $fileData['fileName'],
+            'file' => $fileName,
             'extension_check' => true,
             'referrer_check' => false,
             'referrer' => null,
             );
+} else {
+    die('Fichier inexistant');
 }
+
 
 require_once INSTALL_DIR.'/inc/classes/class.chip_download.php';
 $download = new chip_download($args);

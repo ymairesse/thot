@@ -1,7 +1,5 @@
 <?php
 
-// require_once INSTALL_DIR.'/config.inc.php';
-
 // définition de la class Application, y compris la lecture de config.ini
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
@@ -14,7 +12,6 @@ $User = isset($_SESSION[APPLICATION]) ? unserialize($_SESSION[APPLICATION]) : nu
 if ($User == null) {
     header('Location: accueil.php');
 }
-
 // définition de la class Chrono
 require_once INSTALL_DIR.'/inc/classes/classChrono.inc.php';
 $chrono = new chrono();

@@ -4,18 +4,23 @@ body {
     background-size: cover;
     padding-top: 2em;
 }
+
 .container {
     background-color: #eed;
 }
+
 .not-allowed {
     cursor: not-allowed !important;
 }
+
 #accordion .panel-heading {
     background: #ffa500;
 }
+
 .navbar-fixed-bottom {
     background: #FFDD86;
 }
+
 .vertical-align {
     min-height: 100%;
     /* Fallback for browsers do NOT support vh unit */
@@ -24,39 +29,50 @@ body {
     display: flex;
     align-items: center;
 }
+
 .selecteur {
     background: #FFDD86;
 }
+
 .echec {
     color: red;
     font-weight: bold;
 }
+
 .dymo {
     padding: 4px 1em !important;
 }
+
 .urgence0 {
     background-color: #9f9;
 }
+
 .urgence1 {
     background-color: #99f;
 }
+
 .urgence2 {
     background-color: #f99;
 }
+
 .anniversaire {
     color: red;
     font-size: 2em;
     list-style: none;
 }
+
 .navbar .fa {
     font-size: 1.4em
 }
+
 .listeAnnonces {
     box-shadow: 2px 2px 5px grey;
 }
+
 .listeAnnonces ul {
     padding-left: 0;
 }
+
 .listeAnnonces li {
     list-style-type: none;
     margin: 0.3em 0;
@@ -65,15 +81,18 @@ body {
     -webkit-transform: rotate(-2deg);
     transform: rotate(-2deg);
 }
+
 .lesAnnonces {
     border: 1px solid #555;
     padding: 0.5em 0.5em 1.5em;
     margin: 1em 0;
     box-shadow: 2px 2px 5px grey;
 }
+
 .lesAnnonces .contact {
     background-color: #ccc
 }
+
 .dateLecture {
     background-color: #FFA500;
     padding: 5px;
@@ -86,100 +105,127 @@ body {
     /* Chrome, Safari, Opera */
     transform: rotate(7deg);
 }
+
 .help {
     background: #aaf;
     padding: 1em;
     border-radius: 5px;
 }
+
 .fa-info-circle {
     color: blue;
 }
+
 .parents {
     background: #ddf;
 }
+
 #detailsJour {
     padding: 1em;
 }
+
 #unTravail * {
     padding: 0 0.3em;
 }
+
 .encadre {
     border: 2px dotted grey;
     padding: 0 0.8em;
     box-shadow: #999 10px 15px 5px;
     min-height: 15em;
 }
+
 #calendar .fc-content {
     cursor: pointer;
 }
+
 body {
     background-color: #fed57b;
 }
+
 .container {
     background-color: #eeeedd;
 }
+
 .not-allowed {
     cursor: not-allowed !important;
 }
+
 #accordion .panel-heading {
     background: #ffa500 none repeat scroll 0 0;
 }
+
 .navbar-fixed-bottom {
     background: #ffdd86 none repeat scroll 0 0;
 }
+
 .vertical-align {
     align-items: center;
     display: flex;
     min-height: 100vh;
 }
+
 .selecteur {
     background: #ffdd86 none repeat scroll 0 0;
 }
+
 .echec {
     color: red;
     font-weight: bold;
 }
+
 .dymo {
     padding: 4px 1em !important;
 }
+
 .urgence0 {
     background-color: #99ff99;
 }
+
 .urgence1 {
     background-color: #9999ff;
 }
+
 .urgence2 {
     background-color: #ff9999;
 }
+
 .anniversaire {
     color: red;
     font-size: 2em;
     list-style: outside none none;
 }
+
 .navbar .fa {
     font-size: 1.4em;
 }
+
 .listeAnnonces {
     box-shadow: 2px 2px 5px grey;
 }
+
 .listeAnnonces ul {
     padding-left: 0;
 }
+
 .listeAnnonces li {
     list-style-type: none;
     margin: 0.3em 0;
     padding: 0.1em 0;
     transform: rotate(-2deg);
 }
+
 .lesAnnonces {
     border: 1px solid #555555;
     box-shadow: 2px 2px 5px grey;
     margin: 1em 0;
     padding: 0.5em 0.5em 1.5em;
 }
+
 .lesAnnonces .contact {
     background-color: #cccccc;
 }
+
 .dateLecture {
     background-color: #ffa500;
     border-radius: 5px;
@@ -188,81 +234,102 @@ body {
     padding: 5px;
     transform: rotate(7deg);
 }
+
 .help {
     background: #aaaaff none repeat scroll 0 0;
     border-radius: 5px;
     padding: 1em;
 }
+
 .fa-info-circle {
     color: blue;
 }
+
 .parents {
     background: #ddddff none repeat scroll 0 0;
 }
+
 #detailsJour {
     padding: 1em;
 }
+
 #unTravail * {
     padding: 0 0.3em;
 }
+
 .encadre {
     border: 2px dotted grey;
     box-shadow: 10px 15px 5px #999999;
     min-height: 15em;
     padding: 0 0.8em;
 }
+
 #calendar .fc-content {
     cursor: pointer;
 }
+
 p.event-special, a.event-special {
     background: #ff0000 none repeat scroll 0px 0px;
 }
+
 p.event-success, a.event-success {
     background: #008000 none repeat scroll 0px 0px;
     color: white;
 }
+
 p.event-warning, a.event-warning {
     background: #ffa500 none repeat scroll 0px 0px;
 }
+
 p.event-info, a.event-info {
     background: #ffff00 none repeat scroll 0px 0px;
     color: red;
 }
+
 p.event-inverse, a.event-inverse {
     background: #286090 !important;
     color: #fff !important;
 }
+
 .fc-prev-button, .fc-next-button, .fc-today-button {
     background: #286090 !important;
     color: #fff !important;
 }
+
 .fa-select {
     font-family: 'FontAwesome', Arial;
 }
+
 .cat_1 {
     background: #f55 !important;
     color: #fff !important;
 }
+
 .cat_2 {
     background: #0f0 !important;
     color: #333 !important;
 }
+
 .cat_3 {
     background: #00f !important;
     color: #fff !important;
 }
+
 .cat_4 {
     background: #ff0 !important;
     color: #000 !important;
 }
+
 .cat_5 {
     background: #f00 !important;
     color: #ff0 !important;
 }
+
 .cat_6 {
     background: #555 !important;
     color: #ccc !important;
 }
+
 .cat_7 {
     background: #fff !important;
     color: #000 !important;
@@ -275,26 +342,28 @@ p.event-inverse, a.event-inverse {
 .attente1 {
     background-color: rgb(242, 193, 239)
 }
+
 .attente2 {
     background-color: rgb(195, 230, 179)
 }
+
 .attente3 {
     background-color: rgb(174, 218, 224)
 }
 
-.panel-info > .panel-heading  {
+.panel-info>.panel-heading {
     background-color: #99f !important;
     border-color: #bce8f1;
     color: #333 !important;
 }
 
-.panel-success > .panel-heading {
+.panel-success>.panel-heading {
     background-color: #9f9 !important;
     border-color: #bce8f1;
     color: #333 !important;
 }
 
-.panel-danger > .panel-heading {
+.panel-danger>.panel-heading {
     background-color: #f99 !important;
     border-color: #bce8f1;
     color: #333 !important;
@@ -305,9 +374,65 @@ p.event-inverse, a.event-inverse {
 }
 
 .selected {
-	background: orange;
+    background: orange;
 }
 
 .wait * {
     cursor: wait;
+}
+
+.casier {
+    position: relative;
+    margin: 0.5em;
+    padding: 0;
+    width: 240px;
+    box-shadow: 1px 1px 12px #555;
+    cursor: pointer;
+}
+
+.casier .corps {
+    padding: 0;
+    border: 1px solid #555;
+    margin: 0;
+    height: 125px;
+    overflow: hidden;
+}
+
+.casier h4 {}
+
+.casier p {
+    margin: 0 5px;
+}
+
+.casier .bottom {
+    position: absolute;
+    border-left: 1px solid #555;
+    bottom: 1px;
+    padding: 0 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+    width: 240px;
+}
+
+.micro {
+    font-size: 8pt;
+}
+
+#modalConsigne {
+    background-color: #ffb;
+}
+
+.readwrite {
+    background-color: #cfc;
+}
+
+.readonly {
+    background-color: #ccf;
+}
+
+.termine {
+    background-color: #fcc;
+}
+
+.cote {
+    font-size: 14pt;
 }

@@ -1,6 +1,6 @@
 <link href="css/filetree.css" type="text/css" rel="stylesheet">
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-pills">
     <li class="active">
         <a data-toggle="tab" href="#classe">Ma classe
         <span class="badge">{$listeDocs.classe|@count|default:0}</span></a>
@@ -41,7 +41,7 @@
                     <td>{$data.groupe}</td>
                     <td>
                         {if $data.fileName != ''}
-                        <a href="download.php?f={$fileId}">{$data.fileName}</a> {else}
+                        <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
                         <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                             <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
                         </button>
@@ -57,7 +57,8 @@
 
 
     <div id="cours" class="tab-pane fade" style="min-height:30em; overflow:auto;">
-        <h3>Les documents pour mes cours</h3> {if isset($listeDocs.cours)}
+        <h3>Les documents pour mes cours</h3>
+        {if isset($listeDocs.cours)}
 
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
             {foreach from=$listeDocs.cours key=libelle item=data name=boucle}
@@ -89,7 +90,7 @@
                     <tr>
                         <td>
                             {if $dataDoc.fileName != ''}
-                            <a href="download.php?f={$fileId}">{$dataDoc.fileName}</a> {else}
+                            <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
                             <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$dataDoc.commentaire}">
                                 <i class="fa fa-folder-open"></i> Dossier: {$dataDoc.commentaire|truncate:40}
                             </button>
@@ -126,7 +127,7 @@
             <tr>
                 <td>
                     {if $data.fileName != ''}
-                    <a href="download.php?f={$fileId}">{$data.fileName}</a> {else}
+                    <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
                     <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                         <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
                     </button>
@@ -153,7 +154,7 @@
             <tr>
                 <td>
                     {if $data.fileName != ''}
-                    <a href="download.php?f={$fileId}">{$data.fileName}</a> {else}
+                    <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
                     <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                         <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
                     </button>

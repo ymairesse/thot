@@ -1,0 +1,41 @@
+<?php
+
+require_once '../config.inc.php';
+
+require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
+$Application = new Application();
+
+// définition de la class USER utilisée en variable de SESSION
+require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
+session_start();
+if (!(isset($_SESSION[APPLICATION]))) {
+    die("<div class='alert alert-danger'>Votre session a expiré. Veuillez vous reconnecter.</div>");
+}
+$User = unserialize($_SESSION['THOT']);
+$matricule = $User->getMatricule();
+
+require_once INSTALL_DIR.'/inc/classes/Files.class.php';
+$Files = new Files();
+
+$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : null;
+$detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
+$verif = $Files->verifEleve4Travail($matricule, $idTravail);
+
+$ds = DIRECTORY_SEPARATOR;
+
+if (!empty($_FILES) && ($verif == true)) {
+    $idTravail = $detailsTravail['idTravail'];
+    $acronyme = $detailsTravail['acronyme'];
+    $tempFile = $_FILES['file']['tmp_name'];
+    $targetPath = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule;
+    $targetFile = $targetPath.$ds.$_FILES['file']['name'];
+    if (move_uploaded_file($tempFile, $targetFile)) {
+        $Files->travailRemis($idTravail, $matricule);
+        return true;
+    }
+    else {
+        $Files->travailRemis($idTravail, $matricule, false);
+        return false;
+    }
+
+}

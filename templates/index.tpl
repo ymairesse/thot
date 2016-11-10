@@ -51,7 +51,10 @@
 <body>
 	<div class="container">
 
-		{include file="entete.tpl"} {include file="menu.tpl"} {if isset($selecteur)} {include file="$selecteur.tpl"} {/if} {if (isset($message))}
+		{include file="entete.tpl"}
+		{include file="menu.tpl"}
+		{if isset($selecteur)} {include file="$selecteur.tpl"} {/if}
+		{if (isset($message))}
 		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">
 			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

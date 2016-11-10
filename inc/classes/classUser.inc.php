@@ -3,21 +3,23 @@
 class user
 {
     private $userName;
-    private $userType;            // eleves ou parents
+    private $acronyme;          // acronyme du prof en alias
+    private $userType;            // eleve, parent ou prof
     private $identite;            // données personnelles
     private $identiteReseau;    // données réseau IP,...
 
     /**
      * constructeur de l'objet user.
      */
-    public function __construct($userName = null, $userType = 'eleve')
+    public function __construct($userName = null, $userType = 'eleve', $acronyme = null)
     {
         $this->identiteReseau = $this->identiteReseau();
         if (isset($userName)) {
             // pseudo
             $this->userName = $userName;
-            // parents ou eleves
+            // parent, eleve ou prof
             $this->userType = $userType;
+            $this->acronyme = $acronyme;
             $this->setIdentite($userType);
         }
     }
@@ -30,6 +32,7 @@ class user
     public function setIdentite($userType)
     {
         $userName = addslashes($this->userName);
+        $acronyme = addslashes($this->acronyme);
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         switch ($userType) {
             case 'eleves':
@@ -45,6 +48,12 @@ class user
                 $sql .= 'JOIN '.PFX.'eleves AS de ON de.matricule = tp.matricule ';
                 $sql .= "WHERE userName = '$userName' LIMIT 1 ";
                 break;
+            // case 'prof':
+            //     $sql = "SELECT 'prof' AS type, formule, userName, tp.matricule, nom, prenom, mail, classe, groupe, md5pwd, ";
+            //     $sql .= 'dp.nom AS nomProf, dp.prenom AS prenomProf ';
+            //     $sql .= 'JOIN '.PFX."profs AS dp ON dp.acronyme = '$acronyme' ";
+            //     $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
+            //     $sql .= "
             default:
                 die('invalid userType');
                 break;
@@ -259,9 +268,11 @@ class user
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT count(*) FROM '.PFX.'thotParents ';
-        $sql .= "WHERE userName = '$userName' ";
-        $resultat = $connexion->query($sql);
-        $nb = $resultat->fetchColumn();
+        $sql .= 'WHERE userName = :userName ';
+        $requete = $connexion->prepare($sql);
+        $data = array(':userName' => $userName);
+        $resultat = $requete->execute($data);
+        $nb = $requete->fetchColumn();
         Application::DeconnexionPDO($connexion);
 
         return $nb > 0;

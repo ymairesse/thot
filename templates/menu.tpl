@@ -18,11 +18,12 @@
 
 		<ul class="nav navbar-nav">
 			<li><a href="index.php?action=annonces"><i class="fa fa-info-circle" style="color:orange"></i> Annonces</a></li>
-			<li><a href="index.php?action=documents"><i class="fa fa-folder-open-o" style="color:red"></i> ISND Docs</a></li>
+			<li><a href="index.php?action=documents"><i class="fa fa-folder-open-o" style="color:red"></i> ISND <br>Docs</a></li>
 			<li><a href="index.php?action=bulletin"><i class="fa fa-graduation-cap" style="color:blue"></i> Bulletins</a></li>
 			{if $userType == 'eleves'}
 			<li><a href="index.php?action=anniversaires"><i class="fa fa-birthday-cake" style="color:red"></i> Anniversaires</a></li>
 			{/if}
+			<li><a href="index.php?action=casiers"><i class="fa fa-inbox"></i> Casiers<br>Virtuels</a></li>
 			<li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> Jdc</a></li>
 			{if $userType == 'eleves'}
 			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>

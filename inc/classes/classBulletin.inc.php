@@ -674,7 +674,7 @@ class Bulletin
             while ($ligne = $resultat->fetch()) {
                 $coursGrp = $ligne['coursGrp'];
                 $sexe = $ligne['sexe'];
-                $ligne['prenom'] = substr($ligne['prenom'], 0, 1).'. ';
+                $ligne['prenom'] = mb_substr($ligne['prenom'], 0, 1, 'UTF-8').'. ';
                 $ligne['adresse'] = ($sexe == 'M') ? 'M. ' : 'Mme';
                 $liste[$i] = $ligne;
                 $i++;

@@ -289,13 +289,13 @@ class Application
     {
         switch ($userType) {
             case 'eleves':
-                $permis = array('bulletin', 'documents', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form');
+                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
             case 'parents':
-                $permis = array('bulletin', 'documents', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form');
+                $permis = array('bulletin', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -748,12 +748,30 @@ class Application
             $userName = $userName.$matricule;
             $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
             $sql = 'INSERT INTO '.PFX.'thotParents ';
-            $sql .= "SET userName='$userName', matricule='$matricule', formule='$formule', nom='$nomParent', prenom='$prenomParent', ";
-            $sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
+            $sql .= 'SET userName=:userName, matricule=:matricule, formule=:formule, nom=:nomParent, prenom=:prenomParent, ';
+            $sql .= 'mail=:mail, lien=:lien, md5pwd=:passwd ';
             $sql .= 'ON DUPLICATE KEY UPDATE ';
-            $sql .= "formule='$formule', nom='$nomParent', prenom='$prenomParent', ";
-            $sql .= "mail='$mail', lien='$lien', md5pwd='$passwd' ";
-            $resultat = $connexion->exec($sql);
+            $sql .= 'formule=:formule, nom=:nomParent, prenom=:prenomParent, ';
+            $sql .= 'mail=:mail, lien=:lien, md5pwd=:passwd ';
+            $requete = $connexion->prepare($sql);
+            $data = array(
+                    ':userName' => $userName,
+                    ':matricule' => $matricule,
+                    ':formule' => $formule,
+                    ':nomParent' => $nomParent,
+                    ':prenomParent' => $prenomParent,
+                    ':mail' => $mail,
+                    ':lien' => $lien,
+                    ':passwd' => $passwd,
+                    ':formule' => $formule,
+                    ':nomParent' => $nomParent,
+                    ':prenomParent' => $prenomParent,
+                    ':mail' => $mail,
+                    ':lien' => $lien,
+                    ':passwd' => $passwd,
+
+                );
+            $resultat = $requete->execute($data);
             if ($resultat) {
                 $resultat = 1;
             }  // pour éviter 2 modifications si DUPLICATE KEY
@@ -1327,7 +1345,7 @@ class Application
             $listeEncadrement[$acronyme] = array(
                 'coursGrp' => '',
                 'cours' => '',
-                'libelle' => 'Direction et encadrement',
+                'libelle' => $data['titre'],
                 'nbheures' => '',
                 'nom' => $data['nom'],
                 'prenom' => $data['prenom'],
@@ -1763,7 +1781,7 @@ class Application
     public function listeStatutsSpeciaux()
     {
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT DISTINCT rv.acronyme,  nom, prenom, sexe ';
+        $sql = 'SELECT DISTINCT rv.acronyme,  nom, prenom, sexe, titre ';
         $sql .= 'FROM '.PFX.'thotRpRv AS rv ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = rv.acronyme ';
         $sql .= "WHERE rv.statut = 'dir' ";
@@ -2102,12 +2120,14 @@ class Application
     // fonctions pour la gestion des e-docs
 
     /**
-    * retourne la liste des e-docs disponibles pour un élève dont on fournit le matricules
-    * @param $matricule
-    *
-    * @return array
-    */
-    public function listeEdocs($matricule){
+     * retourne la liste des e-docs disponibles pour un élève dont on fournit le matricules.
+     *
+     * @param $matricule
+     *
+     * @return array
+     */
+    public function listeEdocs($matricule)
+    {
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT matricule, edoc, date ';
         $sql .= 'FROM '.PFX.'thotEdocs ';
@@ -2121,8 +2141,8 @@ class Application
                 $matricule = $ligne['matricule'];
                 $edoc = $ligne['edoc'];
                 $date = $this->datePhp($ligne['date']);
-                $liste[$matricule][] = array('date'=>$date, 'doc'=>$edoc);
-                }
+                $liste[$matricule][] = array('date' => $date, 'doc' => $edoc);
+            }
         }
         self::deconnexionPDO($connexion);
 
@@ -2130,19 +2150,20 @@ class Application
     }
 
     /**
-    * retourne la date déclarée pour un e-doc donné pour un élève donné
-    *
-    * @param $matricule
-    * @param $typeEdoc (pia, competences)
-    *
-    * @return string
-    */
-    public function getDocDate($matricule, $typeDoc){
+     * retourne la date déclarée pour un e-doc donné pour un élève donné.
+     *
+     * @param $matricule
+     * @param $typeEdoc (pia, competences)
+     *
+     * @return string
+     */
+    public function getDocDate($matricule, $typeDoc)
+    {
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT date FROM '.PFX.'thotEdocs ';
         $sql .= "WHERE matricule='$matricule' AND edoc='$typeDoc' ";
         $resultat = $connexion->query($sql);
-        $date = Null;
+        $date = null;
         if ($resultat) {
             $ligne = $resultat->fetch();
             $date = $ligne['date'];
@@ -2151,5 +2172,4 @@ class Application
 
         return self::datePHP($date);
     }
-
 }
