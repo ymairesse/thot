@@ -9,12 +9,12 @@ switch ($mode) {
         $motifRefus = '';
 
         $problemeUserName = $User->userExists($userName);
-        $problemeMail = $User->mailExists($mail);
+        // $problemeMail = $User->mailExists($mail);
         if ($problemeUserName) {
             $motifRefus .= "Le nom d'utilisateur <strong>$userName</strong> est déjà utilisé pour une autre personne.<br>";
         }
-        if ($problemeMail)
-            $motifRefus .= "L'adresse mail <strong>{$mail}</strong> est déjà utilisée pour une autre personne.<br>";
+        // if ($problemeMail)
+        //     $motifRefus .= "L'adresse mail <strong>{$mail}</strong> est déjà utilisée pour une autre personne.<br>";
 
         $smarty->assign('motifRefus', $motifRefus);
 
