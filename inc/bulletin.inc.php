@@ -4,6 +4,12 @@ $matricule = $User->getMatricule();
 $anneeEtude = $User->getAnnee();
 $classe = $User->getClasse();
 $nomEleve = $User->getNomEleve();
+$section = $User->getSection();
+
+$eleve = $User->getIdentite();
+
+$smarty->assign('eleve', $eleve);
+
 require_once INSTALL_DIR.'/inc/classes/classBulletin.inc.php';
 $Bulletin = new Bulletin();
 
@@ -19,51 +25,15 @@ $noBulletin = isset($_POST['noBulletin']) ? $_POST['noBulletin'] : $dernier;
 
 // si le bulletin existe (entre 1 et dernier bulletin) et qu'un élève a été choisi
 if (($noBulletin <= $dernier) && ($noBulletin >= 0) && ($matricule != '')) {
-    // liste de tous les cours suivis par cet élève durant la période $noBulletin (historique pris en compte)
-    $listeCoursGrp = $Bulletin->listeCoursGrpEleves($matricule, $noBulletin);
-    if ($listeCoursGrp) {
-        $listeCoursGrp = $listeCoursGrp[$matricule];
-        $listeProfsCoursGrp = $Application->listeProfsListeCoursGrp($listeCoursGrp);
-        $listeSituations = $Bulletin->listeSituationsCours($matricule, array_keys($listeCoursGrp), null, true);
-        $sitPrecedentes = $Bulletin->situationsPrecedentes($listeSituations, $noBulletin);
-        $sitActuelles = $Bulletin->situationsPeriode($listeSituations, $noBulletin);
-        $listeCompetences = $Bulletin->listeCompetencesListeCoursGrp($listeCoursGrp);
-        $listeCotes = $Bulletin->listeCotes($matricule, $listeCoursGrp, $listeCompetences, $noBulletin);
-
-        $ponderations = $Bulletin->getPonderations($listeCoursGrp, $noBulletin);
-        $cotesPonderees = $Bulletin->listeGlobalPeriodePondere($listeCotes, $ponderations, $noBulletin);
-
-        $tableauAttitudes = $Bulletin->tableauxAttitudes($matricule, $noBulletin);
-
-        $commentairesCotes = $Bulletin->listeCommentairesTousCours($matricule, $noBulletin);
-        $mentions = $Bulletin->listeMentions($matricule, $noBulletin);
-        $ficheEduc = $Bulletin->listeFichesEduc($matricule, $noBulletin);
-        $remarqueTitulaire = $Bulletin->remarqueTitu($matricule, $noBulletin);
-        if ($remarqueTitulaire != null) {
-            $remarqueTitulaire = $remarqueTitulaire[$matricule][$noBulletin];
-        } else {
-            $remarqueTitulaire = '';
-        }
-        $tableauAttitudes = $Bulletin->tableauxAttitudes($matricule, $noBulletin);
-        $noticeDirection = $Bulletin->noteDirection($anneeEtude, $noBulletin);
-
-        $smarty->assign('noBulletin', $noBulletin);
-        $smarty->assign('nomEleve', $nomEleve);
-        $smarty->assign('listeCoursGrp', $listeCoursGrp);
-        $smarty->assign('listeProfsCoursGrp', $listeProfsCoursGrp);
-        $smarty->assign('sitPrecedentes', $sitPrecedentes);
-        $smarty->assign('sitActuelles', $sitActuelles);
-        $smarty->assign('listeCotes', $listeCotes);
-        $smarty->assign('listeCompetences', $listeCompetences);
-
-        $smarty->assign('cotesPonderees', $cotesPonderees);
-        $smarty->assign('commentaires', $commentairesCotes);
-        $smarty->assign('attitudes', $tableauAttitudes);
-        $smarty->assign('ficheEduc', $ficheEduc);
-        $smarty->assign('remTitu', $remarqueTitulaire);
-        $smarty->assign('mention', $mentions);
-        $smarty->assign('noticeDirection', $noticeDirection);
-        $smarty->assign('corpsPage', 'showBulletin');
+    $smarty->assign('noBulletin', $noBulletin);
+    // ********************************************************
+    // sélection du bulletin en fonction de la section
+    $bulletinTQ = array('TQ');
+    $bullISND = array('G', 'TT', 'S');
+    if (in_array($section, $bullISND)) {
+        include 'inc/bulletin/bulletinGTTT.inc.php';
+    } else {
+        include 'inc/bulletin/bulletinTQ.inc.php';
     }
 } else {
     // POUR PARER À UNE TENTATIVE D'ACCES À UN BULLETIN NON PUBLIÉ ;O)

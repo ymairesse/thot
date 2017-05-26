@@ -19,33 +19,10 @@
 	<script type="text/javascript" src="js/moment-with-locales.js"></script>
 	<script type="text/javascript" src="fc/fullcalendar.js"></script>
 	<script type="text/javascript" src="fc/lang/fr.js"></script>
+	 </script>
 
 	<link rel="stylesheet" href="fc/fullcalendar.css" media="screen">
-	<!-- Piwik -->
-	<script type="text/javascript">
-		var _paq = _paq || [];
-		_paq.push(['trackPageView']);
-		_paq.push(['enableLinkTracking']);
-		(function() {
-			var u = "//isnd.be/piwik/";
-			_paq.push(['setTrackerUrl', u + 'piwik.php']);
-			_paq.push(['setSiteId', 1]);
-			var d = document,
-				g = d.createElement('script'),
-				s = d.getElementsByTagName('script')[0];
-			g.type = 'text/javascript';
-			g.async = true;
-			g.defer = true;
-			g.src = u + 'piwik.js';
-			s.parentNode.insertBefore(g, s);
-		})();
-	</script>
-	<noscript>
-		<p>
-			<img src="//isnd.be/piwik/piwik.php?idsite=1" style="border:0;" alt="" />
-		</p>
-	</noscript>
-	<!-- End Piwik Code -->
+
 </head>
 
 <body>
@@ -63,7 +40,9 @@
 		</div>
 		{/if} {* La valeur de $corpsPage est définie dans index.php ou les sous-modules php *}
 		<div id="corpsPage">
-			{if isset($corpsPage)} {include file="$corpsPage.tpl"} {/if}
+			{if isset($corpsPage)}
+			{include file="$corpsPage.tpl"}
+			{/if}
 		</div>
 
 	</div>
@@ -77,6 +56,7 @@
 				$(this).remove();
 			});
 		}, 3000);
+
 
 		$(document).ready(function() {
 

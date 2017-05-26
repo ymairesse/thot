@@ -54,6 +54,9 @@ switch ($action) {
     case 'logoff':
         include_once 'logout.php';
         break;
+    case 'info':
+        require_once 'inc/info.inc.php';
+        break;
     default:
         require_once 'inc/annonces.inc.php';
         break;

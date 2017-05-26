@@ -4,6 +4,7 @@ class user
 {
     private $userName;
     private $acronyme;          // acronyme du prof en alias
+    private $section;           // section pour l'élève (TQ, GT, TT, ...)
     private $userType;            // eleve, parent ou prof
     private $identite;            // données personnelles
     private $identiteReseau;    // données réseau IP,...
@@ -36,13 +37,13 @@ class user
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         switch ($userType) {
             case 'eleves':
-                $sql = "SELECT 'eleve' AS type, el.matricule, nom, prenom, classe, groupe, mailDomain, md5pwd ";
+                $sql = "SELECT 'eleve' AS type, el.matricule, nom, prenom, classe, groupe, section, mailDomain, md5pwd ";
                 $sql .= 'FROM '.PFX.'eleves AS el ';
                 $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
                 $sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";
                 break;
             case 'parents':
-                $sql = "SELECT 'parent' AS type, formule, userName, tp.matricule, tp.nom, tp.prenom, lien, mail, classe, groupe, md5pwd, ";
+                $sql = "SELECT 'parent' AS type, formule, userName, tp.matricule, tp.nom, tp.prenom, lien, mail, classe, groupe, section, md5pwd, ";
                 $sql .= 'de.nom AS nomEl, de.prenom AS prenomEl ';
                 $sql .= 'FROM '.PFX.'thotParents AS tp ';
                 $sql .= 'JOIN '.PFX.'eleves AS de ON de.matricule = tp.matricule ';
@@ -105,6 +106,14 @@ class user
         $classe = $identite['groupe'];
 
         return $classe;
+    }
+
+    public function getSection()
+    {
+        $identite = $this->identite;
+        $section = $identite['section'];
+
+        return $section;
     }
 
     /**

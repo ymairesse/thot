@@ -289,13 +289,13 @@ class Application
     {
         switch ($userType) {
             case 'eleves':
-                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form');
+                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form', 'info');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
             case 'parents':
-                $permis = array('bulletin', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form');
+                $permis = array('bulletin', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form', 'info');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -960,7 +960,7 @@ class Application
     public function verifUser($parametre, $critere)
     {
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT matricule, formule, nom, prenom, userName, mail, lien ';
+        $sql = 'SELECT matricule, formule, nom, prenom, userName, mail, md5pwd, lien ';
         $sql .= 'FROM '.PFX.'thotParents ';
 
         if ($critere == 'userName') {
@@ -1040,6 +1040,84 @@ class Application
         $mail->Body = $texteFinal;
 
         return !$mail->Send();
+    }
+
+    /**
+     * Envoi du mail de confirmation d'inscription sur la plate-forme
+     *
+     * @param $userName : nom d'utilisateur du parent
+     *
+     * @return bool : le mail a été envoyé
+     */
+    public function sendConfirmMail($userName) {
+        // matricule, formule, nom, prenom, userName, mail, md5pwd, lien
+        $identite = $this->verifUser($userName,'userName');
+
+        $smarty = new Smarty();
+        $smarty->assign('MAILADMIN', MAILADMIN);
+        $smarty->assign('ADMINNAME', ADMINNAME);
+
+        $smarty->assign('identite', $identite);
+        $smarty->assign('ECOLE', ECOLE);
+        $smarty->assign('ADRESSETHOT', ADRESSETHOT);
+        $token = substr($identite['md5pwd'], 0, 20);
+        $link = ADRESSETHOT.'/confirm/index.php?token='.$token.'&amp;mail='.$identite['mail'].'&amp;userName='.$identite['userName'];
+        $smarty->assign('link', $link);
+        $texteMail = $smarty->fetch('../templates/parents/texteConfirmation.tpl');
+
+        require_once INSTALL_DIR.'/phpMailer/class.phpmailer.php';
+        $mail = new PHPmailer();
+        $mail->IsHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->From = MAILADMIN;
+        $mail->FromName = ADMINNAME;
+        $mail->AddAddress($identite['mail']);
+        $mail->Subject = CONFIRM;
+        $mail->Body = $texteMail;
+
+        return !$mail->Send();
+    }
+
+    /**
+     * Confirmation de l'adresse mail d'un parent dans la base de données
+     *
+     * @param string $token
+     * @param string $mail
+     * @param $string userName
+     *
+     * @return int : -1 = pas trouvé, 0 = déjà confirmé, 1 = confirmation OK
+     */
+    public function confirmeParent($userName, $mail, $token) {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT userName, mail, confirme ';
+        $sql .= 'FROM '.PFX.'thotParents ';
+        $sql .= 'WHERE userName =:userName AND mail =:mail AND SUBSTR(md5pwd, 1, 20) =:token ';
+        $requete = $connexion->prepare($sql);
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+        $requete->bindParam(':mail', $mail, PDO::PARAM_STR, 60);
+        $requete->bindParam(':token', $token, PDO::PARAM_STR, 20);
+        $resultat = $requete->execute();
+
+        if ($resultat) {
+            $ligne = $requete->fetch();
+            if ($ligne['userName'] == Null)
+                return -1;
+
+            $confirme = $ligne['confirme'];
+            if ($confirme == 0) {
+                $sql = 'UPDATE '.PFX.'thotParents ';
+                $sql .= 'SET confirme = 1 ';
+                $sql .= 'WHERE userName =:userName AND mail =:mail AND SUBSTR(md5pwd, 1, 20) =:token ';
+                $requete = $connexion->prepare($sql);
+                $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+                $requete->bindParam(':mail', $mail, PDO::PARAM_STR, 60);
+                $requete->bindParam(':token', $token, PDO::PARAM_STR, 20);
+                $resultat = $requete->execute();
+                return $resultat;
+            }
+            else return 0;
+        }
+        else return -1;
     }
 
     /**

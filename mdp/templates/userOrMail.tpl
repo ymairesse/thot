@@ -1,4 +1,4 @@
-<h3>J'ai oublié mon mot de passe (CETTE FONCTION EST EXPÉRIMENTALE)</h3>
+<h3>J'ai oublié mon mot de passe</h3>
 
 <div class="col-md-9 col-sm-6">
 
@@ -41,6 +41,7 @@
     <div class="col-md-6 col-sm-12">
         <h4>Obtenir le lien pour changer mon mot de passe</h4>
         <p>Il nous faut le nom d'utilisateur que vous avez choisi.</p>
+        <p><img src="../images/inviteParents.png" alt="Inviter ses parents" style="float:right; padding-left: 1em;">Si vous avez oublié votre nom d'utilisateur, votre enfant peut le trouver sur la plate-forme, dans la fonctionnalité d'invitation des parents.</p>
 
         <form name="userOrMail" id="userOrMail" method="POST" action="index.php" autocomplete="off" role="form" class="form-vertical">
             <div class="input-group">

@@ -2550,39 +2550,51 @@ class Bulletin
 
         return $listeMentions;
     }
+    
+        /**
+         * retourne la liste des commentaires "educ" par bulletin et par educ
+         * pour la liste d'élèves donnée
+         *
+         * @param  array $listeEleves : liste des élèves concernés
+         * @param int $bulletin : numéro du bulletin (éventuellement)
+         * @return array liste des commentaires
+         */
+        public function listeCommentairesEduc($listeEleves, $bulletin = Null) {
+            if (is_array($listeEleves)) {
+                $listeElevesString = implode(',', array_keys($listeEleves));
+            } else {
+                $listeElevesString = $listeEleves;
+            }
+            $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+            $sql = 'SELECT matricule, bulletin, fiche, commentaire, dbe.acronyme, nom, prenom, sexe, titre ';
+            $sql .= 'FROM '.PFX.'bullEducs AS dbe ';
+            $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = dbe.acronyme ';
+            $sql .= 'WHERE matricule in ('.$listeElevesString.') ';
+            if ($bulletin != Null)
+                $sql .= 'AND bulletin=:bulletin ';
 
-    /**
-     * retourne une liste des fichers éducs pour une liste d'élèves donnés et pour un bulletin donné.
-     *
-     * @param $listeEleves, $bulletin
-     *
-     * @return array
-     */
-    public function listeFichesEduc($listeEleves, $bulletin)
-    {
-        if (is_array($listeEleves)) {
-            $listeElevesString = implode(',', array_keys($listeEleves));
-        } else {
-            $listeElevesString = $listeEleves;
-        }
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT matricule, fiche ';
-        $sql .= 'FROM '.PFX.'bullEducs ';
-        $sql .= "WHERE matricule in ($listeElevesString)";
+            $requete = $connexion->prepare($sql);
+            if ($bulletin != Null)
+                $requete->bindParam(':bulletin', $bulletin, PDO::PARAM_INT);
 
-        $resultat = $connexion->query($sql);
-        $listeEducs = array();
-        if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-        }
-        while ($ligne = $resultat->fetch()) {
-            $matricule = $ligne['matricule'];
-            $listeEducs[$matricule] = $ligne['fiche'];
-        }
-        Application::DeconnexionPDO($connexion);
+            $resultat = $requete->execute();
+            $liste = array();
+            if ($resultat) {
+                $requete->setFetchMode(PDO::FETCH_ASSOC);
+                while ($ligne = $requete->fetch()) {
+                    $matricule = $ligne['matricule'];
+                    $bulletin = $ligne['bulletin'];
+                    $acronyme = $ligne['acronyme'];
+                    $commentaire = trim($ligne['commentaire']);
+                    if ($commentaire != '')
+                        $liste[$matricule][$bulletin][$acronyme] = $ligne;
+                }
+            }
 
-        return $listeEducs;
-    }
+            Application::DeconnexionPDO($connexion);
+
+            return $liste;
+        }
 
     /**
      * retourne un tableau des 4 attitudes pour tous les élèves de la liste

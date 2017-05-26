@@ -2,46 +2,41 @@
 
 <p>Tu peux inviter un maximum de deux parents.</p>
 
-<div class="panel-group" id="accordion">
+<ul class="nav nav-pills">
+    <li {if !isset($onglet)}class="active"{/if}><a data-toggle="tab" href="#parents">Parents invités</a></li>
+    <li {if (isset($onglet)) && ($onglet == 'inviter')}class="active"{/if}><a data-toggle="tab" href="#invitation">Inviter un parent</a></li>
+</ul>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-           Parent(s) invité(s)
-        </a><i class="indicator glyphicon glyphicon-chevron-down pull-right"></i>
-            </h4>
-        </div>
-        <div id="collapse1" class="panel-collapse collapse in">
-            <div class="panel-body">
-
-                {include file="parents/listeParents.tpl"}
-
+<div class="tab-content">
+    <div id="parents" class="tab-pane fade {if !isset($onglet)} in active{/if}">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                   Parent(s) invité(s)
+                </h4>
             </div>
+                <div class="panel-body">
+                    {include file="parents/listeParents.tpl"}
+                </div>
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-          Inviter un parent
-        </a><i class="indicator glyphicon glyphicon-chevron-up  pull-right"></i>
-            </h4>
-        </div>
-        <div id="collapse2" class="panel-collapse collapse">
+    <div id="invitation" class="tab-pane fade {if (isset($onglet)) && ($onglet == 'inviter')}in active{/if}">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    Inviter un parent
+                </h4>
+            </div>
             <div class="panel-body">
-
                 {if $listeParents|count < 2}
                     {include file="parents/formulaireParents.tpl" } {else} <p>Tu as déjà invité deux parents.</p>
                 {/if}
-
             </div>
         </div>
     </div>
 
 </div>
-
 
 
 {if isset($motifRefus) && ($motifRefus != '')}
@@ -72,26 +67,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#collapse1").collapse('hide');
-        $("#collapse2").collapse('show');
         $("#motifRefus").modal('show');
     })
 </script>
 {/if}
-
-
-<script type="text/javascript">
-    $(document).ready(function() {
-
-        function toggleChevron(e) {
-            $(e.target)
-                .prev('.panel-heading')
-                .find("i.indicator")
-                .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-        }
-
-        $('#accordion').on('hidden.bs.collapse', toggleChevron);
-        $('#accordion').on('shown.bs.collapse', toggleChevron);
-
-    })
-</script>

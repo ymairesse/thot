@@ -131,12 +131,12 @@
     })
 
     var nbFichiersMax = 1;
-    var maxFileSize = 4;
+    var maxFileSize = 20;
 
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
         maxFiles: nbFichiersMax,
-        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.html",
+        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf",
         url: "inc/upload.inc.php",
         accept: function(file, done) {
             done();
@@ -148,6 +148,9 @@
                 this.on("sending", function(file, xhr, formData) {
                     formData.append("idTravail", $("#modalIdTravail").val());
                 }),
+                this.on("error", function(file, response) {
+					alert('Une erreur s\'est produite.');
+					}),
                 this.on('queuecomplete', function() {
                     var idTravail = $('#modalIdTravail').val();
                     $.post('inc/files/restoreUnCasier.inc.php', {
@@ -170,7 +173,7 @@
                             // $(".dateRemise[data-idtravail='"+idTravail+"']").text(obj.fileInfos.dateRemise);
                         })
                         $("#myDropZone").hide('slow');
-                    }, 3000);
+                    }, 5000);
 
                 })
         }

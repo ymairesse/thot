@@ -32,9 +32,9 @@
         <li>au moins 2 lettres</li>
         <li>au moins 2 chiffres</li>
     </ul>
-    <p>Le système fait la distinction entre la majuscules et les minuscules.</p>
+    <p>Le système fait la distinction entre les majuscules et les minuscules.</p>
     <p>Il serait extrêmement imprudent d'utiliser un prénom ou un mot du dictionnaire.</p>
-    <p>Nous ne conservons aucun mot de passe en clair: ils sont cryptés sur notre serveur. Nous n'avons donc aucun moyen de vous rappeler un mot de passe oublié. Mais il vous sera possible de le changer.</p>
+    <p>Nous ne conservons aucun mot de passe en clair: ils sont cryptés sur notre serveur. Nous n'avons donc aucun moyen de vous rappeler un mot de passe oublié. Mais il vous sera possible d'en demander un nouveau.</p>
 </div>
 
 <div id="texte_passwd2" class="help">

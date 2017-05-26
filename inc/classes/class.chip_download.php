@@ -30,49 +30,52 @@ class chip_download
                     );
 
     private $allowed_extensions = array(
+            /* Archives */
+            'zip' => 'application/zip',
+            '7z' => 'application/octet-stream',
 
-                        /* Archives */
-                        'zip' => 'application/zip',
-                        '7z' => 'application/octet-stream',
+            /* Documents */
+            'txt' => 'text/plain',
+            'csv' => 'text/csv',
+            'mm' => 'application/x-freeplane',
+            'json' => 'application/json',
+            'html' => 'text/html',
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'xls' => 'application/vnd.ms-excel',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'odp' => 'application/vnd.oasis.opendocument.presentation',
+            'odg' => 'application/vnd.oasis.opendocument.graphics',
+            'ott' => 'application/vnd.oasis.opendocument.text-template',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'xmind' => 'application/x-xmind',
 
-                        /* Documents */
-                        'txt' => 'text/plain',
-						'csv' => 'text/csv',
-                        'html' => 'text/html',
-                        'pdf' => 'application/pdf',
-                        'doc' => 'application/msword',
-                        'xls' => 'application/vnd.ms-excel',
-                        'ppt' => 'application/vnd.ms-powerpoint',
-                        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-                        'odt' => 'application/vnd.oasis.opendocument.text',
-                        'odp' => 'application/vnd.oasis.opendocument.presentation',
-                        'odg' => 'application/vnd.oasis.opendocument.graphics',
-                        'ott' => 'application/vnd.oasis.opendocument.text-template',
-						'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-						'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-						'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            /* Executables */
+            //  	'exe'	=> 'application/octet-stream',
 
-                        /* Executables */
-                        //  	'exe'	=> 'application/octet-stream',
+            /* Images */
+            'gif' => 'image/gif',
+            'png' => 'image/png',
+            'jpg' => 'image/jpg',
+            'jpeg' => 'image/jpeg',
+            'xcf' => 'image/xcf',
 
-                        /* Images */
-                        'gif' => 'image/gif',
-                        'png' => 'image/png',
-                        'jpg' => 'image/jpeg',
-                        'jpeg' => 'image/jpeg',
-
-                        /* Audio */
-                        'mp3' => 'audio/mpeg',
+            /* Audio */
+            'mp3' => 'audio/mpeg',
 //					  	'wav'	=> 'audio/x-wav',
 
-                        /* Video */
-                        //  	'mpeg'	=> 'video/mpeg',
-                        //  	'mpg'	=> 'video/mpeg',
-                        //  	'mpe'	=> 'video/mpeg',
-                        //  	'mov'	=> 'video/quicktime',
-                        //  	'avi'	=> 'video/x-msvideo'
+            /* Video */
+            //  	'mpeg'	=> 'video/mpeg',
+            //  	'mpg'	=> 'video/mpeg',
+            //  	'mpe'	=> 'video/mpeg',
+            //  	'mov'	=> 'video/quicktime',
+            //  	'avi'	=> 'video/x-msvideo'
 
-                    );
+        );
 
     /*
     |---------------------------
@@ -415,8 +418,8 @@ class chip_download
         // on ne retient que le nom du fichier sans le chemin
         $ds = DIRECTORY_SEPARATOR;
         $shortFileName = array_reverse(explode($ds, $file))[0];
-		// les espaces sont remplacés par des _
-		$shortFileName = str_replace(' ','_',$shortFileName);
+        // les espaces sont remplacés par des _
+        $shortFileName = str_replace(' ', '_', $shortFileName);
 
         /*
         |----------------

@@ -34,7 +34,7 @@
 			<li><a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a></li>
 			<li><a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a></li>
 			{/if}
-
+			<li><a href="index.php?action=info" title="Informations"><i class="fa fa-info-circle" style="color:blue"></i></a></li>
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">
