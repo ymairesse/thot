@@ -1,19 +1,52 @@
 <?php
 
-// require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
-// $User = unserialize($_SESSION['THOT']);
-
 $matricule = $User->getMatricule();
-$classe = $User->getClasse();
-$niveau = substr($classe, 0, 1);
-$listeCoursEleve = $User->listeCoursEleve();
-$listeCoursString = "'".implode("','", $listeCoursEleve)."'";
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
-$listeDocs = $Files->listeDocumentsCasiers ($listeCoursString, $matricule);
 
-$smarty->assign('listeDocs', $listeDocs);
+$listeCours = $User->listeCoursEleve();
+$listeCoursString = "'".implode("','", $listeCours)."'";
 
-// présenter les formulaires
-$smarty->assign('corpsPage', 'files/casiers');
+// liste de tous les travaux indexés sur les cours; les keys donnent donc la liste des cours
+// "avec travaux"
+$listeCoursAvecTravaux = $Files->listeDocumentsCasiers($listeCoursString, $matricule);
+
+$idTravail = $Application->postOrCookie('idTravail');
+$coursGrp = $Application->postOrCookie('coursGrp');
+
+// si un cours a été sélectionné, retrouver les travaux pour ce cours (sauf les 'hidden' et les 'archive')
+if ($coursGrp != Null) {
+    $listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
+    $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
+    }
+    else {
+        $listeTravauxCours = Null;
+        $listeArchives = Null;
+    }
+
+// si le travail actuellement pointé par $idTravail figure dans ceux du cours,
+// on cherche les informations détaillées pour l'affichage
+if (in_array($idTravail, array_keys($listeTravauxCours))) {
+    $detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
+    $listeCotes = $Files->getCotesTravail ($idTravail, $matricule);
+    $totalTravail = $Files->totalisation($listeCotes);
+    }
+    else {
+        $detailsTravail = Null;
+        $evaluationTravail = Null;
+        $listeCotes = Null;
+        $totalTravail = Null;
+    }
+
+$smarty->assign('listeCoursAvecTravaux', $listeCoursAvecTravaux);
+$smarty->assign('listeTravauxCours', $listeTravauxCours);
+$smarty->assign('listeArchives', $listeArchives);
+$smarty->assign('idTravail', $idTravail);
+$smarty->assign('coursGrp', $coursGrp);
+$smarty->assign('detailsTravail', $detailsTravail);
+$smarty->assign('totalTravail', $totalTravail);
+
+$smarty->assign('listeCotes', $listeCotes);
+
+$smarty->assign('corpsPage', 'casiers/casiers');

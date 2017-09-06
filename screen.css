@@ -417,8 +417,10 @@ p.event-inverse, a.event-inverse {
     font-size: 8pt;
 }
 
-#modalConsigne {
+.texte {
     background-color: #ffb;
+    border: 1px solid #555;
+    padding: 0.5em 1em;
 }
 
 .readwrite {
@@ -433,6 +435,63 @@ p.event-inverse, a.event-inverse {
     background-color: #fcc;
 }
 
+.archive {
+    background-color: #555;
+    color: #fff;
+}
+
 .cote {
     font-size: 14pt;
+}
+
+.cours {
+    background-color: #fcc !important;
+}
+
+.niveau {
+    background-color: #cff;
+}
+
+.classes {
+    background-color: #cfc !important;
+}
+
+.ecole {
+    background-color: #ffc;
+}
+
+.notification {
+    cursor: pointer;
+}
+
+tr.nonLu td{
+    font-weight: bold;
+    color: #55e;
+}
+
+.avertissement {
+    padding-top: 1.5em;
+    text-align: center;
+    font-size: 64px;
+    font-weight: bold;
+    color: #bbb;
+}
+
+.notice {
+    background-color: #ee8;
+    background-position: 10px 10px;
+    background-repeat: no-repeat;
+    border: 1px solid red;
+    border-radius: 5px;
+    box-shadow: 1px 1px 12px #555;
+    margin: 1em;
+    padding: 10px;
+}
+
+.notice:before {
+    color: #2661D6;
+    content: "\e086";
+    font-family: "Glyphicons Halflings";
+    font-size: 1.5em;
+    padding: 0 5px;
 }

@@ -48,6 +48,9 @@ switch ($action) {
     case 'reunionParents':
         require_once 'inc/reunionParents.inc.php';
         break;
+    case 'mails':
+        require_once 'inc/gestMails.inc.php';
+        break;
     case 'form':
         require_once 'inc/formulaires.inc.php';
         break;
@@ -60,7 +63,6 @@ switch ($action) {
     default:
         require_once 'inc/annonces.inc.php';
         break;
-
 }
 
 $smarty->assign('action', $action);

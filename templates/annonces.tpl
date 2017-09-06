@@ -1,124 +1,155 @@
-<div class="row">
+<div id="listeAnnonces" style="max-height: 25em; overflow: auto">
 
-	<div class="col-md-3 col-sm-12">
-		{include file="annonces/titresAnnonces.tpl"}
-	</div>
+	<table class="table table-condensed table-hover">
+		<tr>
+			<th style="width:1em">&nbsp;</th>
+			<th>Date et heure</th>
+			<th>Visible le</th>
+			<th>Objet</th>
+			<th>Responsable</th>
+			<th>Destinataire</th>
+			<th>Acc. lecture</th>
+		</tr>
+		{foreach from=$listeAnnonces key=id item=dataAnnonce name=n}
+			<tr
+				data-id="{$id}"
+				data-accuse="
+					{if ($dataAnnonce.accuse == 1)}
+					 	{if $dataAnnonce.flags.dateHeure == Null}
+						1
+						{else}
+						0
+						{/if}
+					{else}
+					0
+					{/if}"
 
-	<div class="col-md-9 col-sm-12">
-		{include file="annonces/listeAnnonces.tpl"}
-	</div>
+				class="notification {$dataAnnonce.type}{if (!(isset($dataAnnonce.flags)) || $dataAnnonce.flags.lu == 0 )} nonLu{/if}">
+				<td>{$smarty.foreach.n.iteration}</td>
+				<td>{if $dataAnnonce.dateEnvoi != Null}{$dataAnnonce.dateEnvoi|truncate:16:'':true}{else}Inconnue{/if}</td>
+				<td>{$dataAnnonce.dateDebut}</td>
+				<td data-texte='{$dataAnnonce.texte}' class="texteAnnonce">{$dataAnnonce.objet}</td>
+				<td>{$dataAnnonce.proprietaire}</td>
+				<td>
+					{if $dataAnnonce.destinataire == $matricule}
+						<i class="fa fa-user text-success" title="{$dataAnnonce.pourQui}"></i>
+						{else}
+						<i class="fa fa-users text-info" title="{$dataAnnonce.pourQui}"></i>
+					{/if}
+				</td>
+				<td class="dateHeure">
+					{if $dataAnnonce.accuse == 1}
+						{if ($dataAnnonce.flags.dateHeure == Null)}
+							<i class="fa fa-warning fa-lg faa-flash animated text-danger"></i>
+							{else}
+							{$dataAnnonce.flags.dateHeure}
+						{/if}
+					{else}
+					-
+					{/if}
+				</td>
+
+			</tr>
+
+		{/foreach}
+
+	</table>
 
 </div>
-<!-- row -->
 
+<p class="help-block pull-right">Total: {$listeAnnonces|@count} annonces.</p>
 
-<div id="accuseLecture" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Accusé de lecture</h4>
-			</div>
-
-			<div class="modal-body" style="height:30em; overflow:auto;">
-				<p>Je confirme que j'ai lu l'annonce</p>
-				{foreach from=$listeAnnonces key=wtf item=sousListe}
-					{foreach from=$sousListe key=id item=data}
-					<div class="resumes" id="annonce_{$id}">
-						<p>
-							<strong>Objet:</strong> {$data.objet}</p>
-						<p>
-							<strong>Texte:</strong> {$data.texte}</p>
-					</div>
-					{/foreach}
-				{/foreach}
-			</div>
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Annuler: je vais la relire</button>
-				<button type="button" class="btn btn-primary" id="confirmation" data-id="" data-type="">J'ai bien lu et j'ai compris</button>
-			</div>
-
-		</div>
-		<!-- modal-content -->
-	</div>
-	<!-- modal-dialog -->
-</div>
-<!-- modal -->
-
-<div id="avertissement" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content alert-warning">
-
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Accusé de lecture</h4>
-			</div>
-
-			<div class="modal-body">
-				<p id="nbAccuses" data-nbaccuses="{$nbAccuses}">Vous devez confirmer la lecture de {$nbAccuses} message(s).</p>
-				<p>Voir les catégories marquées d'un signal <i class="fa fa-warning fa-lg"></i></p>
-			</div>
-
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">OK, je regarde ça.</button>
-			</div>
-
-		</div>
-		<!-- modal-content -->
-	</div>
-	<!-- modal-dialog -->
-</div>
-<!-- modal -->
-
-<h4>Légende des couleurs</h4>
+<h4>Code des couleurs</h4>
 <ul class="list-inline">
-	<li class="urgence0">Peu urgent</li>
-	<li class="urgence1">Moyennement urgent</li>
-	<li class="urgence2">Très urgent et important</li>
+	<li class="ecole">Pour tous les élèves</li>
+	<li class="niveau">Pour tous les élèves de ton niveau</li>
+	<li class="cours">Pour un ou plusieurs élèves d'un cours</li>
+	<li class="classe">Pour un ou plusieurs élèves de ta classe</li>
 </ul>
 
+{include file='annonces/modal/modalAccuseLecture.tpl'}
+{include file='annonces/modal/modalLecture.tpl'}
+
 <script type="text/javascript">
+
 	$(document).ready(function() {
 
-		if ($("#nbAccuses").data('nbaccuses') > 0)
-			$("#avertissement").modal('show');
+		var nbAccuses = {$nbAccuses};
+		var nbNonLus = {$nbNonLus};
+		var texte = 'Vous avez ';
+		if (nbNonLus > 0) {
+			texte += '<strong>' + nbNonLus + '</strong> message(s) non lu(s) ';
+			if (nbAccuses > 0)
+				texte += 'et ';
+		}
+		if (nbAccuses > 0) {
+			texte += '<strong>' + nbAccuses + '</strong> accusés de lecture en attente <i class="fa fa-warning faa-flash animated text-danger"></i>';
+		}
 
-		$(".lesAnnonces").hide();
+		if (nbAccuses > 0 || nbNonLus > 0)
+			bootbox.alert({
+				message: texte,
+				className: 'animated rubberBand',
+				backdrop: false
+			});
 
-		$(".lesAnnonces").first().show();
+		$('#listeAnnonces tr').click(function(){
+			var ligne = $(this);
+			var id = $(this).data('id');
+			// marquer l'annonce lue
+			if ($(this).hasClass('nonLu')) {
+				$.post('inc/annonces/marqueLu.inc.php', {
+					id: id
+					},
+					function(resultat){
+						ligne.removeClass('nonLu');
+					})
+				}
+			$('#listeAnnonces tr').removeClass('active');
+			$(this).addClass('active');
+			var texteHTML = $(this).find('.texteAnnonce').data('texte');
+			var accuse = $(this).data('accuse');
+			if (accuse == 1) {
+				$('#modalAccuseLecture .modal-body').html(texteHTML);
+				$('#cbConfirmation').prop('checked', false).prop('disabled', false);
 
-		$(".listeAnnonces li a").click(function() {
-			var link = $(this).attr('href');
-			$(".lesAnnonces").hide();
-			$(link).fadeIn();
-		});
-
-		$(".lecture").click(function() {
-			var id = $(this).data("id");
-			var type = $(this).data("type");
-			$(".resumes").hide();
-			$("#annonce_" + id).show();
-			$("#confirmation").data("id", id);
-			$("#confirmation").data("type", type);
-			$("#accuseLecture").modal('show');
+				$('#cbConfirmation').data('id', id);
+				$('#modalAccuseLecture').modal('show');
+			}
+				else {
+					$('#modalLecture .modal-body').html(texteHTML);
+					$('#modalLecture').modal('show');
+				}
 		})
 
-		$("#confirmation").click(function() {
-			var id = $(this).data('id');
-			var type = $(this).data('type');
-			$.post("inc/accuseReception.inc.php", {
-					id: id
-				},
-				function(resultat) {
-					$("#span" + id).text(resultat).addClass('dateLecture');
-				});
-			$("#accuseLecture").modal('hide');
-			$("#warning" + id).removeClass();
-			if ($("#panel-" + type).find('.danger').length == 0)
-				$("#panel-" + type + " .panel-title").find(".fa-warning").hide();
-		});
+		$('#modalAccuseLecture').on('hide.bs.modal', function (e) {
+			var confirme = $('#cbConfirmation').prop('checked');
+			if (confirme == false)
+				e.preventDefault();
+			})
+
+		$('#cbConfirmation').change(function(){
+			var cb = $(this);
+			cb.prop('disabled', true);
+			var id = cb.data('id');
+            if (cb.prop('checked') == true) {
+				$.post("inc/accuseLecture.inc.php", {
+						id: id
+					},
+					function(resultat) {
+						cb.next('span').text(' le '+resultat);
+						$('#modalConfirmationLecture').data('id', id);
+						$('#modalConfirmationLecture').prop('disabled', false);
+						$('#listeAnnonces table tr[data-id="' + id + '"]').find('td.dateHeure').html(resultat);
+						$('#listeAnnonces table tr[data-id="' + id + '"]').data('accuse', 0);
+					});
+                }
+        	})
+
+		$('#modalConfirmationLecture').click(function(){
+			$('#modalAccuseLecture').modal('hide');
+
+		})
 
 	})
 </script>

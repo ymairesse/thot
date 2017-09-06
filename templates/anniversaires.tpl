@@ -1,8 +1,9 @@
 <h3>Aujourd'hui le {$smarty.now|date_format:'%d/%m '}, Joyeux Anniversaire à</h3>
+
 {if $anniversaires|@count > 0}
 <ul>
 	{foreach from=$anniversaires key=matricule item=unEleve}
-	<li class="anniversaire">{$unEleve.nomPrenom} [{$unEleve.groupe}]</li>
+	<li class="anniversaire animated rollIn">{$unEleve.nomPrenom} [{$unEleve.groupe}]</li>
 	{/foreach}
 </ul>
 {else}

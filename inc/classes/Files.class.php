@@ -208,7 +208,7 @@ class Files
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT files.fileId, shareId, type, groupe, destinataire, commentaire, path, fileName, ';
-        $sql .= 'files.acronyme, nom, prenom, sexe, libelle ';
+        $sql .= 'files.acronyme, nom, prenom, sexe, libelle, dirOrFile ';
         $sql .= 'FROM '.PFX.'thotShares AS share ';
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
@@ -254,19 +254,19 @@ class Files
     }
 
     /**
-     * retourne la liste des 'id' des documents auxquels un élève a accès.
+     * retourne la liste des 'fileId' des documents auxquels un élève a accès.
      *
      * @param $matricule
      * @param $classe
      * @param $niveau
      * @param $listeCoursString : ses cours (chaînes séparées par des virgules)
      *
-     * @return array : le tableau de la liste des id's
+     * @return array : le tableau de la liste des fileId's
      */
     public function listeDocsEleve($matricule, $classe, $niveau, $listeCoursString)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT share.fileId ';
+        $sql = 'SELECT share.fileId, shareId ';
         $sql .= 'FROM '.PFX.'thotShares AS share ';
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
@@ -283,7 +283,7 @@ class Files
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
                 $fileId = $ligne['fileId'];
-                $liste[$fileId] = $fileId;
+                $liste[$fileId] = array('fileId' => $fileId, 'shareId' => $ligne['shareId']);
             }
         }
         Application::DeconnexionPDO($connexion);
@@ -321,6 +321,68 @@ class Files
     }
 
     /**
+     * retourne les caractéristiques d'un éventuel espion sur le fichier shareId
+     *
+     * @param  int $shareId
+     *
+     * @return array
+     */
+    public function getSpyInfo4ShareId ($shareId) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT spyId, dtss.shareId, dtss.isDir, dtss.fileId, acronyme ';
+        $sql .= 'FROM '.PFX.'thotSharesSpy AS dtss ';
+        $sql .= 'JOIN '.PFX.'thotShares AS dts ON dtss.shareId = dts.shareId ';
+        $sql .= 'JOIN '.PFX.'thotFiles AS dtf ON dtf.fileId = dts.fileId ';
+        $sql .= 'WHERE dtss.shareId =:shareId ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':shareId', $shareId, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+        $ligne = Null;
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $ligne = $requete->fetch();
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $ligne;
+    }
+
+    /**
+     * note le téléchargement d'un fichier référence par $spyId par l'utilisateur $acronyme
+     * s'il s'agit d'un fichier dans un dossier, $fileId indique le fichier correspondant
+     *
+     * @param string $acronyme
+     * @param int $spyId
+     * @param int $fileId (éventuellement Null)
+     *
+     * @return void()
+     */
+    public function setSpiedDownload ($userName, $userType, $spyId, $path=Null, $fileName=Null) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'thotSharesSpyUsers ';
+        $sql .= 'SET spyId=:spyId, userName=:userName, date=NOW(), userType=:userType, ';
+        $sql .= 'path=:path, fileName=:fileName ';
+        $sql .= 'ON DUPLICATE KEY UPDATE date=NOW() ';
+// echo $sql;
+        $path = ($path != Null) ? $path : '';
+        $fileName = ($fileName != Null) ? $fileName : '';
+
+        $requete = $connexion->prepare($sql);
+        $requete->bindParam(':spyId', $spyId, PDO::PARAM_INT);
+        $requete->bindParam(':userType', $userType, PDO::PARAM_STR, 6);
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 7);
+        $requete->bindParam(':path', $path, PDO::PARAM_STR, 255);
+        $requete->bindParam(':fileName', $fileName, PDO::PARAM_STR, 255);
+        $resultat = $requete->execute();
+// Application::afficher(array($spyId, $userName, $userType, $path, $fileName), true);
+        Application::DeconnexionPDO($connexion);
+
+        return ;
+    }
+
+    /**
      * retourne la liste des documents attendus pour chaque cours de la liste fournie en paramètre
      * pour l'utilisateur dont on donne le matricule.
      *
@@ -333,13 +395,15 @@ class Files
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT tt.idTravail, tt.acronyme, nom, prenom, coursGrp, tt.titre, consigne, dateDebut, dateFin, tt.statut, ';
-        $sql .= 'cote, max, remarque, evaluation, statutEleve, libelle, nbheures ';
+        $sql .= 'remarque, evaluation, libelle, nbheures, idCompetence, dttc.max ';
         $sql .= 'FROM '.PFX.'thotTravaux AS tt ';
         $sql .= 'JOIN '.PFX.'thotTravauxRemis AS tr ON tt.idTravail = tr.idTravail ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = tt.acronyme ';
         $sql .= 'JOIN '.PFX."cours AS dc ON (dc.cours = SUBSTR(coursGrp, 1, LOCATE('-', coursGrp)-1)) ";
+        $sql .= 'LEFT JOIN '.PFX.'thotTravauxCompetences AS dttc ON dttc.idTravail = tt.idTravail ';
         $sql .= "WHERE coursGrp IN ($listeCoursString) AND matricule='$matricule' ";
         $sql .= 'ORDER BY nbheures, libelle ';
+
         $resultat = $connexion->query($sql);
         $liste = array();
         if ($resultat) {
@@ -365,6 +429,152 @@ class Files
     }
 
     /**
+     * retourne la liste des résultats, par compétence, pour chacun des travaux dans les casiers
+     * et pour un élève dont on fournit le matricule
+     *
+     * @param int : $matricule
+     *
+     * @return array
+     */
+    public function listeCotesCasiers($matricule) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT matricule, dtte.idTravail, dtte.idCompetence, dtte.cote, dttc.max, libelle ';
+        $sql .= 'FROM '.PFX.'thotTravauxEvaluations AS dtte ';
+        $sql .= 'JOIN '.PFX.'thotTravauxCompetences AS dttc ON dttc.idTravail = dtte.idTravail AND dttc.idCompetence = dtte.idCompetence ';
+        $sql .= 'JOIN '.PFX.'bullCompetences AS dbc ON dbc.id = dttc.idCompetence ';
+        $sql .= 'WHERE matricule =:matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $liste = array();
+        $requete->bindValue(':matricule', $matricule, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $idTravail = $ligne['idTravail'];
+                $idCompetence = $ligne['idCompetence'];
+                $liste[$idTravail][$idCompetence] = $ligne;
+                if (!(isset($liste[$idTravail]['total'])))
+                    $liste[$idTravail]['total'] = array('cote' => '', 'max' => '');
+                $liste[$idTravail]['total']['cote'] += $ligne['cote'];
+                $liste[$idTravail]['total']['max'] += $ligne['max'];
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * retourne les cotes par compétence pour un travail dont on fournit le 'idTravail' pour l'élève $matricule
+     *
+     * @param int $idTravail
+     * @param int $matricule : matricule de l'élève
+     *
+     * @return array
+     */
+    public function getCotesTravail ($idTravail, $matricule){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT idCompetence, max, formCert, libelle, "-" AS cote ';
+        $sql .= 'FROM '.PFX.'thotTravauxCompetences AS ttc ';
+        $sql .= 'JOIN '.PFX.'bullCompetences AS bc ON bc.id = ttc.idCompetence ';
+        $sql .= 'WHERE idTravail =:idTravail ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+
+        $liste = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $idCompetence = $ligne['idCompetence'];
+                $liste[$idCompetence] = $ligne;
+            }
+        }
+        $listeCompetences = implode(',', array_keys($liste));
+
+        $sql = 'SELECT idCompetence, cote ';
+        $sql .= 'FROM '.PFX.'thotTravauxEvaluations ';
+        $sql .= "WHERE matricule=:matricule AND idTravail =:idTravail AND idCompetence IN ($listeCompetences) ";
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $idCompetence = $ligne['idCompetence'];
+                $liste[$idCompetence]['cote'] = $ligne['cote'];
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * retourne la totalisation des cotes pour les différentes compétences d'un travail
+     *
+     * @param array $listeCotes : liste des cotes par compétences
+     *
+     * @return array('cote' => valeur, 'max' => valeur)
+     */
+    public function totalisation($listeCotes){
+        $total = array('cote' => Null, 'max' => Null);
+        foreach ($listeCotes as $idCompetence => $evaluation) {
+            $cote = (float) Application::sansVirg($evaluation['cote']);
+            if ($cote != Null)
+                $total['cote'] += $cote;
+            $max = (float) Application::sansVirg($evaluation['max']);
+            if ($max != Null)
+                $total['max'] += $max;
+        }
+
+        return $total;
+    }
+
+    /**
+     * retourne la liste des compétences pour une liste de coursGrp donnée
+     *
+     * @param $listeCoursGrp
+     *
+     * @return array
+     */
+    public function listeCompetences($listeCoursGrp) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $listeCours = array();
+        foreach ($listeCoursGrp as $coursGrp) {
+            $listeCours[] = substr($coursGrp, 0, strpos($coursGrp, '-'));
+            }
+        $listeCoursString = "'".implode('\',\'', $listeCours)."'";
+        $sql = 'SELECT id, cours, ordre, libelle ';
+        $sql .= 'FROM '.PFX.'bullCompetences ';
+        $sql .= "WHERE cours IN ($listeCoursString) ";
+        $sql .= 'ORDER  BY cours, ordre ';
+        $requete = $connexion->prepare($sql);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $cours = $ligne['cours'];
+                $id = $ligne['id'];
+                $liste[$cours][$id] = $ligne['libelle'];
+                }
+            }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
      * recherche les détails relatifs à un fichier déposé par l'élève $matricule pour un $idTravail donné.
      *
      * @param $matricule
@@ -372,11 +582,11 @@ class Files
      *
      * @return array
      */
-    private function getFileInfos($matricule, $idTravail, $acronyme)
+    public function getFileInfos($matricule, $idTravail, $acronyme)
     {
         $ds = DIRECTORY_SEPARATOR;
         $dir = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule;
-        $infos = array('fileName' => null, 'size' => '', 'dateRemise' => 'Non remis');
+        $infos = array('fileName' => null, 'size' => '', 'dateRemise' => '');
         $files = @scandir($dir);
         // ce répertoire est-il défini?
         if ($files != null) {
@@ -412,6 +622,42 @@ class Files
     }
 
     /**
+     * renvoie la liste indexée sur $idTravail des différents travaux existants pour le cours $coursGrp
+     *
+     * @param string $coursGrp
+     * @param array $listeStatuts : liste des statuts souhaités (Ex: pas les hidden)
+     *
+     * @return array
+     */
+    public function getTravaux4Cours($coursGrp, $listeStatuts=Null) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT idTravail, acronyme, coursGrp, titre, consigne, dateDebut, dateFin, statut ';
+        $sql .= 'FROM '.PFX.'thotTravaux ';
+        $sql .= 'WHERE coursGrp=:coursGrp ';
+        if ($listeStatuts != Null) {
+            $listeStatutsString = "'".implode("','", $listeStatuts)."'";
+            $sql .= "AND statut IN ($listeStatutsString) ";
+        }
+        $sql .= 'ORDER BY dateDebut, titre ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindValue(':coursGrp', $coursGrp, PDO::PARAM_STR);
+        $resultat = $requete->execute();
+        $liste = array();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $idTravail = $ligne['idTravail'];
+                $liste[$idTravail] = $ligne;
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
      * retourne les détails d'un travail dont on fournit l'idTravail et le matricule de l'élève.
      *
      * @param $idTravail
@@ -423,7 +669,7 @@ class Files
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT tt.idTravail, tt.acronyme, nom, prenom, coursGrp, tt.titre, consigne, dateDebut, dateFin, tt.statut, ';
-        $sql .= 'cote, max, evaluation, remarque,  statutEleve, libelle, nbheures ';
+        $sql .= 'cote, max, evaluation, remarque, libelle, nbheures ';
         $sql .= 'FROM '.PFX.'thotTravaux AS tt ';
         $sql .= 'JOIN '.PFX.'thotTravauxRemis AS tr ON tt.idTravail = tr.idTravail ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = tt.acronyme ';
@@ -440,6 +686,7 @@ class Files
             $details['dateDebut'] = Application::datePHP($details['dateDebut']);
             $details['dateFin'] = Application::datePHP($details['dateFin']);
             $fileInfos = $this->getFileInfos($matricule, $idTravail, $acronyme);
+
             $details['fileInfos'] = $fileInfos;
         }
 
@@ -447,6 +694,84 @@ class Files
 
         return $details;
     }
+
+    /**
+     *
+     * retourne les caractéristiques de l'évaluation du travail idTravail pour l'élève $matricule.
+     *
+     * @param $idTravail
+     * @param $matricule
+     *
+     * @return array
+     */
+    public function getEvaluationTravail($idTravail, $matricule)
+    {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+
+        // recherche des compétences et des maximas pour ce travail
+        $sql = 'SELECT idCompetence, max, dbc.libelle, formCert ';
+        $sql .= 'FROM '.PFX.'thotTravauxCompetences AS dttc ';
+        $sql .= 'JOIN '.PFX.'bullCompetences AS dbc ON dbc.id = dttc.idCompetence ';
+        $sql .= 'WHERE idTravail =:idTravail ';
+        $requete = $connexion->prepare($sql);
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+
+        $listeCompetences = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $idCompetence = $ligne['idCompetence'];
+                $listeCompetences[$idCompetence] = $ligne;
+                // $listeCompetences[$idCompetence]['max'] = $ligne['max'];
+                // $listeCompetences[$idCompetence]['libelle'] = $ligne['libelle'];
+            }
+        }
+
+        // recherche des cotes obenues pour chaque compétences
+        $sql = 'SELECT idCompetence, cote ';
+        $sql .= 'FROM '.PFX.'thotTravauxEvaluations ';
+        $sql .= 'WHERE matricule =:matricule AND idTravail =:idTravail ';
+        $requete = $connexion->prepare($sql);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+        $listeResulats = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $idCompetence = $ligne['idCompetence'];
+                $listeResultats['cotes'][$idCompetence] = array(
+                    'libelle' => $listeCompetences[$idCompetence]['libelle'],
+                    'formCert' => $listeCompetences[$idCompetence]['formCert'],
+                    'cote' => $ligne['cote'],
+                    'max' => $listeCompetences[$idCompetence]['max']
+                );
+                }
+            }
+
+        // recherche du commentaire professeur pour cette évaluation
+        $sql = 'SELECT evaluation, acronyme, consigne, dateDebut, dateFin ';
+        $sql .= 'FROM '.PFX.'thotTravauxRemis AS dtr ';
+        $sql .= 'JOIN '.PFX.'thotTravaux AS dt ON dt.idTravail = dtr.idTravail ';
+        $sql .= 'WHERE dtr.idTravail =:idTravail AND matricule =:matricule ';
+        $requete = $connexion->prepare($sql);
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+        $commentaire = '';
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $ligne = $requete->fetch();
+            $commentaire = $ligne['evaluation'];
+        }
+        $listeResultats['commentaire'] = $commentaire;
+
+        return $listeResultats;
+    }
+
 
     /**
      * vérifie que l'élève $matricule est effectivement affecté à un travail dont on fournit l'idTravail.
@@ -546,12 +871,10 @@ class Files
     }
 
     /**
-     * Supprime un fichier $fileName correspondant à un travail $idTravail appartenant à $acronyme pour l'élève $matricule.
+     * Supprime un fichier correspondant à un travail $idTravail appartenant à l'élève $matricule.
      *
      * @param $idTravail
-     * @param $acronyme
      * @param $matricule
-     * @param $fileName
      *
      * @return int : nombre de fichiers supprimés
      */

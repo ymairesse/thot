@@ -33,28 +33,23 @@ class user
     public function setIdentite($userType)
     {
         $userName = addslashes($this->userName);
-        $acronyme = addslashes($this->acronyme);
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         switch ($userType) {
-            case 'eleves':
+            case 'eleve':
                 $sql = "SELECT 'eleve' AS type, el.matricule, nom, prenom, classe, groupe, section, mailDomain, md5pwd ";
                 $sql .= 'FROM '.PFX.'eleves AS el ';
                 $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
                 $sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";
                 break;
-            case 'parents':
+
+            case 'parent':
                 $sql = "SELECT 'parent' AS type, formule, userName, tp.matricule, tp.nom, tp.prenom, lien, mail, classe, groupe, section, md5pwd, ";
                 $sql .= 'de.nom AS nomEl, de.prenom AS prenomEl ';
                 $sql .= 'FROM '.PFX.'thotParents AS tp ';
                 $sql .= 'JOIN '.PFX.'eleves AS de ON de.matricule = tp.matricule ';
                 $sql .= "WHERE userName = '$userName' LIMIT 1 ";
                 break;
-            // case 'prof':
-            //     $sql = "SELECT 'prof' AS type, formule, userName, tp.matricule, nom, prenom, mail, classe, groupe, md5pwd, ";
-            //     $sql .= 'dp.nom AS nomProf, dp.prenom AS prenomProf ';
-            //     $sql .= 'JOIN '.PFX."profs AS dp ON dp.acronyme = '$acronyme' ";
-            //     $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
-            //     $sql .= "
+
             default:
                 die('invalid userType');
                 break;

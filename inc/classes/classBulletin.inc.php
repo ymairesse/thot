@@ -460,8 +460,9 @@ class Bulletin
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT id, cours, ordre, libelle ';
         $sql .= 'FROM '.PFX.'bullCompetences ';
-        $sql .= "WHERE cours IN ($listeCoursString)";
-        $sql .= 'ORDER BY ordre';
+        $sql .= "WHERE cours IN ($listeCoursString) ";
+        $sql .= 'ORDER BY ordre ';
+
         $resultat = $connexion->query($sql);
         $listeCompetences = array();
         if ($resultat) {
@@ -2550,7 +2551,7 @@ class Bulletin
 
         return $listeMentions;
     }
-    
+
         /**
          * retourne la liste des commentaires "educ" par bulletin et par educ
          * pour la liste d'élèves donnée

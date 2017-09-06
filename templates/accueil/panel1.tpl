@@ -38,7 +38,7 @@
                             <!-- form-group -->
 
                             <button type="submit" class="btn btn-primary" tabindex="3">Connexion Élèves</button>
-                            <input type="hidden" name="userType" value="eleves">
+                            <input type="hidden" name="userType" value="eleve">
 
                         </form>
 
@@ -69,7 +69,7 @@
                             <a href="mdp/index.php">Mot de passe oublié</a>
 
                             <button type="submit" class="btn btn-primary pull-right" tabindex="5">Connexion Parents</button>
-                            <input type="hidden" name="userType" value="parents">
+                            <input type="hidden" name="userType" value="parent">
 
                         </form>
 

@@ -25,6 +25,7 @@ class Formulaires
         $sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole', $listeCoursString) ";
         $sql .= 'AND (dateFin >= NOW() AND dateDebut <= NOW()) ';
         $sql .= 'ORDER BY dateDebut ';
+        
         $resultat = $connexion->query($sql);
         $liste = array();
         if ($resultat) {

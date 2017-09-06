@@ -20,8 +20,8 @@ if ($listeCoursGrp) {
     $commentairesCotes = $Bulletin->listeCommentairesTousCours($matricule, $noBulletin);
     $mentions = $Bulletin->listeMentions($matricule, $noBulletin);
 
-    $commentairesEducs = $Bulletin->listeCommentairesEduc($matricule, $bulletin);
-    $commentairesEducs = isset($commentairesEducs[$matricule][$bulletin]) ? $commentairesEducs[$matricule][$bulletin] : Null;
+    $commentairesEducs = $Bulletin->listeCommentairesEduc($matricule, $noBulletin);
+    $commentairesEducs = isset($commentairesEducs[$matricule][$noBulletin]) ? $commentairesEducs[$matricule][$noBulletin] : Null;
 
     $remarqueTitulaire = $Bulletin->remarqueTitu($matricule, $noBulletin);
     if ($remarqueTitulaire != null) {

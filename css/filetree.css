@@ -166,7 +166,7 @@ ul.filetree a.dirLink {
     background: url(images/css.png) no-repeat left top;
 }
 
-.filetree li.ext_doc {
+.filetree li.ext_doc, .filetree li.ext_docx {
     background: url(images/doc.png) no-repeat left top;
 }
 

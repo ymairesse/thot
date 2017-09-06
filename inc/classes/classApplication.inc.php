@@ -79,7 +79,7 @@ class Application
      * @param :    $data n'importe quel tableau ou variable
      * @param bool $die  : si l'on souhaite interrompre le programme avec le dump
      * */
-    public static function afficher($data, $die = false)
+    static function afficher($data, $die = false)
     {
         if (count($data) == 0) {
             echo 'Tableau vide';
@@ -92,6 +92,43 @@ class Application
         if ($die) {
             die();
         }
+    }
+
+    /**
+     * afficher proprement le contenu d'une variable
+     * sans affichage visible à l'écran
+     * le programme est éventuellement interrompu si demandé.
+     *
+     * @param $data
+     * @param bool $die: si l'on souhaite interrompre le programme avec le dump
+     *
+     * */
+     static function afficher_silent($tableau, $die = false)
+     {
+         echo '<!-- ';
+         self::afficher($tableau, $die);
+         echo '-->';
+     }
+
+    /**
+     * retourne la valeur "POSTEE" ou, si pas de POST, la valeur du COOKIE
+     * fixe la valeur du COOKIE à la valeur "POSTEE"
+     *
+     * @param  string $name  $_POST[$name]
+     * @param  int $duree: durée de validité du cookie
+     *
+     * @return string
+     */
+    public static function postOrCookie ($name, $duree=Null) {
+        if ($duree == Null)
+            $duree = time() + 365 * 24 * 3600;
+        if (isset($_POST[$name])) {
+            $value = $_POST[$name];
+            setcookie($name, $value, $duree, '/', null, false, true);
+        } else {
+                $value = (isset($_COOKIE[$name])) ? $_COOKIE[$name] : null;
+            }
+        return $value;
     }
 
     /**
@@ -235,6 +272,24 @@ class Application
         return $heure;
     }
 
+
+    /**
+     * convertir un datetime (date et heure) MySQL en date et heure conventionnel en français
+     *
+     * @param string dateTime : au format YYYY-MM-DD hh:mm
+     *
+     * @return string : DD-MM-YYYY hh:mm
+     */
+    public function dateTimeFr($dateTime) {
+        if ($dateTime != Null) {
+            $dateEnvoi = explode(' ', $dateTime);
+            $date = self::datePHP($dateEnvoi[0]);
+
+            return sprintf('%s %s', $date, $dateEnvoi[1]);
+        }
+        else return Null;
+    }
+
     /**
      * retourne le jour de la semaine correspondant à une date au format MySQL.
      *
@@ -278,6 +333,21 @@ class Application
     }
 
     /**
+     * Suppression de la virgule et remplacement par un point dans les nombres + suppression des espaces.
+     *
+     * @param $nombre string
+     *
+     * @return string
+     */
+    public static function sansVirg($nombre)
+    {
+        $nombre = preg_replace("/,/", ".",$nombre);
+        $nombre = filter_var($nombre, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
+        return $nombre;
+    }
+
+    /**
      * filtrage des actions par utilisateur.
      *
      * @param $action : action envisagée
@@ -288,13 +358,13 @@ class Application
     public function filtreAction($action, $userType)
     {
         switch ($userType) {
-            case 'eleves':
-                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form', 'info');
+            case 'eleve':
+                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form', 'info', 'mails');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
-            case 'parents':
+            case 'parent':
                 $permis = array('bulletin', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form', 'info');
                 if (!(in_array($action, $permis))) {
                     $action = null;
@@ -455,42 +525,93 @@ class Application
     }
 
     /**
-     * liste structurée des profs liés à une liste de coursGrp (liste indexée par coursGrp).
+     * retourne le nom en français du cours dont on fournit le code (Ex: 2C:INFO2-03)
      *
-     * @param string | array : $listeCoursGrp
+     * @param string $coursGrp
      *
-     * @return array
+     * @return string
      */
+    public function nomCours ($coursGrp) {
+        $cours = substr($coursGrp, 0, strpos($coursGrp,'-'));
+
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT libelle, nbheures ';
+        $sql .= 'FROM '.PFX.'cours ';
+        $sql .= 'WHERE cours=:cours ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':cours', $cours, PDO::PARAM_STR, 16);
+        $resultat = $requete->execute();
+        $nomCours = '';
+        if ($resultat) {
+            $ligne = $requete->fetch();
+            $nomCours = sprintf('%s %dh', $ligne['libelle'], $ligne['nbheures']);
+        }
+
+        self::DeconnexionPDO($connexion);
+
+        return $nomCours;
+    }
 
     /**
-     * retourne la liste structurée par type de destinataire des annonces destinées à l'élève dont on donne le matricule et la classe.
+     * détermine la nature précise du destinataire d'une annonces
+     *
+     * @param $type : le type général de destinataire (ecole, niveau, classe, cours)
+     * @param $destinataire : précision du destinataire: $niveau, $classe, $cours
+     *
+     * @return string
+     */
+    public function pourQui($type, $destinataire, $matricule, $nomEleve) {
+        if ($matricule == $destinataire)
+            return $nomEleve;
+            else  {
+                switch ($type) {
+                    case 'ecole':
+                        return 'TOUS';
+                        break;
+                    case 'niveau':
+                        return sprintf('Élèves de %de année', $destinataire);
+                        break;
+                    case ('cours'):
+                        return sprintf('Les élèves du cours %s', self::nomCours($destinataire));
+                        break;
+                    case ('classes'):
+                        return sprintf('Les élèves de %s', $destinataire);
+                        break;
+                    }
+            }
+    }
+
+    /**
+     * retourne la liste structurée des annonces destinées à l'élève dont on donne le matricule et la classe.
      *
      * @param $matricule
      * @param $classe
      *
      * @return array
      */
-    public function listeAnnonces($matricule, $classe, $listeCours)
+    public function listeAnnonces($matricule, $classe, $listeCours, $nomEleve)
     {
         $niveau = substr($classe, 0, 1);
         $listeCoursString = "'".implode('\',\'', $listeCours)."'";
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT dtn.id, type, proprietaire, destinataire, objet, texte, dateDebut, dateFin, urgence, dtn.mail, accuse, dp.nom, dp.sexe ';
+        $sql = 'SELECT dtn.id, type, proprietaire, destinataire, objet, texte, dateDebut, dateFin, dtn.mail, accuse, dp.nom, dp.sexe, dateEnvoi ';
         $sql .= 'FROM '.PFX.'thotNotifications AS dtn ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = dtn.proprietaire ';
         $sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole', $listeCoursString) ";
         $sql .= 'AND (dateFin > NOW() AND dateDebut <= NOW()) ';
-        $sql .= 'ORDER BY urgence DESC, dateDebut ';
+        $sql .= 'ORDER BY dateEnvoi DESC, dateDebut DESC ';
+
         $resultat = $connexion->query($sql);
         $listeAnnonces = array();
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
-                $type = $ligne['type'];
-                // $destinataire = $ligne['destinataire'];
                 $id = $ligne['id'];
                 $ligne['dateDebut'] = self::datePHP($ligne['dateDebut']);
                 $ligne['dateFin'] = self::datePHP($ligne['dateFin']);
+                $ligne['dateEnvoi'] = self::dateTimeFr($ligne['dateEnvoi']);
+                $ligne['pourQui'] = self::pourQui($ligne['type'], $ligne['destinataire'], $matricule, $nomEleve);
                 if ($ligne['nom'] != '') {
                     switch ($ligne['sexe']) {
                         case 'M':
@@ -501,7 +622,7 @@ class Application
                             break;
                     }
                 }
-                $listeAnnonces[$type][$id] = $ligne;
+                $listeAnnonces[$id] = $ligne;
             }
         }
         self::DeconnexionPDO($connexion);
@@ -510,100 +631,65 @@ class Application
     }
 
     /**
-     * Liste des accusés de lecture demandés à un élève dont on fournit le matricule.
-     *
-     * @param $matricule : le matricule de l'élève
-     *
-     * @return array : la liste des accusés triés par id
-     */
-    public function listeAccusesEleve($matricule)
-    {
-        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT id, dateHeure ';
-        $sql .= 'FROM '.PFX.'thotAccuse ';
-        $sql .= "WHERE matricule = '$matricule' ";
-        $resultat = $connexion->query($sql);
-        $liste = array();
-        if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
-                $id = $ligne['id'];
-                $ligne['dateHeure'] = isset($ligne['dateHeure']) ? $this->dateHeure($ligne['dateHeure']) : null;
-                $liste[$id] = $ligne;
-            }
-        }
-        self::DeconnexionPDO($connexion);
-
-        return $liste;
-    }
-
-    /**
-     * Liste des annonces et des demandes d'accusés de lecture correspondant (si existant).
+     * Fusionne la liste des annonces et la liste des flags
      *
      * @param $listeAnnonces : liste des annonces triées par id de l'annonce
-     * @param $listeAccuses : liste des demandes d'accusés de lecture triées par id
+     * @param $listeFlas : liste des demandes d'accusés de lecture triées par id
      *
      * @return array : combinaison des deux arrays de données
      */
-    public function listeAnnoncesAccuses($listeAnnonces, $listeAccuses)
+    public function comboAnnoncesFlags($listeAnnonces, $listeFlagsAnnonces)
     {
-        foreach ($listeAnnonces as $type => $listeType) {
-            foreach ($listeType as $id => $dataAnnonce) {
-                $dateHeure = isset($listeAccuses[$id]) ? $listeAccuses[$id]['dateHeure'] : null;
-                $listeAnnonces[$type][$id]['dateHeure'] = $dateHeure;
-            }
+        foreach ($listeAnnonces as $id => $dataAnnonce) {
+            if (isset($listeFlagsAnnonces[$id])) {
+                $listeAnnonces[$id]['flags'] = $listeFlagsAnnonces[$id];
+                }
+                else $listeAnnonces[$id]['flags'] = array('lu' => Null, 'dateHeure' => Null);
         }
 
         return $listeAnnonces;
     }
 
     /**
-     * retourne une liste simple des accusés de lecture pour une liste d'annonces; la liste est classée par groupe d'annonces.
+     * retourne le nombre d'accusés de lecture manquants pour un élève; on fournit la liste des annonces comboAnnoncesFlags
      *
-     * @param $listeAnnonces : la liste complète des annonces (voir la fonction listeAnnonces)
-     * @param $matricule : matricule de l'élève concerné
-     * @param $classe: classe de l'élève
+     * @param array $listeAnnoncesCombo
      *
-     * @return array : pour chaque type d'annonces, le nombre d'accusés de lecture demandés
+     * @return int
      */
-    public function shortListeAccuses($listeAnnonces, $matricule, $classe)
-    {
-        // détermination du niveau d'étude
-        $niveau = substr($classe, 0, 1);
-        // initialisation du tableau
-        $listeAccuses = array('eleves' => 0, 'cours' => 0, 'classes' => 0, 'niveau' => 0, 'ecole' => 0);
-
-        foreach ($listeAnnonces as $unType => $unPaquet) {
-            foreach ($unPaquet as $destinataire => $uneAnnonce) {
-                $type = $uneAnnonce['type'];
-                if (($uneAnnonce['accuse'] == 1) && ($uneAnnonce['dateHeure'] == null)) {
-                    ++$listeAccuses[$type];
+    public function nbAccusesManquants($listeAnnoncesCombo) {
+        $nb = 0;
+        foreach ($listeAnnoncesCombo as $id => $uneAnnonce) {
+            if ($uneAnnonce['accuse'] == 1) {
+                if ($uneAnnonce['flags']['dateHeure'] == Null) {
+                    $nb++;
+                    }
                 }
             }
-        }
-
-        return $listeAccuses;
-    }
-
-    /**
-     * renvoie le nombre d'accusés de lecture pour une liste de demande d'accusés fournie.
-     *
-     * @param $listeAccuses : liste des accusés de lecture par type
-     *
-     * @return integer: nombre total d'accusés de lecture demandés
-     */
-    public function nbAccuses($listeAccuses)
-    {
-        $nb = 0;
-        foreach ($listeAccuses as $type => $nombre) {
-            $nb += $nombre;
-        }
 
         return $nb;
     }
 
     /**
-     * marque une notification lue pour un élève donné.
+     * retourne le nombre de messages non lus pour un élève dont on fournit la liste des annonces comboAnnoncesFlags
+     *
+     * @param array $listeAnnoncesCombo
+     *
+     * @return int
+     */
+    public function nbNonLus($listeAnnoncesCombo) {
+        $nb = 0;
+        foreach ($listeAnnoncesCombo as $id => $uneAnnonce) {
+            if ($uneAnnonce['flags']['lu'] == 0) {
+                $nb++;
+                }
+            }
+
+        return $nb;
+    }
+
+    /**
+     * marque un accusé de lecture d'une notification  pour un élève donné.
      *
      * @param $matricule: identité de l'élève
      * @param $id : id de la notification
@@ -612,27 +698,93 @@ class Application
      */
     public function marqueAccuse($matricule, $id)
     {
-        $dateHeure = '';
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'UPDATE '.PFX.'thotAccuse ';
-        $sql .= 'SET dateHeure = NOW() ';
-        $sql .= "WHERE id='$id' AND matricule='$matricule' ";
-        $resultat = $connexion->exec($sql);
+        $sql = 'INSERT INTO '.PFX.'thotNotifFlags ';
+        $sql .= 'SET id=:id, dateHeure = NOW(), matricule=:matricule ';
+        $sql .= 'ON DUPLICATE KEY UPDATE dateHeure = NOW() ';
+        $requete = $connexion->prepare($sql);
+
+        $dateHeure = '';
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+        $resultat = $requete->execute();
         if ($resultat) {
             $sql = 'SELECT dateHeure ';
-            $sql .= 'FROM '.PFX.'thotAccuse ';
-            $sql .= "WHERE id='$id' AND matricule='$matricule' ";
+            $sql .= 'FROM '.PFX.'thotNotifFlags ';
+            $sql .= 'WHERE id=:id AND matricule=:matricule ';
+            $requete = $connexion->prepare($sql);
+            $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+            $requete->bindParam(':id', $id, PDO::PARAM_INT);
 
-            $resultat = $connexion->query($sql);
+            $resultat = $requete->execute();
             if ($resultat) {
-                $resultat->setFetchMode(PDO::FETCH_ASSOC);
-                $ligne = $resultat->fetch();
+                $ligne = $requete->fetch();
                 $dateHeure = $this->dateHeure($ligne['dateHeure']);
             }
         }
         self::DeconnexionPDO($connexion);
 
         return $dateHeure;
+    }
+
+    /**
+     * note la lecture de la notification $id pour un élève $matricule donné.
+     *
+     * @param $matricule: identité de l'élève
+     * @param $id : id de la notification
+     *
+     * @return string: jour et heure de lecture
+     */
+    public function marqueLu($matricule, $id)
+    {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'thotNotifFlags ';
+        $sql .= 'SET id=:id, lu=1, matricule=:matricule ';
+        $sql .= 'ON DUPLICATE KEY UPDATE lu = 1 ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+
+        self::DeconnexionPDO($connexion);
+
+        return $resultat;
+    }
+
+    /**
+     * renvoie un tableau de tous les flags existants pour la liste d'annonce passée en paramètre
+     *
+     * @param array $listeAnnonces: liste **des clefs** pour les annonces
+     * @param int $matricule : le matricule de l'élève concerné
+     *
+     * @return array
+     */
+    public function listeFlagsAnnonces($listeAnnonces, $matricule) {
+        $listeAnnoncesString = implode(', ', $listeAnnonces);
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT id, matricule, dateHeure, lu ';
+        $sql .= 'FROM '.PFX.'thotNotifFlags ';
+        $sql .= "WHERE matricule=:matricule AND id IN ($listeAnnoncesString) ";
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+        $liste = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $id = $ligne['id'];
+                $liste[$id] = array(
+                    'dateHeure' => $this->dateHeure($ligne['dateHeure']),
+                    'lu' => $ligne['lu']
+                    );
+                }
+            }
+
+        self::DeconnexionPDO($connexion);
+
+        return $liste;
     }
 
     /**
@@ -645,11 +797,12 @@ class Application
      */
     private function dateHeure($dateHeure)
     {
-        $dateHeure = explode(' ', $dateHeure);
-        $date = $dateHeure[0];
-        $date = self::datePHP($date);
-        $dateHeure = $date.' à '.substr($dateHeure[1], 0, 5);
-
+        if($dateHeure != '') {
+            $dateHeure = explode(' ', $dateHeure);
+            $date = $dateHeure[0];
+            $date = self::datePHP($date);
+            $dateHeure = $date.' à '.substr($dateHeure[1], 0, 5);
+        }
         return $dateHeure;
     }
 
@@ -1124,6 +1277,8 @@ class Application
      * Effacement de toutes les notifications périmées et qui ne sont pas gelées par leur propriétaire.
      *
      * @param void()
+     *
+     * @return void()
      */
     public function delPerimes()
     {
@@ -1133,6 +1288,14 @@ class Application
         $sql .= "WHERE dateFin < '$date' AND freeze = 0 ";
 
         $resultat = $connexion->exec($sql);
+
+        // suppression des accusés de lecture devenus sans objet (plus de notification correspondante)
+        $sql = 'DELETE FROM '.PFX.'thotAccuse ';
+        $sql .= 'WHERE id NOT IN (SELECT id FROM '.PFX.'thotNotifications) ';
+        $requete = $connexion->prepare($sql);
+
+        $resultat = $requete->execute();
+
         self::DeconnexionPDO($connexion);
     }
 
@@ -2250,4 +2413,13 @@ class Application
 
         return self::datePHP($date);
     }
+
+
+
+    /**
+     * renvoie la liste des adressses mail des élè
+     */
+//     SELECT user, mailDomain, nom, prenom, groupe FROM `didac_passwd` AS dpw
+// JOIN didac_eleves AS de ON de.matricule = dpw.matricule
+// WHERE dpw.matricule = 6510
 }

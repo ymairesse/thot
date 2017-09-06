@@ -4,14 +4,16 @@ require_once '../../config.inc.php';
 
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
-
-// définition de la class USER utilisée en variable de SESSION
-require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 session_start();
+
 if (!(isset($_SESSION[APPLICATION]))) {
-    die("<div class='alert alert-danger'>Votre session a expiré. Veuillez vous reconnecter.</div>");
+    echo "<script type='text/javascript'>document.location.replace('".BASEDIR."');</script>";
+    exit;
 }
-$User = unserialize($_SESSION['THOT']);
+
+require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
+$User = unserialize($_SESSION[APPLICATION]);
+
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';

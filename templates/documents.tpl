@@ -40,8 +40,9 @@
                 <tr>
                     <td>{$data.groupe}</td>
                     <td>
-                        {if $data.fileName != ''}
-                        <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
+                        {if $data.dirOrFile == 'file'}
+                        <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a>
+                        {else}
                         <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                             <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
                         </button>
@@ -58,6 +59,7 @@
 
     <div id="cours" class="tab-pane fade" style="min-height:30em; overflow:auto;">
         <h3>Les documents pour mes cours</h3>
+
         {if isset($listeDocs.cours)}
 
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
@@ -89,7 +91,7 @@
                     {foreach from=$dataBranche key=fileId item=dataDoc}
                     <tr>
                         <td>
-                            {if $dataDoc.fileName != ''}
+                            {if $dataDoc.dirOrFile == 'file'}
                             <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
                             <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$dataDoc.commentaire}">
                                 <i class="fa fa-folder-open"></i> Dossier: {$dataDoc.commentaire|truncate:40}
@@ -126,7 +128,7 @@
             {if isset($listeDocs.niveau)} {foreach from=$listeDocs.niveau key=fileId item=data}
             <tr>
                 <td>
-                    {if $data.fileName != ''}
+                    {if $data.dirOrFile == 'file'}
                     <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
                     <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                         <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
@@ -153,8 +155,9 @@
             {if isset($listeDocs.ecole)} {foreach from=$listeDocs.ecole key=fileId item=data}
             <tr>
                 <td>
-                    {if $data.fileName != ''}
-                    <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
+                    {if $data.dirOrFile == 'file'}
+                    <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a>
+                    {else}
                     <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
                         <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
                     </button>

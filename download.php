@@ -4,21 +4,23 @@ require_once 'config.inc.php';
 
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
-
 session_start();
 
-// définition de la class USER utilisée en variable de SESSION
-require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
-$User = isset($_SESSION[APPLICATION]) ? unserialize($_SESSION[APPLICATION]) : null;
-
-// si pas d'utilisateur authentifié en SESSION et répertorié dans la BD, on renvoie à l'accueil
-if ($User == null) {
-    header('Location: accueil.php');
+if (!(isset($_SESSION[APPLICATION]))) {
+    echo "<script type='text/javascript'>document.location.replace('".BASEDIR."');</script>";
+    exit;
 }
+
+require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
+$User = unserialize($_SESSION[APPLICATION]);
+
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
+
+$userName = $User->getUserName();
+$userType = $User->getUserType();
 
 // téléchargement sur base du fileId ou du nom du fichier et du path?
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
@@ -33,7 +35,6 @@ $fileNotFound = 'Document non identifié';
 $noAccess = 'Vous n\'avez pas accès à ce document';
 
 // vérifier dans la table des shares si l'utilisateur courant a accès au fichier
-$matricule = $User->getMatricule();
 $classe = $User->getClasse();
 $niveau = substr($classe, 0, 1);
 $listeCoursEleve = $User->listeCoursEleve();
@@ -49,9 +50,16 @@ switch ($type) {
         }
         $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
         // si le répertoire $fileId est dans les documents partagés avec cet élève
-        if (in_array($fileId, $listeDocs)) {
+        if (in_array($fileId, array_keys($listeDocs))) {
+            $shareId = $listeDocs[$fileId]['shareId'];
             $fileData = $Files->getFileData($fileId);
-            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'];
+            // le fichier qui sera réellement téléchargé dans le répertoire partagé
+            $downloadedFileInfo = array(
+                'path' => substr($fileName, 0, strrpos($fileName, '/')+1),
+                'fileName' => substr($fileName, strrpos($fileName, '/') + 1),
+            );
+
+            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$fileData['fileName'];
         } else {
             die($noAccess);
         }
@@ -72,8 +80,9 @@ switch ($type) {
         }
         $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
         // si le fichier figure parmi les documents partagés avec cet élève
-        if (in_array($fileId, $listeDocs)) {
+        if (in_array($fileId, array_keys($listeDocs))) {
             // récupérer les données du fichier
+            $shareId = $listeDocs[$fileId]['shareId'];
             $fileData = $Files->getFileData($fileId);
             $fileName = $fileData['fileName'];
             $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$ds;
@@ -126,6 +135,15 @@ if ($download_hook['download'] != 1) {
 if ($download_hook['download'] == true) {
 
     /* You can write your logic before proceeding to download */
+    // enregistrement du suivi de téléchargement pour le document
+    $spyInfo = $Files->getSpyInfo4ShareId($shareId);
+    // il y a un espion sur le fichier ou le répertoire
+    if (!(empty($spyInfo))) {
+        $spyId = $spyInfo['spyId'];
+        $path = (isset($downloadedFileInfo['path'])) ? $downloadedFileInfo['path'] : Null;
+        $fileName = (isset($downloadedFileInfo['fileName'])) ? $downloadedFileInfo['fileName'] : Null;
+        $Files->setSpiedDownload($userName, $userType, $spyId, $path, $fileName);
+    }
 
     /* Let's download file */
     $download->get_download();

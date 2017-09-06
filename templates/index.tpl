@@ -15,13 +15,14 @@
 	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/jquery.validate.js"></script>
+	<script type="text/javascript" src="js/bootbox.min.js"></script>
 
 	<script type="text/javascript" src="js/moment-with-locales.js"></script>
 	<script type="text/javascript" src="fc/fullcalendar.js"></script>
 	<script type="text/javascript" src="fc/lang/fr.js"></script>
-	 </script>
 
 	<link rel="stylesheet" href="fc/fullcalendar.css" media="screen">
+	<link rel="stylesheet" href="css/animate/animate.min.css">
 
 </head>
 
@@ -30,7 +31,10 @@
 
 		{include file="entete.tpl"}
 		{include file="menu.tpl"}
-		{if isset($selecteur)} {include file="$selecteur.tpl"} {/if}
+		{if isset($selecteur)}
+			{include file="$selecteur.tpl"}
+		{/if}
+		
 		{if (isset($message))}
 		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">

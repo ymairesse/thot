@@ -6,16 +6,29 @@
             <strong class="dateRemise" data-idTravail="{$data.idTravail}">{$data.fileInfos.dateRemise}</strong>
         </p>
         <p>
-            {if ($data.cote == null) && ($data.fileInfos.fileName != '')}
+
+            {if isset($listeCotes.$idTravail) && ($listeCotes.$idTravail.total.cote != '')}
+
+                <button type="button"
+                        style="float:left; margin-right:0.5em;"
+                        class="btn btn-xs btn-success btnVoirEval"
+                        data-coursgrp="{$coursGrp}"
+                        data-idTravail="{$data.idTravail}">
+                    Voir
+                </button>
+                <strong>{$listeCotes.$idTravail.total.cote}/{$listeCotes.$idTravail.total.max}</strong>
+            {else}
+                {if $data.fileInfos.fileName != ''}
                 <button type="button"
                         class="btn btn-xs btn-danger btnDel"
                         data-idtravail="{$data.idTravail}"
                         data-filename="{$data.fileInfos.fileName}">
-                        Effacer
-                </button> <span>Pas encore évalué</span>
-                {elseif $data.cote != null}
-                <button type="button" class="btn btn-xs btn-success btnVoirEval" data-idTravail="{$data.idTravail}">Voir</button> <strong>{$data.cote}/{$data.max}</strong>
+                    Effacer
+                </button>
+                {/if}
+                <span>Pas encore évalué</span>
             {/if}
+
         </p>
         <p>Fin: le <strong>{$data.dateFin}</strong></p>
 
