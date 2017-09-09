@@ -15,9 +15,17 @@ $listeCoursAvecTravaux = $Files->listeDocumentsCasiers($listeCoursString, $matri
 $idTravail = $Application->postOrCookie('idTravail');
 $coursGrp = $Application->postOrCookie('coursGrp');
 
-// si un cours a été sélectionné, retrouver les travaux pour ce cours (sauf les 'hidden' et les 'archive')
-if ($coursGrp != Null) {
+// s'il y a des cours avec travaux
+if (count($listeCoursAvecTravaux) > 0) {
+    // si aucun cours n'a été sélectionné, on prend le premier
+    if ($coursGrp == Null)
+        $coursGrp = array_keys($listeCoursAvecTravaux)[0];
+    // pour le cours sélectionné,
+    // retrouver les travaux pour ce cours (sauf les 'hidden' et les 'archive')
     $listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
+    // si aucun travail n'a été sélectionné, on prend le premier
+    if ($idTravail == Null)
+        $idTravail = array_keys($listeTravauxCours)[0];
     $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
     }
     else {
