@@ -124,7 +124,7 @@ class Application
             $duree = time() + 365 * 24 * 3600;
         if (isset($_POST[$name])) {
             $value = $_POST[$name];
-            setcookie($name, $value, $duree, '/', null, false, true);
+            setcookie($name, $value, $duree);
         } else {
                 $value = (isset($_COOKIE[$name])) ? $_COOKIE[$name] : null;
             }
