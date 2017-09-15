@@ -138,7 +138,7 @@
             function(resultat){
                 if (resultat != '') {
                     $('#detailsTravail').html(resultat);
-                    $("#myDropZone").dropzone(Dropzone.options.myDropZone);
+                    // $("#myDropZone").dropzone(Dropzone.options.myDropZone);
                     }
             })
         })
@@ -150,11 +150,11 @@
             $('.btn-showCours.active').data('idtravail', idTravail);
             $.post('inc/casiers/getDetailsTravail.inc.php', {
                 idTravail: idTravail
-            },
-            function(resultat){
-                $('#detailsTravail').html(resultat);
-                $("#myDropZone").dropzone(Dropzone.options.myDropZone);
-            })
+                },
+                function(resultat){
+                    $('#detailsTravail').html(resultat);
+                    // $("#myDropZone").dropzone(Dropzone.options.myDropZone);
+                })
         })
 
     })

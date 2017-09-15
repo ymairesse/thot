@@ -14,7 +14,6 @@
                             style="width: 18em; overflow: hidden; text-overflow: ellipsis"
                             data-idtravail="{$id}"
                             title="{$unTravail.titre}">
-
                         {$unTravail.dateDebut|truncate:5:''} - {$unTravail.titre}
                     </button>
                 </div>

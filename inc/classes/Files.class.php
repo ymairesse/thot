@@ -648,6 +648,8 @@ class Files
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $requete->fetch()){
                 $idTravail = $ligne['idTravail'];
+                $ligne['dateDebut'] = Application::datePHP($ligne['dateDebut']);
+                $ligne['dateFin'] = Application::datePHP($ligne['dateFin']);
                 $liste[$idTravail] = $ligne;
             }
         }
