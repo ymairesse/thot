@@ -19,8 +19,8 @@ $matricule = $User->getMatricule();
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$coursGrp = $Application->postOrCookie('coursGrp');
-$idTravail = $Application->postOrCookie('idTravail');
+$coursGrp = isset($_POST['coursGrp']) ? $_POST['coursGrp'] : Null;
+$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
 
 $listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
 $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
