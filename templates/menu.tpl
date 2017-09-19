@@ -29,7 +29,9 @@
 			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>
 			{/if}
 			<li><a href="index.php?action=form"><i class="fa fa-pencil" style="color:#55aaaa"></i> Formulaires</a></li>
-			{* <li><a href="index.php?action=mails"><i class="fa fa-send-o"></i> Communiquer</a></li> *}
+			{if $userType == 'eleve'}
+			<li><a href="index.php?action=mails"><i class="fa fa-send-o"></i> Communiquer</a></li>
+			{/if}
 			{if $userType == 'parent'}
 			<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil</a></li>
 			<li><a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a></li>
