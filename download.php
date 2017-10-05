@@ -27,7 +27,7 @@ $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
 // éventuellement, le $fileId
 $fileId = isset($_REQUEST['fileId']) ? $_REQUEST['fileId'] : null;
 // éventuellement le idTravail
-$idTravail = isset($_REQUEST['idTravail']) ? $_REQUEST['idTravail'] : null;
+$idTravail = isset($_GET['idTravail']) ? $_GET['idTravail'] : null;
 // éventuellement, le nom du fichier et son path depuis le répertoire partagé
 $fileName = isset($_REQUEST['fileName']) ? $_REQUEST['fileName'] : null;
 
@@ -48,18 +48,33 @@ switch ($type) {
         if (($fileName == null) || ($fileId == null)) {
             die($fileNotFound);
         }
+
+        // liste des documents auquel l'élève a accès
         $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
+
         // si le répertoire $fileId est dans les documents partagés avec cet élève
         if (in_array($fileId, array_keys($listeDocs))) {
             $shareId = $listeDocs[$fileId]['shareId'];
             $fileData = $Files->getFileData($fileId);
+
             // le fichier qui sera réellement téléchargé dans le répertoire partagé
+            // nécessaire pour le suivi des téléchargements
             $downloadedFileInfo = array(
-                'path' => substr($fileName, 0, strrpos($fileName, '/')+1),
+                'path' => $fileData['path'].$ds.$fileData['fileName'],
                 'fileName' => substr($fileName, strrpos($fileName, '/') + 1),
             );
+            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$ds.$fileData['fileName'];
 
-            $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$fileData['fileName'];
+            // le document est-il dans un sous-répertoire? On l'extrait du fileName
+            $sousRepertoire = substr($fileName, 0, strrpos($fileName,'/') + 1);
+            // ce qui suit le dernier "/" est le nom du fichier
+            $fileName = substr($fileName, strrpos($fileName, '/') + 1);
+
+            // on ajoute le sous-repertoire au path
+            $download_path .= $ds.$sousRepertoire;
+            // suppression des "//" doubles
+            $download_path = preg_replace('~/+~', '/', $download_path);
+
         } else {
             die($noAccess);
         }
@@ -72,6 +87,7 @@ switch ($type) {
         $travailData = $Files->getDetailsTravail($idTravail, $matricule);
         $acronyme = $travailData['acronyme'];
         $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule.$ds;
+        $download_path = preg_replace('~/+~', '/', $download_path);
         break;
 
     case 'pId':   // lecture d'un fichier partagé par fileId
@@ -96,7 +112,7 @@ switch ($type) {
         break;
 }
 
-if (file_exists($download_path.$fileName)) {
+if (file_exists($download_path.$ds.$fileName)) {
     $args = array(
             'download_path' => $download_path,
             'file' => $fileName,
@@ -107,7 +123,6 @@ if (file_exists($download_path.$fileName)) {
 } else {
     die('Fichier inexistant');
 }
-
 
 require_once INSTALL_DIR.'/inc/classes/class.chip_download.php';
 $download = new chip_download($args);
