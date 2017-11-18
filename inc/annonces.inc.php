@@ -13,11 +13,16 @@ $nomEleve = $User->getNom();
 
 // création de la liste des annonces pour l'élève, fonction de son matricule, de sa classe
 // -et donc de son niveau d'étude- et de sa liste de cours pour chacune des catégories: élève, cours, classe, niveau, école
-$listeAnnonces = $Application->listeAnnonces($matricule,$classe,$listeCoursEleve, $User->getNom());
+$listeAnnonces = $Application->listeAnnonces($matricule, $classe, $listeCoursEleve, $User->getNom());
+
 $listeFlagsAnnonces = $Application->listeFlagsAnnonces(array_keys($listeAnnonces), $matricule);
+$listePJ = $Application->getPJ4notifs($listeAnnonces, $matricule);
+
 // mise en concordance des annonces et des accusés de lecture
 $listeAnnonces = $Application->comboAnnoncesFlags($listeAnnonces, $listeFlagsAnnonces);
-// Application::afficher($listeAnnonces, true);
+// mise en concordance des annonces et des PJ
+$listeAnnonces = $Application->comboAnnoncesPJ($listeAnnonces, $listePJ);
+
 $nbAccuses = $Application->nbAccusesManquants($listeAnnonces);
 $nbNonLus = $Application->nbNonLus($listeAnnonces);
 

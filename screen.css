@@ -478,7 +478,7 @@ tr.nonLu td{
 }
 
 .notice {
-    background-color: #ee8;
+    background-color: #efe6c3;
     background-position: 10px 10px;
     background-repeat: no-repeat;
     border: 1px solid red;
@@ -494,4 +494,10 @@ tr.nonLu td{
     font-family: "Glyphicons Halflings";
     font-size: 1.5em;
     padding: 0 5px;
+    float:left;
+}
+
+.discret {
+    font-size: 10pt;
+    color: #555;
 }

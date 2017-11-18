@@ -145,7 +145,6 @@ class chip_download
         $temp = array();
         $temp['file_name'] = strtolower(substr($file_name, 0, strripos($file_name, '.')));
         $temp['file_extension'] = strtolower(substr($file_name, strripos($file_name, '.') + 1));
-
         return $temp;
     }
 

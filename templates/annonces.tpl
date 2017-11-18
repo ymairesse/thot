@@ -6,6 +6,7 @@
 			<th>Date et heure</th>
 			<th>Visible le</th>
 			<th>Objet</th>
+			<th>PJ</th>
 			<th>Responsable</th>
 			<th>Destinataire</th>
 			<th>Acc. lecture</th>
@@ -29,6 +30,7 @@
 				<td>{if $dataAnnonce.dateEnvoi != Null}{$dataAnnonce.dateEnvoi|truncate:16:'':true}{else}Inconnue{/if}</td>
 				<td>{$dataAnnonce.dateDebut}</td>
 				<td data-texte='{$dataAnnonce.texte}' class="texteAnnonce">{$dataAnnonce.objet}</td>
+				<td>{if ($dataAnnonce.PJ|@count > 0)}<i class="fa fa-paperclip"></i>{else}&nbsp;{/if}</td>
 				<td>{$dataAnnonce.proprietaire}</td>
 				<td>
 					{if $dataAnnonce.destinataire == $matricule}
@@ -64,7 +66,7 @@
 	<li class="ecole">Pour tous les élèves</li>
 	<li class="niveau">Pour tous les élèves de ton niveau</li>
 	<li class="cours">Pour un ou plusieurs élèves d'un cours</li>
-	<li class="classe">Pour un ou plusieurs élèves de ta classe</li>
+	<li class="classes">Pour un ou plusieurs élèves de ta classe</li>
 </ul>
 
 {include file='annonces/modal/modalAccuseLecture.tpl'}
@@ -95,11 +97,11 @@
 
 		$('#listeAnnonces tr').click(function(){
 			var ligne = $(this);
-			var id = $(this).data('id');
+			var notifId = $(this).data('id');
 			// marquer l'annonce lue
 			if ($(this).hasClass('nonLu')) {
 				$.post('inc/annonces/marqueLu.inc.php', {
-					id: id
+					notifId: notifId
 					},
 					function(resultat){
 						ligne.removeClass('nonLu');
@@ -107,17 +109,25 @@
 				}
 			$('#listeAnnonces tr').removeClass('active');
 			$(this).addClass('active');
+
+			$.post('inc/annonces/listePJ4notif.inc.php', {
+				notifId: notifId
+				}, function (resultat){
+					$('#modalLecture .modal-body .PJ').html(resultat);
+					$('#modalAccuseLecture .modal-body .PJ').html(resultat);
+				})
+
 			var texteHTML = $(this).find('.texteAnnonce').data('texte');
 			var accuse = $(this).data('accuse');
 			if (accuse == 1) {
-				$('#modalAccuseLecture .modal-body').html(texteHTML);
+				$('#modalAccuseLecture .modal-body .texteAnnonce').html(texteHTML);
 				$('#cbConfirmation').prop('checked', false).prop('disabled', false);
 
-				$('#cbConfirmation').data('id', id);
+				$('#cbConfirmation').data('id', notifId);
 				$('#modalAccuseLecture').modal('show');
 			}
 				else {
-					$('#modalLecture .modal-body').html(texteHTML);
+					$('#modalLecture .modal-body .texteAnnonce').html(texteHTML);
 					$('#modalLecture').modal('show');
 				}
 		})

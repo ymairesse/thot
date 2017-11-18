@@ -14,11 +14,9 @@ require_once INSTALL_DIR.'/inc/fonctions.inc.php';
 
 $listeDocs = $Files->listeElevesShares($matricule, $classe, $niveau, $listeCoursString);
 
-afficher_silent($listeDocs);
-
 // retrier les documents des cours par cours
-if (isset($listeDocs['cours']))
-    $listeDocs['cours'] = $Files->sortByCours($listeDocs['cours']);
+if (isset($listeDocs['coursGrp']))
+    $listeDocs['coursGrp'] = $Files->sortByCours($listeDocs['coursGrp']);
 
 $listeEdocs = $Application->listeEdocs($matricule);
 

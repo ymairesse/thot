@@ -554,14 +554,14 @@ class Application
     }
 
     /**
-     * détermine la nature précise du destinataire d'une annonces
+     * détermine la nature précise du destinataire d'une annonce
      *
      * @param $type : le type général de destinataire (ecole, niveau, classe, cours)
      * @param $destinataire : précision du destinataire: $niveau, $classe, $cours
      *
      * @return string
      */
-    public function pourQui($type, $destinataire, $matricule, $nomEleve) {
+    public function pourQui ($type, $destinataire, $matricule, $nomEleve) {
         if ($matricule == $destinataire)
             return $nomEleve;
             else  {
@@ -572,7 +572,7 @@ class Application
                     case 'niveau':
                         return sprintf('Élèves de %de année', $destinataire);
                         break;
-                    case ('cours'):
+                    case ('coursGrp'):
                         return sprintf('Les élèves du cours %s', self::nomCours($destinataire));
                         break;
                     case ('classes'):
@@ -580,6 +580,35 @@ class Application
                         break;
                     }
             }
+    }
+
+    /**
+     * renvoie les détails d'une notification dont on fournit l'id dans la base de données
+     *
+     * @param $notifId : l'id de la notification dans la BD
+     *
+     * @return array
+     */
+    public function getNotification($notifId)
+    {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT id, type, proprietaire, objet, texte, dateDebut, dateFin, destinataire, mail, accuse, freeze ';
+        $sql .= 'FROM '.PFX.'thotNotifications ';
+        $sql .= 'WHERE id= :notifId ';
+        $requete = $connexion->prepare($sql);
+
+        $notification = Null;
+        $requete->bindParam(':notifId', $notifId, PDO::PARAM_INT);
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $notification = $requete->fetch();
+            $notification['dateDebut'] = self::datePHP($notification['dateDebut']);
+            $notification['dateFin'] = self::datePHP($notification['dateFin']);
+        }
+        Application::deconnexionPDO($connexion);
+
+        return $notification;
     }
 
     /**
@@ -634,7 +663,7 @@ class Application
      * Fusionne la liste des annonces et la liste des flags
      *
      * @param $listeAnnonces : liste des annonces triées par id de l'annonce
-     * @param $listeFlas : liste des demandes d'accusés de lecture triées par id
+     * @param $listeFlag : liste des demandes d'accusés de lecture triées par id
      *
      * @return array : combinaison des deux arrays de données
      */
@@ -646,6 +675,22 @@ class Application
                 }
                 else $listeAnnonces[$id]['flags'] = array('lu' => Null, 'dateHeure' => Null);
         }
+
+        return $listeAnnonces;
+    }
+
+    /**
+     * fustionne la liste des annonces et la liste des PJ
+     *
+     * @param array $listeAnnonces : liste des annonces triées sur le le notifId
+     * @param array $listePJ : liste des shareId des PJ pour triées sur les notifId
+     *
+     * @return array
+     */
+    public function comboAnnoncesPJ($listeAnnonces, $listePJ) {
+        foreach ($listeAnnonces as $notifId => $dataAnnonce) {
+            $listeAnnonces[$notifId]['PJ'] = isset($listePJ[$notifId]) ? $listePJ[$notifId] : Null;
+            }
 
         return $listeAnnonces;
     }
@@ -742,7 +787,8 @@ class Application
         $sql .= 'SET id=:id, lu=1, matricule=:matricule ';
         $sql .= 'ON DUPLICATE KEY UPDATE lu = 1 ';
         $requete = $connexion->prepare($sql);
-
+echo $sql;
+Application::afficher(array($matricule, $id));
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':id', $id, PDO::PARAM_INT);
         $resultat = $requete->execute();
@@ -781,6 +827,43 @@ class Application
                     );
                 }
             }
+
+        self::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * renvoie un tableau des shareIds correspondant aux notifIds
+     *
+     * @param array $listeAnnonces : liste des clefs pour les annonces
+     * @param int $matricule : matricule de l'élève
+     *
+     * @return array
+     */
+    public function getPJ4notifs ($listeAnnonces, $matricule) {
+        if (is_array($listeAnnonces))
+            $listeAnnoncesString = implode(', ', array_keys($listeAnnonces));
+            else $listeAnnoncesString = $listeAnnonces;
+
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT notifId, dtnpj.shareId, dts.fileId, fileName ';
+        $sql .= 'FROM '.PFX.'thotNotifPJ AS dtnpj ';
+        $sql .= 'JOIN '.PFX.'thotShares AS dts ON dts.shareId = dtnpj.shareId ';
+        $sql .= 'JOIN '.PFX.'thotFiles AS dtf ON dtf.fileId = dts.fileId ';
+        $sql .= 'WHERE notifId IN ('.$listeAnnoncesString.')';
+
+        $requete = $connexion->prepare($sql);
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $notifId = $ligne['notifId'];
+                $fileId = $ligne['fileId'];
+                $liste[$notifId][$fileId] = $ligne['fileName'];
+                }
+        }
 
         self::DeconnexionPDO($connexion);
 
@@ -2353,7 +2436,7 @@ class Application
     {
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
         // remise à zéro des lignes périmées depuis plus de 4 heures et qui n'ont jamais été confirmées
-        $sql = "UPDATE didac_thotRv SET md5conf = Null WHERE (dateHeure < NOW() - INTERVAL $heures HOUR AND confirme = 0) ";
+        $sql = "UPDATE '.PFX.'thotRv SET md5conf = Null WHERE (dateHeure < NOW() - INTERVAL $heures HOUR AND confirme = 0) ";
         $connexion->exec($sql);
         self::deconnexionPDO($connexion);
     }
@@ -2415,11 +2498,4 @@ class Application
     }
 
 
-
-    /**
-     * renvoie la liste des adressses mail des élè
-     */
-//     SELECT user, mailDomain, nom, prenom, groupe FROM `didac_passwd` AS dpw
-// JOIN didac_eleves AS de ON de.matricule = dpw.matricule
-// WHERE dpw.matricule = 6510
 }

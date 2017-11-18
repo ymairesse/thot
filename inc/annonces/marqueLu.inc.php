@@ -11,9 +11,9 @@ $User = unserialize($_SESSION['THOT']);
 
 $matricule = $User->getMatricule();
 
-$id = isset($_POST['id']) ? $_POST['id'] : Null;
+$notifId = isset($_POST['notifId']) ? $_POST['notifId'] : Null;
 
-if ($id != Null) {
-    $Application->marqueLu($matricule, $id);
+if ($notifId != Null) {
+    $Application->marqueLu($matricule, $notifId);
     return $id;
 }

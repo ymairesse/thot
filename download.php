@@ -102,7 +102,6 @@ switch ($type) {
             $fileData = $Files->getFileData($fileId);
             $fileName = $fileData['fileName'];
             $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$fileData['acronyme'].$fileData['path'].$ds;
-
         } else {
             die($noAccess);
         }

@@ -12,7 +12,8 @@ $listeCoursString = "'".implode("','", $listeCours)."'";
 // "avec travaux"
 $listeCoursAvecTravaux = $Files->listeDocumentsCasiers($listeCoursString, $matricule);
 
-$idTravail = $Application->postOrCookie('idTravail');
+// $idTravail = $Application->postOrCookie('idTravail');
+$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
 $coursGrp = $Application->postOrCookie('coursGrp');
 
 // s'il y a des cours avec travaux

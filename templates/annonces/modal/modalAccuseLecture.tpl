@@ -8,8 +8,15 @@
 			</div>
 
 			<div class="modal-body" style="max-height:30em; overflow:auto;">
+				<div class="texteAnnonce">
+
+				</div>
+				<div class="PJ">
+
+				</div>
 
 			</div>
+
 
 			<div class="modal-footer">
                 <p>Je confirme que j'ai bien lu,

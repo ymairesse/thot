@@ -3,11 +3,11 @@
 <ul class="nav nav-pills">
     <li class="active">
         <a data-toggle="tab" href="#classe">Ma classe
-        <span class="badge">{$listeDocs.classe|@count|default:0}</span></a>
+        <span class="badge">{$listeDocs.classes|@count|default:0}</span></a>
     </li>
     <li>
         <a data-toggle="tab" href="#cours">Mes cours
-        <span class="badge">{$listeDocs.cours|@count|default:0}</span></a>
+        <span class="badge">{$listeDocs.coursGrp|@count|default:0}</span></a>
     </li>
     <li>
         <a data-toggle="tab" href="#niveau">Mon niveau d'études
@@ -35,8 +35,8 @@
                     <th>Professeur</th>
                 </tr>
             </thead>
-            {if isset($listeDocs.classe)}
-                {foreach from=$listeDocs.classe key=fileId item=data}
+            {if isset($listeDocs.classes)}
+                {foreach from=$listeDocs.classes key=fileId item=data}
                 <tr>
                     <td>{$data.groupe}</td>
                     <td>
@@ -60,13 +60,13 @@
     <div id="cours" class="tab-pane fade" style="min-height:30em; overflow:auto;">
         <h3>Les documents pour mes cours</h3>
 
-        {if isset($listeDocs.cours)}
+        {if isset($listeDocs.coursGrp)}
 
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-            {foreach from=$listeDocs.cours key=libelle item=data name=boucle}
+            {foreach from=$listeDocs.coursGrp key=libelle item=data name=boucle}
             <li>
                 <a href="#{$libelle|replace:' ':'_'}" data-toggle="tab" {if $smarty.foreach.boucle.iteration==1 }class="active" {/if}>
-                    {$libelle} <span class="badge">{$listeDocs.cours.$libelle|count}</span>
+                    {$libelle} <span class="badge">{$listeDocs.coursGrp.$libelle|count}</span>
                 </a>
             </li>
             {/foreach}
@@ -75,7 +75,7 @@
 
         <div id="my-tab-content" class="tab-content">
 
-            {foreach from=$listeDocs.cours key=libelle item=dataBranche name=boucle}
+            {foreach from=$listeDocs.coursGrp key=libelle item=dataBranche name=boucle}
 
             <div class="tab-pane{if $smarty.foreach.boucle.iteration == 1} active{/if}" id="{$libelle|replace:' ':'_'}">
 
@@ -111,7 +111,7 @@
         </div>
 
         {/if}
-        <!-- isset($listeDocs.cours) -->
+        <!-- isset($listeDocs.coursGrp) -->
 
     </div>
 

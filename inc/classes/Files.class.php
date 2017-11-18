@@ -224,7 +224,10 @@ class Files
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $resultat->fetch()) {
+                // pallier le problème de la graphie 'classe' ou 'classes'
                 $type = $ligne['type'];
+                if ($type == 'classe')
+                    $type = 'classes';
                 $fileId = $ligne['fileId'];
                 $liste[$type][$fileId] = $ligne;
             }
