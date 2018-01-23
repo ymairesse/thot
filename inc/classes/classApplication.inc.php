@@ -787,8 +787,7 @@ class Application
         $sql .= 'SET id=:id, lu=1, matricule=:matricule ';
         $sql .= 'ON DUPLICATE KEY UPDATE lu = 1 ';
         $requete = $connexion->prepare($sql);
-echo $sql;
-Application::afficher(array($matricule, $id));
+
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':id', $id, PDO::PARAM_INT);
         $resultat = $requete->execute();

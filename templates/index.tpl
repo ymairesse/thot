@@ -11,6 +11,8 @@
 	<link rel="stylesheet" href="print.css" type="text/css" media="print">
 	<link rel="stylesheet" href="bootstrap/fa/css/font-awesome.min.css" type="text/css" media="screen, print">
 	<link rel="stylesheet" href="font-awesome-animation.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="js/bootstrapDatepicker/css/datepicker3.css" media="all">
+	<link rel="stylesheet" href="js/boostrapTimepicker/css/bootstrap-timepicker.css" media="screen">
 
 	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
@@ -20,6 +22,9 @@
 	<script type="text/javascript" src="js/moment-with-locales.js"></script>
 	<script type="text/javascript" src="fc/fullcalendar.js"></script>
 	<script type="text/javascript" src="fc/lang/fr.js"></script>
+	<script type="text/javascript" src="js/boostrapTimepicker/js/bootstrap-timepicker.min.js"></script>
+	<script type="text/javascript" src="js/bootstrapDatepicker/js/bootstrap-datepicker.js"></script>
+	<script type="text/javascript" src="js/bootstrapDatepicker/js/locales/bootstrap-datepicker.fr.js"></script>
 
 	<link rel="stylesheet" href="fc/fullcalendar.css" media="screen">
 	<link rel="stylesheet" href="css/animate/animate.min.css">
@@ -34,7 +39,7 @@
 		{if isset($selecteur)}
 			{include file="$selecteur.tpl"}
 		{/if}
-		
+
 		{if (isset($message))}
 		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
 			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">

@@ -24,7 +24,17 @@
 			<li><a href="index.php?action=anniversaires"><i class="fa fa-birthday-cake" style="color:red"></i> Anniversaires</a></li>
 			{/if}
 			<li><a href="index.php?action=casiers"><i class="fa fa-inbox"></i> Casiers<br>Virtuels</a></li>
-			<li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> Jdc</a></li>
+
+			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC {if ($isChargeJDC == true) && ($userType == 'eleve')} <i class="fa fa-user-circle-o"></i>{/if} <b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li><a href="index.php?action=jdc">Mon JDC</a></li>
+					<li><a href="index.php?action=jdc&amp;mode=liste">Périodes de charge JDC</a> </li>
+					{if ($isChargeJDC == true) && ($userType == 'eleve')}
+					<li><a href="index.php?action=jdc&amp;mode=classe">JDC de la classe</a></li>
+					{/if}
+				</ul>
+			</li>
+			{* <li><a href="index.php?action=jdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> Jdc{if $isChargeJDC == true} <i class="fa fa-user-circle-o"></i>{/if}</a></li> *}
 			{if $userType == 'eleve'}
 			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>
 			{/if}

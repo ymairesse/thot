@@ -17,6 +17,10 @@ $smarty->assign('ADRESSEECOLE', ADRESSEECOLE);
 // filtrer les actions possibles selon le type d'utilisateur; si pas d'accès pour une "action", la fonction renvoie Null
 $action = $Application->filtreAction($action, $userType);
 
+require_once INSTALL_DIR.'/inc/classes/classJdc.inc.php';
+$Jdc = new Jdc();
+$isChargeJDC = $Jdc->isChargeJDC($matricule);
+
 switch ($action) {
     case 'annonces':
         require_once 'inc/annonces.inc.php';
@@ -66,6 +70,7 @@ switch ($action) {
 }
 
 $smarty->assign('action', $action);
+$smarty->assign('isChargeJDC', $isChargeJDC);
 
 // toutes les informations d'identification réseau (adresse IP, jour et heure)
 $smarty->assign('identiteReseau', user::identiteReseau());

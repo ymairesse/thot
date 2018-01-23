@@ -501,3 +501,12 @@ tr.nonLu td{
     font-size: 10pt;
     color: #555;
 }
+
+.error {
+    color: #ff0000;
+}
+
+.badge.badge-danger {
+    background: #ff0000;
+    color: #ffffff;
+}

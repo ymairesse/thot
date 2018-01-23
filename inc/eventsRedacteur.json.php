@@ -24,6 +24,6 @@ $end = $_GET['end'];
 require_once INSTALL_DIR.'/inc/classes/classJdc.inc.php';
 $Jdc = new Jdc();
 
-$liste = $Jdc->retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString);
+$liste = $Jdc->retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString, $matricule);
 
 echo json_encode($liste);

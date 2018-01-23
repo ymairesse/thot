@@ -54,6 +54,7 @@ class user
                 die('invalid userType');
                 break;
         }
+
         $resultat = $connexion->query($sql);
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
@@ -162,7 +163,7 @@ class user
     /**
      * Renvoie la liste des coursGrp suivis par l'utilisateur.
      *
-     * @param void()
+     * @param void
      *
      * @return array
      */
@@ -181,6 +182,54 @@ class user
             }
         }
         Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * retourne la liste de tous les cours qui se donnent dans une classe
+     * chaque ligne contient
+     *  - le cours
+     *  - le coursGrp
+     *  - les références complètes du/des profs pour ce cours
+     *  - le nombre d'heures de cours et le libellé du cours.
+     *
+     * @param $classe
+     *
+     * @return array
+     */
+    public function listeDetailCoursEleve()
+    {
+        $matricule = $this->getMatricule();
+
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = "SELECT DISTINCT ec.coursGrp, SUBSTR(ec.coursGrp, 1, LOCATE('-', ec.coursGrp)-1) AS cours, ";
+        $sql .= 'sc.statut, pc.acronyme, dp.nom, dp.prenom, dp.sexe, nbheures, libelle ';
+        $sql .= 'FROM '.PFX.'elevesCours AS ec ';
+        $sql .= 'JOIN '.PFX."cours AS dcours ON (dcours.cours = SUBSTR(ec.coursGrp, 1,LOCATE('-',ec.coursGrp)-1)) ";
+        $sql .= 'JOIN '.PFX.'eleves AS de ON (de.matricule = ec.matricule) ';
+        $sql .= 'JOIN '.PFX.'profsCours AS pc ON (pc.coursGrp = ec.coursGrp) ';
+        $sql .= 'JOIN '.PFX.'profs AS dp ON (dp.acronyme = pc.acronyme) ';
+        $sql .= 'JOIN '.PFX.'statutCours AS sc ON (sc.cadre = dcours.cadre ) ';
+        $sql .= 'WHERE de.matricule = :matricule ';
+        $sql .= 'ORDER BY nbheures DESC, libelle';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_STR, 6);
+        $resultat = $requete->execute();
+
+        $liste = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $coursGrp = $ligne['coursGrp'];
+                $liste[$coursGrp]['dataCours'] = array('nbheures' => $ligne['nbheures'], 'libelle' => $ligne['libelle'], 'statut' => $ligne['statut']);
+                $formule = ($ligne['sexe'] == 'F') ? 'Mme' : 'M.';
+                $nom = sprintf('%s %s. %s', $formule, mb_substr($ligne['prenom'], 0, 1, 'UTF-8'), $ligne['nom']);
+                $liste[$coursGrp]['profs'] = array('acronyme' => $ligne['acronyme'], 'nom' => $nom);
+            }
+        }
+        Application::DeconnexionPDO($connexion);
 
         return $liste;
     }

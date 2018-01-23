@@ -113,9 +113,11 @@ class ecole
         return $listeTitus;
     }
 
-    /*
+    /**
      * retourne un tableau de la liste des profs titulaires d'un groupe donné
-     * @param $groupe
+     *
+     * @param string $groupe
+     *
      * @return array
      */
     public static function titusDeGroupe($groupe)
@@ -124,22 +126,65 @@ class ecole
             die('missing group');
         }
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT '.PFX."titus.acronyme, CONCAT(prenom,' ',nom) AS nomProf ";
-        $sql .= 'FROM '.PFX.'titus ';
-        $sql .= 'JOIN '.PFX.'profs ON ('.PFX.'profs.acronyme = '.PFX.'titus.acronyme) ';
-        $sql .= 'WHERE '.PFX."titus.classe='$groupe' ";
+        $sql = 'SELECT titus.acronyme, sexe, nom, prenom ';
+        $sql .= 'FROM '.PFX.'titus AS titus ';
+        $sql .= 'JOIN '.PFX.'profs AS dp ON (dp.acronyme = titus.acronyme) ';
+        $sql .= 'WHERE titus.classe= :groupe ';
         $sql .= 'ORDER BY concat(nom, prenom) ';
-        $resultat = $connexion->query($sql);
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':groupe', $groupe, PDO::PARAM_STR, 7);
         $titulaires = array();
+        $resultat = $requete->execute();
         if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
                 $acronyme = $ligne['acronyme'];
-                $titulaires[$acronyme] = $ligne['nomProf'];
+                $adresse = ($ligne['sexe'] == 'F') ? 'Mme' : 'M.';
+                $nom = sprintf('%s %s. %s', $adresse, mb_substr($ligne['prenom'], 0, 1, 'UTF-8'), $ligne['nom']);
+                $titulaires[$acronyme] = $nom;
             }
         }
 
+        $titulaires = implode(', ', $titulaires);
+
         return $titulaires;
+    }
+
+    /**
+     * retourne, sous forme de chaîne, la liste des profs qui donnent un cours donné
+     *
+     * @param string $coursGrp
+     *
+     * @return string
+     */
+    public function getProfs4CoursGrp ($coursGrp) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT dpc.acronyme, nom, prenom, sexe ';
+        $sql .= 'FROM '.PFX.'profsCours AS dpc ';
+        $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = dpc.acronyme ';
+        $sql .= 'WHERE coursGrp = :coursGrp ';
+        $sql .= 'ORDER BY nom, prenom ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':coursGrp', $coursGrp, PDO::PARAM_STR, 15);
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $acronyme = $ligne['acronyme'];
+                $adresse = ($ligne['sexe'] == 'F') ? 'Mme' : 'M.';
+                $nom = sprintf('%s %s. %s', $adresse, mb_substr($ligne['prenom'], 0, 1, 'UTF-8'), $ligne['nom']);
+                $liste[$acronyme] = $nom;
+            }
+        }
+
+        $noms = implode(', ', $liste);
+
+        Application::deconnexionPDO($connexion);
+
+        return $noms;
     }
 
     /***
@@ -647,9 +692,10 @@ class ecole
     /**
      * liste structurée des profs liés à une liste de coursGrp (liste indexée par coursGrp).
      *
-     * @param string | array : $listeCoursGrp
+     * @param string || array : $listeCoursGrp
+     * @param string $type : retour = chaîne ou array?
      *
-     * @return array
+     * @return array || string
      */
     public function listeProfsListeCoursGrp($listeCoursGrp, $type = 'string')
     {
@@ -684,7 +730,9 @@ class ecole
                     $liste[$coursGrp][$acronyme] = $ligne;
                 }
                 // on supprime le cours dont le prof a été trouvé
-                unset($listeCoursGrp[$coursGrp]);
+                if (is_array($listeCoursGrp))
+                    unset($listeCoursGrp[$coursGrp]);
+                    else $listeCoursGrp = Null;
             }
         }
         Application::DeconnexionPDO($connexion);

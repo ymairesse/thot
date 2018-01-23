@@ -8,9 +8,22 @@
         <p>Professeur
             <strong>{$travail.nom}</strong>
         </p>
+
+        <p>
         {if $travail.libelle != ''}
-        <p>{$travail.libelle} {$travail.nbheures}h {if isset($travail.nomCours)}> {$travail.nomCours} {/if} [{$travail.destinataire}]</p>
+            {$travail.libelle} {$travail.nbheures}h
         {/if}
+        {if $travail.type == 'classe'}
+            Classe de {$travail.destinataire}
+        {/if}
+        {if $travail.type == 'niveau'}
+            Pour les élèves de {$travail.destinataire}e année
+        {/if}
+        {if $travail.type == 'ecole'}
+            Pour tous
+        {/if}
+         </p>
+
         <p>{$travail.title}:
             <strong>Le {$travail.startDate} à {$travail.heure} ({$travail.duree}) </strong>
         </p>
