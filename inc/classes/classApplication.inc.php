@@ -359,13 +359,13 @@ class Application
     {
         switch ($userType) {
             case 'eleve':
-                $permis = array('bulletin', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'form', 'info', 'mails');
+                $permis = array('bulletin', 'repertoire', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
             case 'parent':
-                $permis = array('bulletin', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'form', 'info');
+                $permis = array('bulletin', 'repertoire', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'info', 'comportement');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -867,6 +867,33 @@ class Application
         self::DeconnexionPDO($connexion);
 
         return $liste;
+    }
+
+    /**
+     * renvoie le texte d'une annonce dont on fournit l'id
+     *
+     * @param int $id
+     *
+     * @return string
+     */
+    public function getTexteAnnonce($id) {
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT texte ';
+        $sql .= 'FROM '.PFX.'thotNotifications ';
+        $sql .= 'WHERE id = :id ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+        $texte = '';
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $ligne = $requete->fetch();
+            $texte = $ligne['texte'];
+        }
+
+        self::DeconnexionPDO($connexion);
+
+        return $texte;
     }
 
     /**
@@ -2496,5 +2523,20 @@ class Application
         return self::datePHP($date);
     }
 
+    /**
+     * retourne l'année scolaire en cours Ex: 2017-2018 sur base de la date courante
+     *
+     * @param void
+     *
+     * @return string
+     */
+    public function getCurrentAnneeScolaire(){
+        $date = $this->dateNow();
+        $date = explode('/', $date);
+        if ($date[1] >= 9)
+            $anscol = sprintf('%s-%s', $date[2], $date[2]+1);
+            else $anScol = sprintf('%s-%s', $date[2]-1, $date[2]);
+        return $anScol;
+    }
 
 }

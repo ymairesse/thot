@@ -29,7 +29,7 @@
 				<td>{$smarty.foreach.n.iteration}</td>
 				<td>{if $dataAnnonce.dateEnvoi != Null}{$dataAnnonce.dateEnvoi|truncate:16:'':true}{else}Inconnue{/if}</td>
 				<td>{$dataAnnonce.dateDebut}</td>
-				<td data-texte='{$dataAnnonce.texte}' class="texteAnnonce">{$dataAnnonce.objet}</td>
+				<td data-id="{$id}" class="texteAnnonce">{$dataAnnonce.objet}</td>
 				<td>{if ($dataAnnonce.PJ|@count > 0)}<i class="fa fa-paperclip"></i>{else}&nbsp;{/if}</td>
 				<td>{$dataAnnonce.proprietaire}</td>
 				<td>
@@ -107,6 +107,7 @@
 						ligne.removeClass('nonLu');
 					})
 				}
+
 			$('#listeAnnonces tr').removeClass('active');
 			$(this).addClass('active');
 
@@ -117,19 +118,24 @@
 					$('#modalAccuseLecture .modal-body .PJ').html(resultat);
 				})
 
-			var texteHTML = $(this).find('.texteAnnonce').data('texte');
 			var accuse = $(this).data('accuse');
-			if (accuse == 1) {
-				$('#modalAccuseLecture .modal-body .texteAnnonce').html(texteHTML);
-				$('#cbConfirmation').prop('checked', false).prop('disabled', false);
 
-				$('#cbConfirmation').data('id', notifId);
-				$('#modalAccuseLecture').modal('show');
-			}
-				else {
-					$('#modalLecture .modal-body .texteAnnonce').html(texteHTML);
-					$('#modalLecture').modal('show');
+			$.post('inc/annonces/getTexteAnnonce.inc.php', {
+				notifId: notifId
+			}, function(texteHTML){
+				if (accuse == 1) {
+					$('#modalAccuseLecture .modal-body .texteAnnonce').html(texteHTML);
+					$('#cbConfirmation').prop('checked', false).prop('disabled', false);
+
+					$('#cbConfirmation').data('id', notifId);
+					$('#modalAccuseLecture').modal('show');
 				}
+					else {
+						$('#modalLecture .modal-body .texteAnnonce').html(texteHTML);
+						$('#modalLecture').modal('show');
+					}
+			})
+
 		})
 
 		$('#modalAccuseLecture').on('hide.bs.modal', function (e) {
