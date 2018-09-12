@@ -274,17 +274,22 @@ class Files
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
         $sql .= 'LEFT JOIN didac_cours AS dc ON SUBSTR(share.groupe, 1, LOCATE("-",share.groupe)-1) = dc.cours ';
-        $sql .= "WHERE destinataire = '$matricule' ";
-        $sql .= "OR groupe = '$classe' ";
-        $sql .= "OR groupe = 'niveau' AND destinataire = '$niveau' ";
-        $sql .= "OR groupe IN ($listeCoursString) ";
+        $sql .= "WHERE destinataire = :matricule ";
+        $sql .= "OR (groupe = :classe AND destinataire = :classe) ";
+        $sql .= "OR (groupe = :niveau  AND destinataire = :niveau) ";
+        $sql .= "OR groupe IN (".$listeCoursString.") ";
         $sql .= "OR groupe = 'ecole' ";
+        $requete = $connexion->prepare($sql);
 
-        $resultat = $connexion->query($sql);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
+        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
         $liste = array();
         if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
                 $fileId = $ligne['fileId'];
                 $liste[$fileId] = array('fileId' => $fileId, 'shareId' => $ligne['shareId']);
             }
