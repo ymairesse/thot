@@ -14,7 +14,10 @@
             <td>{$data.startHeure|truncate:5:''}</td>
             <td title="{$data.destinataire}">{$data.libelle}</td>
             <td>{$data.enonce|truncate:150:'...'}</td>
-            <td><button type="button" class="btn btn-primary btn-xs btn-show">&nbsp;<i class="fa fa-eye"></i>&nbsp;</button>  </td>
+            <td>{if $data.enonce|count_characters > 150}
+                <button title="Voir tout" type="button" class="btn btn-primary btn-xs btn-show">&nbsp;<i class="fa fa-eye"></i>&nbsp;</button>
+                {/if}
+            </td>
         </tr>
     {/foreach}
 </table>

@@ -12,12 +12,13 @@ $listeCoursString = "'".implode("','", $listeCours)."'";
 // "avec travaux"
 $listeCoursAvecTravaux = $Files->listeDocumentsCasiers($listeCoursString, $matricule);
 
-// $idTravail = $Application->postOrCookie('idTravail');
 $idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
-$coursGrp = $Application->postOrCookie('coursGrp');
+$coursGrp = isset($_POST['coursGrp']) ? $_POST['coursGrp'] : Null;
+// $coursGrp = $Application->postOrCookie('coursGrp');
 
 // s'il y a des cours avec travaux
 if (count($listeCoursAvecTravaux) > 0) {
+// Application::afficher($listeCoursAvecTravaux);
     // si aucun cours n'a été sélectionné, on prend le premier
     if ($coursGrp == Null)
         $coursGrp = array_keys($listeCoursAvecTravaux)[0];
@@ -53,6 +54,7 @@ if (in_array($idTravail, array_keys($listeTravauxCours))) {
         $listeCotes = Null;
         $totalTravail = Null;
     }
+$onglet = isset($_COOKIE['ongletCasiers']) ? $_COOKIE['ongletCasiers'] : 'consignes';
 
 $smarty->assign('listeCoursAvecTravaux', $listeCoursAvecTravaux);
 $smarty->assign('listeTravauxCours', $listeTravauxCours);
@@ -61,6 +63,7 @@ $smarty->assign('idTravail', $idTravail);
 $smarty->assign('coursGrp', $coursGrp);
 $smarty->assign('detailsTravail', $detailsTravail);
 $smarty->assign('totalTravail', $totalTravail);
+$smarty->assign('onglet', $onglet);
 
 $smarty->assign('listeCotes', $listeCotes);
 

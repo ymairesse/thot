@@ -31,8 +31,12 @@ if (!empty($_FILES) && ($verif == true)) {
     $idTravail = $detailsTravail['idTravail'];
     $acronyme = $detailsTravail['acronyme'];
     $tempFile = $_FILES['file']['tmp_name'];
+
     $targetPath = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule;
     $targetFile = $targetPath.$ds.$_FILES['file']['name'];
+    if (!is_dir($targetPath)) {
+        mkdir($targetPath, 0700, true);
+    }
     if (move_uploaded_file($tempFile, $targetFile)) {
         $Files->travailRemis($idTravail, $matricule);
         return true;

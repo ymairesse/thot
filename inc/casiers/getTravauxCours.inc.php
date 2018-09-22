@@ -30,9 +30,12 @@ $smarty = new Smarty();
 $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
+$onglet = isset($_COOKIE['ongletCasiers']) ? $_COOKIE['ongletCasiers'] : 'consignes';
+
 $smarty->assign('listeTravauxCours', $listeTravauxCours);
 $smarty->assign('listeArchives', $listeArchives);
 $smarty->assign('coursGrp', $coursGrp);
 $smarty->assign('idTravail', $idTravail);
+$smarty->assign('onglet', $onglet);
 
 $smarty->display('casiers/listeTravauxCours.tpl');

@@ -20,7 +20,7 @@ class Jdc
     public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString, $redacteur=Null)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, url, class, allDay, startDate, endDate ';
+        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, enonce, class, allDay, startDate, endDate ';
         $sql .= 'FROM '.PFX.'thotJdc ';
         $sql .= 'WHERE startDate BETWEEN :start AND :end ';
         if ($redacteur == Null) {
@@ -48,14 +48,19 @@ class Jdc
         if ($resultat) {
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $requete->fetch()) {
+                $destinataire = $ligne['destinataire'];
+                preg_match('/[0-9].*:(.*)-[0-9]*/', $destinataire, $matches);
+                $cours = $matches[1];
                 $liste[] = array(
                     'id' => $ligne['id'],
                     'title' => $ligne['title'],
-                    'url' => $ligne['url'],
+                    'enonce' => mb_strimwidth(strip_tags(html_entity_decode($ligne['enonce'])), 0, 200,'...'),
                     'className' => 'cat_'.$ligne['idCategorie'],
                     'start' => $ligne['startDate'],
                     'end' => $ligne['endDate'],
-                    'allDay' => ($ligne['allDay'] != 0)
+                    'allDay' => ($ligne['allDay'] != 0),
+                    'destinataire' => $destinataire,
+                    'cours' => $cours
                     );
             }
         }
@@ -64,11 +69,18 @@ class Jdc
         return $liste;
     }
 
+    /**
+     * retrouve une notification dont on fournit l'identifiant.
+     *
+     * @param int $itemId : l'identifiant dans la BD
+     *
+     * @return array
+     */
     public function getTravail($itemId)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = "SELECT destinataire, type, proprietaire, redacteur, title, enonce, class, id, DATE_FORMAT(startDate,'%d/%m/%Y') AS startDate, ";
-        $sql .= "DATE_FORMAT(startDate,'%H:%i') AS heure, endDate, TIMEDIFF(endDate, startDate) AS duree, allDay, ";
+        $sql .= "DATE_FORMAT(startDate,'%H:%i') AS heure, endDate, TIMEDIFF(endDate, startDate) AS duree, allDay, DATE_FORMAT(lastModif, '%d/%m/%Y %H:%i') AS lastModif, ";
         $sql .= 'jdc.idCategorie, categorie, sexe, nom, prenom, libelle, nbheures, nomCours ';
         $sql .= 'FROM '.PFX.'thotJdc AS jdc ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = jdc.proprietaire ';
@@ -111,6 +123,39 @@ class Jdc
         Application::DeconnexionPDO($connexion);
 
         return $travail;
+    }
+
+    /**
+     * retrouve les PJ liées au JDC dont on fournit l'identifiant $idJdc
+     *
+     * @param int $idJdc : l'identifiant du journal de classe
+     *
+     * @return array : la liste des fichiers joints
+     */
+    public function getPj($idJdc) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT tjdc.shareId, shares.fileId, path, fileName ';
+        $sql .= 'FROM '.PFX.'thotJdcPJ AS tjdc ';
+        $sql .= 'JOIN '.PFX.'thotShares AS shares ON shares.shareId = tjdc.shareId ';
+        $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = shares.fileId ';
+        $sql .= 'WHERE idJdc = :idJdc ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':idJdc', $idJdc, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $shareId = $ligne['shareId'];
+                $liste[$shareId] = $ligne;
+            }
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
     }
 
     /**

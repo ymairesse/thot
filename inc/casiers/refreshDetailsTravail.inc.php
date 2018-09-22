@@ -27,6 +27,7 @@ if (in_array($idTravail, array_keys($listeTravauxCours))) {
     $detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
     $listeCotes = $Files->getCotesTravail ($idTravail, $matricule);
     $totalTravail = $Files->totalisation($listeCotes);
+    $onglet = isset($_COOKIE['ongletCasiers']) ? $_COOKIE['ongletCasiers'] : 'consignes';
 
     require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
     $smarty = new Smarty();
@@ -35,6 +36,7 @@ if (in_array($idTravail, array_keys($listeTravauxCours))) {
 
     $smarty->assign('idTravail', $idTravail);
     $smarty->assign('detailsTravail', $detailsTravail);
+    $smarty->assign('onglet', $onglet);
     $smarty->assign('listeCotes', $listeCotes);
     $smarty->assign('totalTravail', $totalTravail);
     $smarty->display('casiers/detailsTravail.tpl');

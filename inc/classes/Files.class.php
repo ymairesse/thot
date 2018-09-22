@@ -195,7 +195,7 @@ class Files
     }
 
     /**
-     * retourne la liste des documents partagés avec l'élève dont on fournit le matricule.
+     * retourne la liste des documents partagés avec l'élève dont on fournit le matricule, etc.
      *
      * @param $matricule
      * @param $classe
@@ -213,17 +213,22 @@ class Files
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
         $sql .= 'LEFT JOIN didac_cours AS dc ON SUBSTR(share.groupe, 1, LOCATE("-",share.groupe)-1) = dc.cours ';
-        $sql .= "WHERE destinataire = '$matricule' ";
-        $sql .= "OR groupe = '$classe' ";
-        $sql .= "OR groupe = 'niveau' AND destinataire = '$niveau' ";
-        $sql .= "OR groupe IN ($listeCoursString) ";
+        $sql .= "WHERE destinataire = :matricule ";
+        $sql .= "OR (groupe = :classe AND destinataire = 'all') ";
+        $sql .= "OR groupe IN ($listeCoursString) AND (destinataire = 'all') ";
+        $sql .= "OR (groupe = :niveau ) ";
         $sql .= "OR groupe = 'ecole' ";
+        $requete = $connexion->prepare($sql);
 
-        $resultat = $connexion->query($sql);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 8);
+        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
         $liste = array();
         if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
                 // pallier le problème de la graphie 'classe' ou 'classes'
                 $type = $ligne['type'];
                 if ($type == 'classe')
@@ -274,17 +279,17 @@ class Files
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
         $sql .= 'LEFT JOIN didac_cours AS dc ON SUBSTR(share.groupe, 1, LOCATE("-",share.groupe)-1) = dc.cours ';
-        $sql .= "WHERE destinataire = :matricule ";
-        $sql .= "OR (groupe = :classe AND destinataire = :classe) ";
-        $sql .= "OR (groupe = :niveau  AND destinataire = :niveau) ";
-        $sql .= "OR groupe IN (".$listeCoursString.") ";
-        $sql .= "OR groupe = 'ecole' ";
+        $sql .= 'WHERE destinataire = :matricule ';
+        $sql .= 'OR (groupe = :classe AND destinataire = "all") ';
+        $sql .= 'OR (groupe = :niveau) ';
+        $sql .= 'OR (groupe IN ('.$listeCoursString.') AND destinataire = "all") ';
+        $sql .= 'OR groupe = "ecole" ';
         $requete = $connexion->prepare($sql);
-
+// echo $sql;
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
         $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
-
+// Application::afficher(array($matricule, $classe, $niveau), true);
         $resultat = $requete->execute();
         $liste = array();
         if ($resultat) {
@@ -341,7 +346,7 @@ class Files
         $sql .= 'FROM '.PFX.'thotSharesSpy AS dtss ';
         $sql .= 'JOIN '.PFX.'thotShares AS dts ON dtss.shareId = dts.shareId ';
         $sql .= 'JOIN '.PFX.'thotFiles AS dtf ON dtf.fileId = dts.fileId ';
-        $sql .= 'WHERE dtss.shareId =:shareId ';
+        $sql .= 'WHERE dtss.shareId = :shareId ';
         $requete = $connexion->prepare($sql);
 
         $requete->bindParam(':shareId', $shareId, PDO::PARAM_INT);
@@ -370,10 +375,10 @@ class Files
     public function setSpiedDownload ($userName, $userType, $spyId, $path=Null, $fileName=Null) {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'INSERT INTO '.PFX.'thotSharesSpyUsers ';
-        $sql .= 'SET spyId=:spyId, userName=:userName, date=NOW(), userType=:userType, ';
-        $sql .= 'path=:path, fileName=:fileName ';
+        $sql .= 'SET spyId = :spyId, userName = :userName, date = NOW(), userType = :userType, ';
+        $sql .= 'path = :path, fileName = :fileName ';
         $sql .= 'ON DUPLICATE KEY UPDATE date=NOW() ';
-// echo $sql;
+
         $path = ($path != Null) ? $path : '';
         $fileName = ($fileName != Null) ? $fileName : '';
 
@@ -384,7 +389,7 @@ class Files
         $requete->bindParam(':path', $path, PDO::PARAM_STR, 255);
         $requete->bindParam(':fileName', $fileName, PDO::PARAM_STR, 255);
         $resultat = $requete->execute();
-// Application::afficher(array($spyId, $userName, $userType, $path, $fileName), true);
+
         Application::DeconnexionPDO($connexion);
 
         return ;

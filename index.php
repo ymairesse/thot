@@ -34,6 +34,12 @@ switch ($action) {
     case 'bulletin':
         require_once 'inc/bulletin.inc.php';
         break;
+    case 'repertoire':
+        require_once 'inc/evaluations.inc.php';
+        break;
+    case 'remediation':
+        require_once 'inc/remediation.inc.php';
+        break;
     case 'anniversaires':
         require_once 'inc/anniversaires.inc.php';
         break;
@@ -48,6 +54,9 @@ switch ($action) {
         break;
     case 'contact':
         require_once 'inc/contact.inc.php';
+        break;
+    case 'comportement':
+        require_once 'inc/comportement.inc.php';
         break;
     case 'reunionParents':
         require_once 'inc/reunionParents.inc.php';

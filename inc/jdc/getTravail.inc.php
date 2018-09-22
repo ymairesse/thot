@@ -29,6 +29,7 @@ $likes = array();
 
 if ($id != null) {
     $travail = $Jdc->getTravail($id);
+    $pj = $Jdc->getPj($id);
     $editable = $Jdc->editable($travail, $matricule, $origine);
 
     if ($travail['proprietaire'] == '') {
@@ -69,5 +70,6 @@ if ($id != null) {
     $smarty->assign('likes', $likes);
     $smarty->assign('editable', $editable);
     $smarty->assign('travail', $travail);
+    $smarty->assign('pj', $pj);
     $smarty->display('jdc/unTravail.tpl');
 }

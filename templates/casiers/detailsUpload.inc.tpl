@@ -1,5 +1,5 @@
 <p>Nom du fichier: <span id="fileName">
-    {if $detailsTravail.fileInfos.fileName == ''}
+    {if trim($detailsTravail.fileInfos.fileName) == ''}
         {if $detailsTravail.statut == termine}
             <strong>Non remis </strong>
             {else}

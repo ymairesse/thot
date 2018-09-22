@@ -9,8 +9,8 @@
         <button
             type="button"
             class="btn btn-primary{if isset($coursGrp) && ($leCoursGrp == $coursGrp)} active{/if} btn-showCours"
-            data-coursgrp={$leCoursGrp|default:Null}
-            data-idtravail={$idTravail|default:Null}>
+            data-coursgrp="{$leCoursGrp|default:Null}"
+            data-idtravail="{$idTravail|default:Null}">
                 {$travail.libelle}
         </button>
 
@@ -40,7 +40,35 @@
 
 <script type="text/javascript">
 
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+function eraseCookie(name) {
+    document.cookie = name+'=; Max-Age=-99999999;';
+}
+
     $(document).ready(function() {
+
+        $('#detailsTravail').on('click', '.onglet', function(){
+            var onglet = $(this).data('onglet');
+            setCookie('ongletCasiers', onglet, 7);
+        })
 
         $('#listeTravauxCours').on('click', '#btn-archives', function(){
             $('#travauxEnCours').addClass('hidden');

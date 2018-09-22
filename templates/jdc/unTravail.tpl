@@ -25,6 +25,10 @@
         <h4>{$travail.title}</h4>
         <div id="unEnonce">{$travail.enonce}</div>
 
+        {foreach from=$pj key=shareId item=data}
+            <span class="file"><a href="download.php?type=pId&amp;fileId={$data.fileId}"><i class="fa fa-file fa-sm"></i> {$data.fileName}</a> </span>
+        {/foreach}
+        <p class="discret">Dernière modification: {$travail.lastModif|default:'-'}</p>
         {if ($travail.redacteur != '')}
             {if ($travail.proprietaire == '')}
                 <i class="fa fa-warning fa-lg faa-flash animated text-danger"></i> <span class='discret'>Attention, pas encore approuvé par le professeur</span><br>

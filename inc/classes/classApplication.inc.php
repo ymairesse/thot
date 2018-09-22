@@ -359,13 +359,13 @@ class Application
     {
         switch ($userType) {
             case 'eleve':
-                $permis = array('bulletin', 'repertoire', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement');
+                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
                 break;
             case 'parent':
-                $permis = array('bulletin', 'repertoire', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'info', 'comportement');
+                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'info', 'comportement');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -2533,8 +2533,8 @@ class Application
     public function getCurrentAnneeScolaire(){
         $date = $this->dateNow();
         $date = explode('/', $date);
-        if ($date[1] >= 9)
-            $anscol = sprintf('%s-%s', $date[2], $date[2]+1);
+        if ((int)$date[1] >= 9)
+            $anScol = sprintf('%s-%s', $date[2], $date[2]+1);
             else $anScol = sprintf('%s-%s', $date[2]-1, $date[2]);
         return $anScol;
     }

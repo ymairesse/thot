@@ -159,7 +159,7 @@
 					// mémoriser la date pour le retour
 					$("#startDate").val(startDate);
 					$.post('inc/jdc/getAdd.inc.php', {
-						startDate: startDate,
+						startDate: dateFr,
 						heure: heure
 						},
 						function(resultat){

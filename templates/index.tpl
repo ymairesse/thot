@@ -20,19 +20,19 @@
 	<script type="text/javascript" src="js/bootbox.min.js"></script>
 
 	<script type="text/javascript" src="js/moment-with-locales.js"></script>
-	<script type="text/javascript" src="fc/fullcalendar.js"></script>
-	<script type="text/javascript" src="fc/lang/fr.js"></script>
+	<script type="text/javascript" src="fc2/fullcalendar.js"></script>
+	<script type="text/javascript" src="fc2/locale/fr.js"></script>
 	<script type="text/javascript" src="js/boostrapTimepicker/js/bootstrap-timepicker.min.js"></script>
 	<script type="text/javascript" src="js/bootstrapDatepicker/js/bootstrap-datepicker.js"></script>
 	<script type="text/javascript" src="js/bootstrapDatepicker/js/locales/bootstrap-datepicker.fr.js"></script>
 
-	<link rel="stylesheet" href="fc/fullcalendar.css" media="screen">
+	<link rel="stylesheet" href="fc2/fullcalendar.css" media="screen">
 	<link rel="stylesheet" href="css/animate/animate.min.css">
 
 </head>
 
 <body>
-	<div class="container">
+	<div class="container-fluid">
 
 		{include file="entete.tpl"}
 		{include file="menu.tpl"}

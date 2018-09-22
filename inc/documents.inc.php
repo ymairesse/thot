@@ -18,10 +18,7 @@ $listeDocs = $Files->listeElevesShares($matricule, $classe, $niveau, $listeCours
 if (isset($listeDocs['coursGrp']))
     $listeDocs['coursGrp'] = $Files->sortByCours($listeDocs['coursGrp']);
 
-$listeEdocs = $Application->listeEdocs($matricule);
-
 $smarty->assign('matricule', $matricule);
 $smarty->assign('listeDocs', $listeDocs);
-$smarty->assign('listeEdocs', $listeEdocs);
 
 $smarty->assign('corpsPage', 'documents');

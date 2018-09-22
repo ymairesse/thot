@@ -28,6 +28,7 @@
             <strong>Le {$travail.startDate} à {$travail.heure} ({$travail.duree}) </strong>
         </p>
         <div id="unEnonce">{$travail.enonce}</div>
+
     </div>
 
 </div>

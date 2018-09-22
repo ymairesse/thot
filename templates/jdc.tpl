@@ -92,8 +92,27 @@
         })
 
         $('body').on('click', '.btn-show', function(){
+            var bouton = $(this);
             var id = $(this).closest('tr').data('id');
-            alert(id);
+            $.post('inc/jdc/getPostId.inc.php', {
+                id: id,
+                show: 1
+            }, function(resultat){
+                bouton.closest('td').prev().html(resultat);
+                bouton.addClass('btn-unShow btn-success').removeClass('btn-show');
+            })
+        })
+
+        $('body').on('click', '.btn-unShow', function(){
+            var bouton = $(this);
+            var id = $(this).closest('tr').data('id');
+            $.post('inc/jdc/getPostId.inc.php', {
+                id: id,
+                show: 0
+            }, function(resultat){
+                bouton.closest('td').prev().html(resultat);
+                bouton.removeClass('btn-unShow btn-success').addClass('btn-show');
+            })
         })
 
 		$('.datepicker').datepicker({
@@ -176,11 +195,20 @@
 				url: 'inc/events.json.php'
 			},
 			eventLimit: 2,
+            defaultView: 'agendaDay',
+            weekends: false,
+            weekNumbers: true,
+            navLinks: true,
 			header: {
 				left: 'prev, today, next',
 				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
+				right: 'month,agendaWeek,agendaDay,listMonth,listWeek,list'
 			},
+            buttonText: {
+                listMonth: 'Liste Mois',
+                listWeek: 'Liste Semaine',
+                list: 'Liste Jour'
+            },
 			eventClick: function(calEvent, jsEvent, view) {
 				var id = calEvent.id; // l'id de l'événement
 				$.post('inc/jdc/getTravail.inc.php', {
@@ -196,6 +224,16 @@
 					}
 				)
 			},
+			eventRender: function(event, element) {
+                element.html('<strong>' + event.cours + '</strong><br>' + event.title),
+                element.popover({
+                    title: event.title,
+                    content: event.enonce,
+                    trigger: "hover",
+                    placement: "top",
+                    container: "body"
+                });
+                },
 			defaultTimedEventDuration: '00:50',
 			businessHours: {
 				start: '08:15',

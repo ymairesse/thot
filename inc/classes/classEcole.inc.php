@@ -825,6 +825,22 @@ class ecole
 
         return $listeCours;
     }
+
+    /**
+     * retourne la liste des abréviations des cours (Ex: 5 GT:SC3-02 devient SC3) dont on fournit la liste
+     *
+     * @param $listeCoursGrp
+     *
+     * @return array
+     */
+    public function abrListeCoursGrp($listeCoursGrp) {
+        foreach ($listeCoursGrp AS $coursGrp) {
+            $listeCours[$coursGrp] = explode('-', explode(':', $coursGrp)[1])[0];
+        }
+
+        return $listeCours;
+    }
+
     /***
      * retourne la liste de tous les cours qui se donnent dans une classe
      * chaque ligne contient
@@ -1563,26 +1579,33 @@ class ecole
     /**
      * retourne la liste des coursGrp d'un élève dont on fournit le matricule.
      *
-     * @param $matricule
+     * @param int $matricule
      *
      * @return array
      */
     public function listeCoursGrpEleve($matricule)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT '.PFX."profs.acronyme, CONCAT(prenom,' ',nom) AS nom, ".PFX.'elevesCours.coursGrp, libelle, nbheures ';
-        $sql .= 'FROM '.PFX.'elevesCours ';
-        $sql .= 'JOIN '.PFX.'cours ON ('.PFX."cours.cours = SUBSTR(coursGrp, 1, LOCATE('-', coursGrp)-1)) ";
-        $sql .= 'JOIN '.PFX.'profsCours ON ('.PFX.'profsCours.coursGrp = '.PFX.'elevesCours.coursGrp ) ';
-        $sql .= 'JOIN '.PFX.'profs ON ('.PFX.'profs.acronyme = '.PFX.'profsCours.acronyme) ';
-        $sql .= "WHERE matricule = '$matricule' ";
+        $sql = 'SELECT dp.acronyme, sexe, nom, prenom, ec.coursGrp, libelle, nbheures ';
+        $sql .= 'FROM '.PFX.'elevesCours AS ec ';
+        $sql .= 'JOIN '.PFX."cours AS dc ON (dc.cours = SUBSTR(coursGrp, 1, LOCATE('-', coursGrp)-1)) ";
+        $sql .= 'JOIN '.PFX.'profsCours AS pc ON pc.coursGrp = ec.coursGrp ';
+        $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = pc.acronyme ';
+        $sql .= 'WHERE matricule = :matricule ';
         $sql .= 'ORDER BY nbheures DESC, libelle ';
-        $resultat = $connexion->query($sql);
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
         $listeCoursGrp = array();
         if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
                 $coursGrp = $ligne['coursGrp'];
+                $ligne['prenom'] = mb_substr($ligne['prenom'], 0, 1, 'UTF-8').'. ';
+                $adresse = ($ligne['sexe'] == 'M') ? 'M. ' : 'Mme';
+                $ligne['nom'] = sprintf('%s %s %s', $adresse, $ligne['prenom'], $ligne['nom']);
                 // si le cours est déjà passé, on rajoute le nom de l'autre titulaire
                 if (isset($listeCoursGrp[$coursGrp])) {
                     $listeCoursGrp[$coursGrp]['nom'] .= ' & '.$ligne['nom'];

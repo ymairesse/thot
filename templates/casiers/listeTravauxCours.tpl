@@ -1,4 +1,3 @@
-
 <div id="travauxEnCours">
 
     <h3>Travaux en cours</h3>
@@ -7,11 +6,11 @@
         <ul class="list-unstyled">
             {foreach from=$listeTravauxCours key=id item=unTravail}
 
-                <div class="input-group">
+                <div class="input-group" style="display: block">
                     <button
                             type="button"
                             class="btn btn-default btn-block btnShowTravail{if $id == $idTravail} active{/if} {$unTravail.statut}"
-                            style="width: 18em; overflow: hidden; text-overflow: ellipsis"
+                            style="overflow: hidden; text-overflow: ellipsis"
                             data-idtravail="{$id}"
                             title="{$unTravail.titre}">
                         {$unTravail.dateDebut|truncate:5:''} - {$unTravail.titre}

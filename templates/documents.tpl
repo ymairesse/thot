@@ -17,10 +17,7 @@
         <a data-toggle="tab" href="#ecole">École
         <span class="badge">{$listeDocs.ecole|@count|default:0}</span></a>
     </li>
-    <li>
-        <a data-toggle="tab" href="#e-docs">Mes e-docs
-        <span class="badge">{$listeEdocs.$matricule|@count|default:0}</span></a>
-    </li>
+
 </ul>
 
 <div class="tab-content">

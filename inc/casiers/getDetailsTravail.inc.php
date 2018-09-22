@@ -16,6 +16,7 @@ $User = unserialize($_SESSION['THOT']);
 $matricule = $User->getMatricule();
 
 $idTravail = $Application->postOrCookie('idTravail');
+$onglet = isset($_COOKIE['ongletCasiers']) ? $_COOKIE['ongletCasiers'] : 'consignes';
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
@@ -31,6 +32,7 @@ $smarty->compile_dir = '../../templates_c';
 
 $smarty->assign('idTravail', $idTravail);
 $smarty->assign('detailsTravail', $detailsTravail);
+$smarty->assign('onglet', $onglet);
 $smarty->assign('listeCotes', $listeCotes);
 $smarty->assign('totalTravail', $totalTravail);
 

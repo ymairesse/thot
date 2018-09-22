@@ -5,7 +5,7 @@ body {
     padding-top: 2em;
 }
 
-.container {
+.container-fluid, .container {
     background-color: #eed;
 }
 
@@ -509,4 +509,72 @@ tr.nonLu td{
 .badge.badge-danger {
     background: #ff0000;
     color: #ffffff;
+}
+
+.cert {
+    background-color: #bfb;
+}
+
+.form {
+    background-color: #ccd
+}
+
+/* corrections pour le mode "liste" de fullCalendar */
+.fc-list-item:hover td {
+  background-color: #ccc !important;
+  color: #333;
+}
+
+.fc-list-item {
+    cursor: pointer;
+}
+
+.demiavertissement {
+    padding-top: 1.5em;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #bbb;
+}
+
+.bordure {
+    border: 1px solid #999;
+    padding: 0.5em;
+    margin: 0.9em 0
+}
+
+.absent {
+    background-color: #f55;
+    color: white;
+}
+
+.present {
+    background-color: #5f5;
+    color: #333;
+}
+
+.indetermine {
+    background-color: #bbb;
+}
+
+.niveau {
+    background-color: #f9d6ea;
+}
+.ecole {
+    background-color: #d1f6fc;
+}
+.classe {
+    background-color: #caffb7;
+}
+.coursGrp {
+    background-color: #ffeb9e;
+}
+.matiere {
+    background-color: #fbffc1;
+}
+
+.file {
+    border: 1px solid #88f;
+    margin: 3px;
+    background-color: #ff0;
 }

@@ -50,7 +50,7 @@
                         {assign var=acronyme value=$data.acronyme}
                         {assign var=coursGrp value=$data.coursGrp}
                         <option value="{$acronyme}">
-                            {if in_array($acronyme,array_keys($titus))}&#xf19d;&nbsp;&nbsp;{else}&#xf007;&nbsp;&nbsp;{/if}{$data.adresse} {$data.prenom} {$data.nom} -> {$data.libelle} {$data.nbheures}h
+                            {$data.adresse} {$data.prenom} {$data.nom} -> {$data.libelle} {$data.nbheures}h
                         </option>
                         {/foreach}
                     </select>

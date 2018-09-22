@@ -46,34 +46,36 @@
 	<!-- container -->
 
 	{include file="footer.tpl"}
-	</div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			$("input:enabled").eq(0).focus();
+
+			$("#login").validate({
+				rules: {
+					userName: {
+						required: true
+					},
+					mdp: {
+						required: true
+					}
+				},
+				errorElement: "span"
+			});
+
+			$("*[title]").tooltip();
+
+			$(".pop").popover({
+				trigger: 'hover'
+			});
+
+		})
+	</script>
+
 
 </body>
 
-<script type="text/javascript">
-	$(document).ready(function() {
 
-		$("input:enabled").eq(0).focus();
-
-		$("#login").validate({
-			rules: {
-				userName: {
-					required: true
-				},
-				mdp: {
-					required: true
-				}
-			},
-			errorElement: "span"
-		});
-
-		$("*[title]").tooltip();
-
-		$(".pop").popover({
-			trigger: 'hover'
-		});
-
-	})
-</script>
 
 </html>
