@@ -14,19 +14,7 @@ if (!(isset($_SESSION[APPLICATION]))) {
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
 
-$matricule = $User->getMatricule();
+$userName = $User->getUserName();
+$identite = $User->getIdentite();
 
-require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
-$Jdc = new Jdc();
-
-$id = isset($_POST['id']) ? $_POST['id'] : null;
-
-$travail = $Jdc->getNotePerso($id);
-
-if ($travail['matricule'] == $matricule) {
-    $nb = $Jdc->deleteJdc($id, $matricule);
-} else {
-    die('Cette note au JDC ne vous appartient pas');
-}
-
-echo $nb;
+echo sprintf('%s %s', $identite['prenom'], $identite['nom']);

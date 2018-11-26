@@ -18,7 +18,6 @@ $coursGrp = isset($_POST['coursGrp']) ? $_POST['coursGrp'] : Null;
 
 // s'il y a des cours avec travaux
 if (count($listeCoursAvecTravaux) > 0) {
-// Application::afficher($listeCoursAvecTravaux);
     // si aucun cours n'a été sélectionné, on prend le premier
     if ($coursGrp == Null)
         $coursGrp = array_keys($listeCoursAvecTravaux)[0];
@@ -43,7 +42,7 @@ if (count($listeCoursAvecTravaux) > 0) {
 
 // si le travail actuellement pointé par $idTravail figure dans ceux du cours,
 // on cherche les informations détaillées pour l'affichage
-if (in_array($idTravail, array_keys($listeTravauxCours))) {
+if (isset($listeTravauxCours) && in_array($idTravail, array_keys($listeTravauxCours))) {
     $detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
     $listeCotes = $Files->getCotesTravail ($idTravail, $matricule);
     $totalTravail = $Files->totalisation($listeCotes);

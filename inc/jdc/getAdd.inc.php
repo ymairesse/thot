@@ -20,17 +20,21 @@ require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
 $Jdc = new Jdc();
 
 $categories = $Jdc->categoriesTravaux();
-
-$startDate = isset($_POST['startDate']) ? $_POST['startDate'] : null;
+// Application::afficher($categories);
 $heure = isset($_POST['heure']) ? $_POST['heure'] : null;
+$startDate = isset($_POST['startDate']) ? $_POST['startDate'] : null;
+
 if ($heure != Null) {
     $heure = $Jdc->heureLaPlusProche($heure);
 }
 
 $listePeriodes = $Jdc->lirePeriodesCours();
 
-$classe = $User->getClasse();
-$listeCours = $User->listeDetailCoursEleve();
+$travail = array(
+    'startDate' => $startDate,
+    'heure' => $heure,
+    'idCategorie' => Null,
+    );
 
 require_once INSTALL_DIR.'/smarty/Smarty.class.php';
 $smarty = new Smarty();
@@ -38,11 +42,11 @@ $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
 $smarty->assign('categories', $categories);
-$smarty->assign('listeCours', $listeCours);
-$smarty->assign('classe', $classe);
 $smarty->assign('listePeriodes', $listePeriodes);
 
 $smarty->assign('startDate', $startDate);
 $smarty->assign('heure', $heure);
+$smarty->assign('travail', $travail);
 
-$smarty->display('jdc/modalEdit.tpl');
+
+$smarty->display('jdc/jdcEdit.tpl');

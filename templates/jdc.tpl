@@ -1,6 +1,6 @@
 <ul class="nav nav-pills">
-  <li class="active"><a data-toggle="tab" href="#calendrier"><i class="fa fa-calendar text-danger"></i> JDC calendrier</a></li>
-  <li><a data-toggle="tab" href="#journalier"><i class="fa fa-calendar-check-o text-success"></i> JDC journalier (expérimental)</a></li>
+    <li class="active"><a data-toggle="tab" href="#calendrier"><i class="fa fa-calendar fa-lg"></i> JDC calendrier</a></li>
+    <li><a data-toggle="tab" href="#journalier"><i class="fa fa-file-pdf-o fa-lg"></i> Imprimer</a></li>
 </ul>
 
 <div class="tab-content">
@@ -35,20 +35,25 @@
 
 	<div class="row tab-pane fade" id="journalier">
 
-		<div class="col-xs-12 selecteur">
-
+        <div class="col-xs-8">
             {include file="jdc/selectDatesCoursClasse.tpl"}
+
+            <div class="clearfix"></div>
+
+            <div id="jdcJournalier" style="height: 35em; overflow: auto; border: 1px solid black">
+
+            </div>
 
         </div>
 
-		<div class="col-xs-12" id="jdcJournalier"  style="height: 35em; overflow: auto">
-
-		</div>
+        <div class="col-xs-4">
+            {include file="jdc/memoPrint.tpl"}
+        </div>
 
     </div>
 
-	</div>
-	<!-- tab-content -->
+</div>
+<!-- tab-content -->
 
 </div>
 
@@ -64,23 +69,9 @@
 </div>
 <!-- row -->
 
-{include file="jdc/modal/modalDislike.tpl"}
-
-{include file="jdc/modal/modalInfoLikes.tpl"}
-
-{include file="jdc/modal/modalViewJDC.tpl"}
-
-
 <script type="text/javascript">
 
 	$(document).ready(function() {
-
-        var formulaire = $('#selectDatesCours').serialize();
-		$.post('inc/jdc/jdcJournalier.inc.php', {
-			formulaire: formulaire
-		}, function(resultat){
-			$('#jdcJournalier').html(resultat);
-		})
 
         $('#dateStart, #dateEnd, #coursGrpClasse, #categories').change(function(){
             var formulaire = $('#selectDatesCours').serialize();
@@ -124,78 +115,12 @@
             todayHighlight: true
             });
 
-		$('#viewJDC').click(function(){
-			$.post('inc/jdc/listeCoursClasseEleve.inc.php', {
-			}, function(resultat){
-				$('#listeCours').html(resultat);
-			})
-			$('#modalPrintJDC').modal('show');
-		})
-
-		$('#btnModalViewJDC').click(function(){
-			var formulaire = $('#printForm').serialize();
-			$.post('inc/jdc/viewJDC.inc.php', {
-				formulaire: formulaire
-			}, function(resultat){
-				bootbox.alert(resultat);
-			})
-		})
-
-		$('#unTravail').on('click', '#like', function(){
-			var id = $(this).data('id');
-			$.post('inc/jdc/saveLikes.inc.php', {
-				mode: 'like',
-				id: id,
-				commentaire: ''
-			}, function(resultat){
-				comptes = JSON.parse(resultat);
-				$('#like').find('.badge').text(comptes.like);
-				$('#dislike').find('.badge').text(comptes.dislike);
-			})
-		})
-
-		$('#unTravail').on('click', '#dislike', function(){
-			var id = $(this).data('id');
-			$('#confirmDislike').data('id', id);
-			$.post('inc/jdc/retreiveDislike.inc.php', {
-				id: id
-			}, function(resultat){
-				$('#commentaire').val(resultat);
-			})
-			$('#modalDislike').modal('show');
-		})
-
-		$('#confirmDislike').click(function(){
-			var id = $(this).data('id');
-			var commentaire = $('#commentaire').val();
-			$.post('inc/jdc/saveLikes.inc.php', {
-				mode: 'dislike',
-				id: id,
-				commentaire: commentaire
-			}, function(resultat){
-				comptes = JSON.parse(resultat);
-				$('#like').find('.badge').text(comptes.like);
-				$('#dislike').find('.badge').text(comptes.dislike);
-				$('#modalDislike').modal('hide');
-			})
-		})
-
-		$('#unTravail').on('click', '#info', function(){
-			var id = $(this).data('id');
-			$.post('inc/jdc/dislikesList.inc.php', {
-				id: id
-			}, function(resultat){
-				$('#dislikes').html(resultat);
-				$('#modalInfo').modal('show');
-			})
-		})
-
 		$("#calendar").fullCalendar({
 			events: {
 				url: 'inc/events.json.php'
 			},
 			eventLimit: 2,
-            defaultView: 'agendaDay',
+            defaultView: 'agendaWeek',
             weekends: false,
             weekNumbers: true,
             navLinks: true,
@@ -224,8 +149,53 @@
 					}
 				)
 			},
+            eventResize: function(event, delta, revertFunc) {
+                var startDate = moment(event.start).format('YYYY-MM-DD HH:mm');
+                var endDate = moment(event.end).format('YYYY-MM-DD HH:mm');
+                // mémoriser la date, pour le retour
+                $("#startDate").val(startDate);
+                var id = event.id;
+                $.post('inc/getDragDrop.inc.php', {
+                        id: id,
+                        startDate: startDate,
+                        endDate: endDate
+                    },
+                    function(resultat) {
+                        $("#unTravail").html(resultat);
+                        $('#calendar').fullCalendar('refetchEvents');
+                    }
+                )
+            },
+            eventDrop: function(event, delta, revertFunc) {
+                var startDate = moment(event.start).format('YYYY-MM-DD HH:mm');
+                // mémoriser la date pour le retour
+                $("#startDate").val(startDate);
+                // si l'événement est draggé sur allDay, la date de fin est incorrecte
+                if (moment.isMoment(event.end))
+                    var endDate = moment(event.end).format('YYYY-MM-DD HH:mm');
+                else var endDate = '0000-00-00 00:00';
+                var id = event.id;
+                $.post('inc/getDragDrop.inc.php', {
+                        id: id,
+                        startDate: startDate,
+                        endDate: endDate
+                    },
+                    function(resultat) {
+                        $("#unTravail").html(resultat);
+                        $('#calendar').fullCalendar('gotoDate', startDate);
+                        // forcer le mode "agendaDay" pour voir finement la modification
+                        $('#calendar').fullCalendar('changeView', 'agendaDay');
+                    }
+                )
+            },
 			eventRender: function(event, element) {
-                element.html('<strong>' + event.cours + '</strong><br>' + event.title),
+                if (event.cours == '')
+                    cours = "<i class='fa fa-info fa-lg'></i> Information";
+                    else if (event.cours == undefined)
+                        cours = "<i class='fa fa-user fa-lg'></i> Note personnelle";
+                        else cours = event.cours;
+
+                element.html('<strong>' + cours + '</strong><br>' + event.title),
                 element.popover({
                     title: event.title,
                     content: event.enonce,

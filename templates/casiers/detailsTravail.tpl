@@ -1,8 +1,7 @@
 {if $detailsTravail != Null}
 
     <ul class="nav nav-pills nav-justified">
-      <li {if $onglet == 'consignes'}class="active"{/if}><a data-toggle="pill" href="#consigne" class="onglet" data-onglet="consignes"><i class="fa fa-info-circle fa-lg"></i> Consignes</a></li>
-      <li {if $onglet == 'depot'}class="active"{/if}><a data-toggle="pill" href="#depot" class="onglet" data-onglet="depot"><i class="fa fa-user fa-lg"></i> Dépôt du travail</a></li>
+      <li {if $onglet == 'consignes'}class="active"{/if}><a data-toggle="pill" href="#consigne" class="onglet" data-onglet="consignes"><i class="fa fa-info-circle fa-lg"></i> Consignes et dépôt</a></li>
       <li {if $onglet == 'evaluation'}class="active"{/if}><a data-toggle="pill" href="#evaluation" class="onglet" data-onglet="evaluation"><i class="fa fa-graduation-cap fa-lg"></i> Évaluation {if $listeCotes|@count > 0}<span class="badge">{$listeCotes|count}</span>{/if}</a></li>
     </ul>
 
@@ -19,10 +18,7 @@
                 <p>Date de début: <strong>{$detailsTravail.dateDebut}</strong> | Date de fin: <strong>{$detailsTravail.dateFin}</strong></p>
             </div>
         </div>
-      </div>
 
-      <div id="depot" class="tab-pane fade {if $onglet == 'depot'}in active{/if}">
-        <h3>Dépôt [{$detailsTravail.titre}]</h3>
         <div class="panel panel-success">
             <div class="panel-body">
                 <div class="col-md-9 col-xs-12">

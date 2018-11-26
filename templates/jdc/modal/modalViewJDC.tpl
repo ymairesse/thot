@@ -52,7 +52,7 @@
 			</div>
 			<div class="modal-footer">
 				<div class="btn-group">
-					<button type="button" class="btn btn-default"data-dismiss="modal">Annuler</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
 					<button type="button" class="btn btn-primary" id="btnModalViewJDC">Générer la vue <i class="fa fa-eye fa-lg"></i></button>
 				</div>
 			</div>

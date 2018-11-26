@@ -21,36 +21,32 @@ require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
 $Jdc = new Jdc();
 
 $id = isset($_POST['id']) ? $_POST['id'] : null;
-$origine = isset($_POST['origine']) ? $_POST['origine'] : null;
-
-$titus = Null;
-$redacteur = Null;
-$likes = array();
 
 if ($id != null) {
-    $travail = $Jdc->getTravail($id);
-    $pj = $Jdc->getPj($id);
-    $editable = $Jdc->editable($travail, $matricule, $origine);
+    // recherche du préfixe de l'identifiant ("Rem, par exemple")
+    $arrayId = explode('_', $id);
+    $id = (isset($arrayId[1])) ? $arrayId[1] : $id;
+    $type = (isset($arrayId[1])) ? $arrayId[0] : Null;
 
-    if ($travail['proprietaire'] == '') {
-        require_once INSTALL_DIR.'/inc/classes/classEcole.inc.php';
-        $Ecole = new Ecole();
-        switch ($travail['type']) {
-            case 'classe':
-                $classe = $travail['destinataire'];
-                $titus = $Ecole->titusDeGroupe($classe);
-                $travail['nom'] = $titus;
-                break;
-            case 'cours':
-                $coursGrp = $travail['destinataire'];
-                $titus = $Ecole->getProfs4CoursGrp($coursGrp);
-                $travail['nom'] = $titus;
-                break;
+    $titus = Null;
+
+    switch ($type) {
+        case 'Rem':
+            $travail = $Jdc->getRemediation($id);
+            $pj = Null;
+            break;
+        case 'Perso':
+            $travail = $Jdc->getNotePerso($id);
+            $pj = Null;
+
+            break;
+        default:
+            $travail = $Jdc->getTravail($id);
+            $pj = $Jdc->getPj($id);
+            break;
         }
-        $redacteur = $User->getNom();
-        $likes = $Jdc->countLikes($id);
-    }
-    else {
+
+    if (isset($travail['proprietaire']) && $travail['proprietaire'] != '') {
         $acronyme = $travail['proprietaire'];
         $identite = $Application->identiteProf($acronyme);
         $adresse = ($identite['sexe'] == 'F') ? 'Mme' : 'M.';
@@ -63,13 +59,20 @@ if ($id != null) {
     $smarty->template_dir = '../../templates';
     $smarty->compile_dir = '../../templates_c';
 
-    $smarty->assign('origine', $origine);
-    $smarty->assign('titus', $titus);
-    $smarty->assign('matricule', $matricule);
-    $smarty->assign('redacteur', $redacteur);
-    $smarty->assign('likes', $likes);
-    $smarty->assign('editable', $editable);
     $smarty->assign('travail', $travail);
-    $smarty->assign('pj', $pj);
-    $smarty->display('jdc/unTravail.tpl');
+
+    switch ($type) {
+        case 'Rem':
+            $smarty->display('jdc/uneRemediation.tpl');
+            break;
+        case 'Perso':
+            $smarty->display('jdc/notePerso.tpl');
+            break;
+        default:
+            $smarty->assign('matricule', $matricule);
+            $smarty->assign('titus', $titus);
+            $smarty->assign('pj', $pj);
+            $smarty->display('jdc/unTravail.tpl');
+            break;
+    }
 }

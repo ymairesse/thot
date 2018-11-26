@@ -1,5 +1,3 @@
-<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
-
 <div id="modalEdit" class="modal fade" aria-hidden="true">
 
     <div class="modal-dialog">
@@ -21,7 +19,7 @@
 
                         <div class="form-group">
                             <label for="categorie" class="sr-only">Catégorie</label>
-                            <select name="categorie" id="categorie" class="form-control input-sm">
+                            <select name="idCategorie" id="idCategorie" class="form-control input-sm">
                                 <option value="">Veuillez choisir une catégorie</option>
                                 {foreach from=$categories key=id item=cat}
                                     <option value="{$id}"{if isset($travail) && ($travail.idCategorie == $id)} selected{/if}>{$cat.categorie}</option>
@@ -33,21 +31,6 @@
 
                     <div class="col-md-6 col-sm-12">
 
-                        <div class="form-group">
-                            <label for="destinataire" class="sr-only">Destinataire</label>
-                            <select name="destinataire" id="destinataire" class="form-control">
-                                <option value="">Destinataire</option>
-                                <option data-type="classe" value="{$classe}"{if isset($travail.destinataire) && ($travail.destinataire == $classe)}  selected{/if}>
-                                    Classe {$classe}
-                                </option>
-
-                                {foreach from=$listeCours key=leCoursGrp item=unCours}
-                                <option data-type="cours" value="{$leCoursGrp}"{if isset($travail.destinataire) && ($travail.destinataire == $leCoursGrp)}  selected{/if}>
-                                    {$unCours.dataCours.libelle} {$unCours.dataCours.nbheures}h [{$unCours.profs.nom}]
-                                </option>
-                                {/foreach}
-                            </select>
-                        </div>
 
                     </div>  <!-- col-md-... -->
 
@@ -207,16 +190,16 @@ jQuery.validator.addMethod(
 
 $(document).ready(function(){
 
-    CKEDITOR.replace('enonce');
+    $('#idCategorie').change(function(){
+        var categorie = $('#idCategorie option:selected').text();
+        $('#titre').val(categorie);
+    })
 
     $('#saveJDC').click(function(){
         if ($('#editJdc').valid()){
             var formulaire = $('#editJdc').serialize();
-            // récupérer le contenu du CKEDITOR
-            var enonce = CKEDITOR.instances.enonce.getData();
             $.post('inc/jdc/saveModalJdc.inc.php', {
-                formulaire: formulaire,
-                enonce: enonce
+                formulaire: formulaire
             }, function(id){
                 if (id != 0)
                     {
@@ -245,12 +228,9 @@ $(document).ready(function(){
 
     $("#editJdc").validate({
         rules: {
-            categorie: {
+            idCategorie: {
                 required: true
                 },
-            destinataire: {
-                required: true
-                  },
             date: {
                 required: true,
                 uneDate: true

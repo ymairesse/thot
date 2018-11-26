@@ -13,8 +13,9 @@ $User = isset($_SESSION[APPLICATION]) ? unserialize($_SESSION[APPLICATION]) : nu
 $listeCoursEleve = $User->listeCoursEleve();
 $listeCoursString = "'".implode("','", $listeCoursEleve)."'";
 
+$matricule = $User->getMatricule();
 $identite = $User->getIdentite();
-$matricule = $identite['matricule'];
+// $matricule = $identite['matricule'];
 $classe = $identite['groupe'];
 $niveau = substr($classe, 0, 1);
 
@@ -24,6 +25,10 @@ $end = $_GET['end'];
 require_once INSTALL_DIR.'/inc/classes/classJdc.inc.php';
 $Jdc = new Jdc();
 
-$liste = $Jdc->retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString);
+$listeJDC = $Jdc->retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString);
+$listeRemediations = $Jdc->retreiveRemediations($start, $end, $matricule);
+$personnalEvents = $Jdc->retreivePersonnalEvents($start, $end, $matricule);
+
+$liste = array_merge($listeJDC, $listeRemediations, $personnalEvents);
 
 echo json_encode($liste);

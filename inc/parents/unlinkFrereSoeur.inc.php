@@ -14,19 +14,13 @@ if (!(isset($_SESSION[APPLICATION]))) {
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
 
-$matricule = $User->getMatricule();
+$proprio = isset($_POST['proprio']) ? $_POST['proprio'] : Null;
+$userName = isset($_POST['userName']) ? $_POST['userName'] : Null;
 
-require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
-$Jdc = new Jdc();
+$nb = $User->unlink($proprio, $userName);
 
-$id = isset($_POST['id']) ? $_POST['id'] : null;
+if ($nb == 1)
+    $message = 'Le lien de famille a été supprimé';
+    else $message = 'Le lien n\'a pas été supprimé';
 
-$travail = $Jdc->getNotePerso($id);
-
-if ($travail['matricule'] == $matricule) {
-    $nb = $Jdc->deleteJdc($id, $matricule);
-} else {
-    die('Cette note au JDC ne vous appartient pas');
-}
-
-echo $nb;
+echo json_encode(array('nb' => $nb, 'messag' => $message));

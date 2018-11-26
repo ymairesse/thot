@@ -33,8 +33,8 @@
 			<div class="panel-group" id="accordion">
 
 				{include file="accueil/panel1.tpl"}
-				{include file="accueil/panel2.tpl"}
-				{include file="accueil/panel3.tpl"}
+				{* include file="accueil/panel2.tpl" *}
+				{* include file="accueil/panel3.tpl" *}
 
 			</div>
 			<!-- panel-group -->

@@ -365,7 +365,7 @@ class Application
                 }
                 break;
             case 'parent':
-                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'jdc', 'profil', 'logoff', 'annonces', 'contact', 'reunionParents', 'info', 'comportement');
+                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'jdc', 'profil', 'frereSoeur', 'logoff', 'annonces', 'contact', 'reunionParents', 'info', 'comportement');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }

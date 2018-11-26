@@ -95,7 +95,7 @@ switch ($type) {
             die($fileNotFound);
         }
         $listeDocs = $Files->listeDocsEleve($matricule, $classe, $niveau, $listeCoursString);
-        // Application::afficher($listeDocs, true);
+
         // si le fichier figure parmi les documents partagés avec cet élève
         if (in_array($fileId, array_keys($listeDocs))) {
             // récupérer les données du fichier

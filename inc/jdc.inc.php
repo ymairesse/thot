@@ -17,19 +17,12 @@ $smarty->assign('classe', $classe);
 $smarty->assign('listeCours', $listeCours);
 
 switch ($mode) {
-    case 'classe':
-        // on vérifie une dernière fois que l'élève actif a la charge du JDC
-        if (!($Jdc->isChargeJDC($matricule)))
-            die('Tu n\'es pas en charge du JDC pour cette période');
+    case 'perso':
         $categories = $Jdc->categoriesTravaux();
         $smarty->assign('categories', $categories);
-        $smarty->assign('corpsPage', 'jdc/writeJDC');
+        $smarty->assign('corpsPage', 'jdc/jdcPerso');
         break;
-    case 'liste':
-        $listeCharges = $Jdc->getChargesJDC($classe);
-        $smarty->assign('listeCharges', $listeCharges);
-        $smarty->assign('corpsPage', 'jdc/listeCharges');
-        break;
+
     default:
         $smarty->assign('corpsPage', 'jdc');
         break;

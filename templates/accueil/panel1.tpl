@@ -107,8 +107,7 @@
     $(document).ready(function() {
 
                 $("#loginParents").validate();
-
                 $("#loginEleves").validate();
 
-            }
+            })
 </script>

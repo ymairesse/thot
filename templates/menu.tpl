@@ -31,13 +31,10 @@
 			{/if}
 			<li><a href="index.php?action=casiers"><i class="fa fa-inbox"></i> Casiers<br>Virtuels</a></li>
 
-			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC {if ($isChargeJDC == true) && ($userType == 'eleve')} <i class="fa fa-user-circle-o"></i>{/if} <b class="caret"></b></a>
+			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)" id="menuJdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC<b class="caret"></b></a>
 				<ul class="dropdown-menu">
-					<li><a href="index.php?action=jdc">Mon JDC</a></li>
-					<li><a href="index.php?action=jdc&amp;mode=liste">Périodes de charge JDC</a> </li>
-					{if ($isChargeJDC == true) && ($userType == 'eleve')}
-					<li><a href="index.php?action=jdc&amp;mode=classe">JDC de la classe</a></li>
-					{/if}
+					<li><a href="index.php?action=jdc" id="linkJdc">Mon JDC</a></li>
+					<li><a href="index.php?action=jdc&amp;mode=perso">Notes personnelles</a></li>
 				</ul>
 			</li>
 
@@ -50,8 +47,15 @@
 			{if $userType == 'eleve'}
 			<li><a href="index.php?action=mails"><i class="fa fa-send-o"></i> Communiquer</a></li>
 			{/if}
+
 			{if $userType == 'parent'}
-			<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil</a></li>
+			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(01)"><i class="fa fa-user" style="color:blue"></i> Profil<b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil personnel</a></li>
+					<li><a href="index.php?action=frereSoeur"><i class="fa fa-users" style="color:#666"></i> Frères et sœurs</a></li>
+				</ul>
+
+		</li>
 			<li><a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a></li>
 			<li><a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a></li>
 			{/if}
@@ -62,7 +66,9 @@
 
 			<li class="dropdown">
 				<a href="#" data-toggle="dropdown">
-					<span id="leNom">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b></a>
+					<span id="leNom">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b>
+				</a>
+
 				<ul class="dropdown-menu">
 					<li>
 						<a href="index.php?action=logoff">
@@ -77,3 +83,13 @@
 	<!-- #barreNavigation -->
 
 </nav>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$('#menuJdc').click(function(){
+			$('#linkJdc').trigger('click');
+		})
+	})
+
+</script>

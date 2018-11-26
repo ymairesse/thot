@@ -21,32 +21,10 @@ $Jdc = new Jdc();
 
 $id = isset($_POST['id'])?$_POST['id']:Null;
 
-if ($id != Null) {
-    if ($id != $Jdc->verifIdRedacteur($id, $matricule))
-        die('Cette note au JDC ne vous appartient pas');
+$travail = $Jdc->getNotePerso($id);
 
-    $travail = $Jdc->getTravail($id);
-    if ($travail['redacteur'] == $matricule) {
-        require_once INSTALL_DIR.'/inc/classes/classEcole.inc.php';
-        $Ecole = new Ecole();
-        switch ($travail['type']) {
-            case 'classe':
-                $classe = $travail['destinataire'];
-                $titus = $Ecole->titusDeGroupe($classe);
-                $travail['nom'] = $titus;
-                break;
-            case 'cours':
-                $coursGrp = $travail['destinataire'];
-                $titus = $Ecole->getProfs4CoursGrp($coursGrp);
-                $travail['nom'] = $titus;
-                break;
-        }
+if ($travail['matricule'] == $matricule) {
     $startDate = $travail['startDate'];
-    $destinataire = $travail['destinataire'];
-    $type = $travail['type'];
-
-    $coursGrp = ($type == 'cours') ? $travail['destinataire'] : Null;
-    $classe = ($type == 'classe') ? $travail['destinataire'] : Null;
 
     require_once(INSTALL_DIR."/smarty/Smarty.class.php");
     $smarty = new Smarty();
@@ -55,10 +33,9 @@ if ($id != Null) {
 
     $smarty->assign('travail',$travail);
     $smarty->assign('startDate',$startDate);
-    $smarty->assign('destinataire',$destinataire);
-    $smarty->assign('type',$type);
-    $smarty->assign('coursGrp',$coursGrp);
-    $smarty->assign('classe',$classe);
+
     $smarty->display('jdc/modalDel.tpl');
-    }
+}
+else {
+    die('Cette note ne vous appartient pas');
 }

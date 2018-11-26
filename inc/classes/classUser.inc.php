@@ -3,7 +3,7 @@
 class user
 {
     private $userName;
-    private $acronyme;          // acronyme du prof en alias
+    private $oldUser;          // sauvegarde d'un utilisateur dans la session
     private $section;           // section pour l'élève (TQ, GT, TT, ...)
     private $userType;            // eleve, parent ou prof
     private $identite;            // données personnelles
@@ -20,7 +20,6 @@ class user
             $this->userName = $userName;
             // parent, eleve ou prof
             $this->userType = $userType;
-            $this->acronyme = $acronyme;
             $this->setIdentite($userType);
         }
     }
@@ -145,7 +144,7 @@ class user
     /**
      * renvoie le nom de l'élève correspondant au parent.
      *
-     * @parem void()
+     * @param void
      *
      * @return string
      */
@@ -387,7 +386,7 @@ class user
     /**
      * ajout de l'utilisateur dans le journal des logs.
      *
-     * @param $userName	: userName de l'utilisateur
+     * @param object $user
      *
      * @return int
      */
@@ -552,4 +551,218 @@ class user
 
         return $acces;
     }
+
+    /**
+     * récupère la liste des comptes de fratrie liés à un compte donné
+     *
+     * @param string $user : utilisateur parent
+     *
+     * @return array : la liste des comptes associés
+     */
+    public function getComptesFratrie ($user){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT matricule, fratrie ';
+        $sql .= 'FROM '.PFX.'thotFratrie AS tfr ';
+        $sql .= 'JOIN '.PFX.'thotParents AS parents ON parents.userName = tfr.fratrie ';
+        $sql .= 'WHERE parent LIKE :user ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':user', $user, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+        $liste = array();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $liste[] = $ligne['fratrie'];
+            }
+        }
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * retourne le nom de l'élève correspondant à un $user parent
+     *
+     * @param array $fratrie : tableau des comptes parents pour une fratrie
+     *
+     * @return array
+     */
+     public function getEleve4Parent($fratrie){
+         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+         $fratrieString = "'".implode("','", $fratrie)."'";
+         $sql = 'SELECT DISTINCT de.matricule, de.nom, de.prenom, groupe ';
+         $sql .= 'FROM '.PFX.'eleves AS de ';
+         $sql .= 'JOIN '.PFX.'thotParents AS parents ON parents.matricule = de.matricule ';
+         $sql .= 'WHERE de.matricule IN (SELECT matricule FROM '.PFX.'thotParents WHERE userName IN ('.$fratrieString.')) ';
+         $requete = $connexion->prepare($sql);
+
+         $resultat = $requete->execute();
+
+         $eleve = array();
+         if ($resultat) {
+             while ($ligne = $requete->fetch()) {
+                 $matricule = $ligne['matricule'];
+                 $eleve[$matricule] = array(
+                     'userName' => $fratrie[$matricule],
+                     'nom' => sprintf('%s %s [%s]', $ligne['nom'], $ligne['prenom'], $ligne['groupe'])
+                 );
+             }
+         }
+
+         Application::deconnexionPDO($connexion);
+
+         return $eleve;
+     }
+
+    /**
+     * vérifie si oldUser et newUser font partie de la même fratrie (sécurité au moment de changer d'utilisateur)
+     *
+     * @param string $oldUser
+     * @param string $newUser
+     *
+     * @return boolean
+     */
+    public function checkSameFratrie($oldUser, $newUser){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT parent FROM '.PFX.'thotFratrie ';
+        $sql .= 'WHERE fratrie = :newUser AND parent = :oldUser ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':oldUser', $oldUser, PDO::PARAM_STR, 25);
+        $requete->bindParam(':newUser', $newUser, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+        $test = false;
+        if ($resultat){
+            $ligne = $requete->fetch();
+            $test = ($ligne['parent'] == $oldUser);
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $test;
+    }
+
+    /**
+     * vérifier le mot de passe pour l'utilisateur parent donné
+     *
+     * @param string $userName : utilisateur "parent"
+     * @param string $passwd : le mot de passe en clair
+     *
+     * @return boolean
+     */
+    public function checkParentPasswd($userName, $passwd){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT userName ';
+        $sql .= 'FROM '.PFX.'thotParents ';
+        $sql .= 'WHERE md5pwd = :md5pwd AND userName = :userName ';
+        $requete = $connexion->prepare($sql);
+
+        $md5pwd = md5($passwd);
+        $requete->bindParam(':md5pwd', $md5pwd, PDO::PARAM_STR, 40);
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+        $user = '';
+        if ($resultat) {
+            $ligne = $requete->fetch();
+            $user = $ligne['userName'];
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $user == $userName;
+    }
+
+    /**
+     * Initialise éventuellement une fratrie avec parent = UserName, fratrie = UserName
+     *
+     * @param string $userName
+     *
+     * @return void()
+     */
+    public function initFratrie($userName){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT IGNORE INTO '.PFX.'thotFratrie ';
+        $sql .= 'SET parent = :userName, fratrie = :userName ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+
+        Application::DeconnexionPDO($connexion);
+    }
+
+    /**
+     * ajout d'un élève à une fratrie
+     *
+     * @param string $userName : nom de l'utilisateur courant
+     * @param string $newUser : nom d'utilisateur correspondant à l'élève à ajouter
+     *
+     * @return int : nombre d'insertions dans la BD
+     */
+    public function add2Fratrie($userName, $newUser){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'INSERT INTO '.PFX.'thotFratrie ';
+        $sql .= 'SET parent = :userName, fratrie = :newUser ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+        $requete->bindParam(':newUser', $newUser, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+
+        Application::DeconnexionPDO($connexion);
+
+        return $resultat;
+    }
+
+    /**
+     * changement d'utilisateur en gardant les droits admins (Application).
+     *
+     * @param $acronyme
+     *
+     * @return string
+     */
+    public function changeUser($userName)
+    {
+        // conserver la session de l'admin courant
+        $this->oldUser = $_SESSION[APPLICATION];
+
+        // prépartion d'un nouvel utilisateur "parent"
+        $newUser = new user($userName, 'parent');
+
+        $_SESSION[APPLICATION] = $newUser;
+        $qui = $_SESSION[APPLICATION]->identite();
+
+        return $qui['prenom'].' '.$qui['nom'].': '.$qui['acronyme'];
+    }
+
+    /**
+     * rompre le lien de famille pour le parent actif $proprio et l'enfant $userName
+     *
+     * @param string $proprio
+     * @param string $userName
+     *
+     * @return int : nombre de liens brisés (normalement, 1 ou 0)
+     */
+    public function unlink($proprio, $userName) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'DELETE FROM '.PFX.'thotFratrie ';
+        $sql .= 'WHERE parent = :proprio AND fratrie = :userName ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':proprio', $proprio, PDO::PARAM_STR, 25);
+        $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+
+        $resultat = $requete->execute();
+
+        Application::DeconnexionPDO($connexion);
+
+        return $resultat;
+    }
+
 }
