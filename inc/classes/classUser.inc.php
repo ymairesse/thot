@@ -39,7 +39,6 @@ class user
                 $sql .= 'FROM '.PFX.'eleves AS el ';
                 $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
                 $sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";
-                echo $sql;
                 break;
 
             case 'parent':
@@ -48,7 +47,6 @@ class user
                 $sql .= 'FROM '.PFX.'thotParents AS tp ';
                 $sql .= 'JOIN '.PFX.'eleves AS de ON de.matricule = tp.matricule ';
                 $sql .= "WHERE userName = '$userName' LIMIT 1 ";
-                echo $sql;
                 break;
 
             default:
