@@ -16,8 +16,6 @@ $User = unserialize($_SESSION[APPLICATION]);
 
 $matricule = $User->getMatricule();
 
-
-
 $id = isset($_POST['id']) ? $_POST['id'] : null;
 $startDate = isset($_POST['startDate']) ? $_POST['startDate'] : null;
 $endDate = isset($_POST['endDate']) ? $_POST['endDate'] : null;
@@ -25,10 +23,6 @@ $allDay = isset($_POST['allDay']) ? $_POST['allDay'] : false;
 
 require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
 $Jdc = new Jdc();
-
-// après un retour de position 'allDay', la date de fin est invalide
-if ($endDate == 'Invalid date')
-    $endDate = $startDate;
 
 $startTime = explode(' ', $startDate)[1];
 $endTime = explode(' ', $endDate)[1];
@@ -39,7 +33,6 @@ $endTime = explode(' ', $endDate)[1];
         $allDay = 0;
     }
 
-// Application::afficher($startDate);
 // si l'événement ne commence pas à zéro heure, il n'est pas pour toute la journée
 if ($startTime != '00:00') {
     $allDay = 0;
@@ -52,11 +45,9 @@ if ($id != null) {
     $resultat = $Jdc->modifEvent($id, $startDate, $endDate, $allDay);
 
     if ($resultat != 0) {
-        echo "coucou";
         $id = explode('_', $id)[1];
         $travail = $Jdc->getNotePerso($id);
-        // $categories = $Jdc->categoriesTravaux();
-// Application::afficher($travail);
+
         $ds = DIRECTORY_SEPARATOR;
         require_once INSTALL_DIR.'/smarty/Smarty.class.php';
         $smarty = new Smarty();

@@ -1,5 +1,10 @@
-<h3>Notes personnelles de {$identite.prenomEl} {$identite.nomEl}</h3>
-
+<h3>Notes personnelles de
+{if $identite.type == 'eleve'}
+	{$identite.prenom} {$identite.nom}
+	{else}
+	{$identite.prenomEl} {$identite.nomEl}
+{/if}
+</h3>
 <div class="container-fluid">
 
 	<div class="row">
@@ -72,9 +77,10 @@
 		return laDate[2] + '-' + laDate[1] + '-' + laDate[0];
 	}
 
+
+	var datePassee = 'Cette date est passée';
+
 	$(document).ready(function() {
-
-
 
 		// http://jsfiddle.net/slyvain/6vmjt9rb/
 		var popTemplate = [
@@ -115,12 +121,12 @@
 				listWeek: 'Liste Semaine'
 			},
 			businessHours: {
-				start: '08:15',
-				end: '19:00',
+				start: '06:00',
+				end: '23:00',
 				dow: [1, 2, 3, 4, 5]
 				},
-			minTime: "08:00:00",
-			maxTime: "22:00:00",
+			minTime: "06:00:00",
+			maxTime: "24:00:00",
 			weekNumbers: true,
 			navLinks: true,
 
@@ -222,9 +228,8 @@
 			eventDrop: function(calEvent, delta, revertFunc, jsEvent, ui, view) {
 				var debut = moment(calEvent.start);
 				var today = moment().format('YYYY-MM-DD');
-				var unlockedPast = $('#unlocked').val();
 				$('.popover').hide();
-				if (debut.isBefore(today) && (unlockedPast == "false")) {
+				if (debut.isBefore(today)) {
 					bootbox.alert({
 						title: 'Erreur',
 						message: datePassee
@@ -232,12 +237,16 @@
 					$('#calendar').fullCalendar('refetchEvents');
 				}
 				else {
+					console.log(calEvent);
 					var startDate = moment(calEvent.start).format('YYYY-MM-DD HH:mm');
+					console.log(calEvent.end);
+					var endDate = moment(calEvent.end).format('YYYY-MM-DD HH:mm');
+					console.log(endDate);
 					// si l'événement est draggé sur allDay, la date de fin est incorrecte
 					if (calEvent.allDay == true) {
 						var endDate = startDate;
 						}
-						else var endDate = moment(calEvent.end).format('YYYY-MM-DD HH:mm');
+
 					// si l'événement est draggé depuis allDay, la date de fin est Null
 					if (calEvent.endDate == undefined) {
 						endDate = startDate;
@@ -259,19 +268,6 @@
 			}
 		}
 		})
-
-		// // suppression d'une note au JDC
-		// $("#unTravail").on('click', '#delete', function() {
-		// 	var id = $(this).data('id');
-		// 	$.post('inc/jdc/getModalDel.inc.php', {
-		// 			id: id,
-		// 		},
-		// 		function(resultat) {
-		// 			$("#zoneDel").html(resultat);
-		// 			$("#modalDel").modal('show');
-		// 		}
-		// 	)
-		// })
 
 
 		$("#unTravail").on('click', '#journee', function() {

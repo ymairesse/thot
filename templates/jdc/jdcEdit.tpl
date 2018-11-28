@@ -36,17 +36,7 @@
 
             <div class="input-group">
                 <label for="heure" class="sr-only">Heure</label>
-                <input type="text" name="heure" id='heure' value="{$travail.heure|default:''}" class="form-control" autocomplete="off" {if isset($travail.allDay) && $travail.allDay == true}disabled{/if}>
-
-                <div class="input-group-btn">
-                    <button id="listePeriodes" type="button" class="btn btn-primary btn-lg" data-toggle="dropdown"><i class="fa fa-hourglass" style="font-size:9pt"></i> <span class="caret" style="font-size:9pt"></span>
-                    </button>
-                    <ul class="dropdown-menu pull-right" id="choixPeriode">
-                        {foreach from=$listePeriodes item=unePeriode}
-                        <li><a href="javascript:void(0)" data-periode="{$unePeriode['debut']}">{$unePeriode['debut']}</a></li>
-                        {/foreach}
-                    </ul>
-                </div>
+                <input type="time" name="heure" id='heure' value="{$travail.heure|default:''}" class="form-control" autocomplete="off" {if isset($travail.allDay) && $travail.allDay == true}disabled{/if}>
             </div>
             <div class="help-block">Heure (modifiable)</div>
 
@@ -164,15 +154,10 @@ jQuery.validator.addMethod(
     "Date incorrecte"
     );
 
-jQuery.validator.addMethod(
-    "time",
-    function(value, element) {
-        return this.optional(element) || (/^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/i.test(value)
-           && ((parseInt(value) >= 8) && (parseInt(value) <= 22)));
-       },
-    "Heure invalide"
-    );
 
+    $.validator.addMethod('time', function(value, element, param) {
+        return value == '' || value.match(/^([01][0-9]|2[0-3]):[0-5][0-9]$/);
+    }, 'Heure invalide (hh:mm)');
 
 $(document).ready(function(){
 
