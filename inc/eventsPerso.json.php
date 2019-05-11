@@ -18,6 +18,8 @@ $end = $_GET['end'];
 require_once INSTALL_DIR.'/inc/classes/classJdc.inc.php';
 $Jdc = new Jdc();
 
-$liste = $Jdc->retreivePersonnalEvents($start, $end, $matricule);
+$sharedEvents = $Jdc->retreiveSharedEvents($start, $end, $matricule, false);
+$personnalEvents = $Jdc->retreivePersonnalEvents($start, $end, $matricule, true);
+$liste = array_merge($personnalEvents, $sharedEvents);
 
 echo json_encode($liste);

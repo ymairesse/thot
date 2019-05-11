@@ -28,7 +28,7 @@ $Jdc = new Jdc();
 $listeJDC = $Jdc->retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString);
 $listeRemediations = $Jdc->retreiveRemediations($start, $end, $matricule);
 $personnalEvents = $Jdc->retreivePersonnalEvents($start, $end, $matricule);
-
-$liste = array_merge($listeJDC, $listeRemediations, $personnalEvents);
+$sharedEvents = $Jdc->retreiveSharedEvents($start, $end, $matricule);
+$liste = array_merge($listeJDC, $listeRemediations, $personnalEvents, $sharedEvents);
 
 echo json_encode($liste);

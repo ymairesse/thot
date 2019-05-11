@@ -1060,25 +1060,25 @@ class ecole
      *
      * @return array
      */
-    public function listOrphanCours()
-    {
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT cours ';
-        $sql .= 'FROM '.PFX.'cours ';
-        $sql .= "WHERE (cours NOT IN (SELECT SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1) FROM ".PFX.'elevesCours) ';
-        $sql .= "AND   (cours NOT IN (SELECT SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1) FROM ".PFX.'profsCours))) ';
-        $resultat = $connexion->query($sql);
-        $listeCours = array();
-        if ($resultat) {
-            while ($ligne = $resultat->fetch()) {
-                $cours = $ligne['cours'];
-                $listeCours[$cours] = $cours;
-            }
-        }
-        Application::DeconnexionPDO($connexion);
-
-        return $listeCours;
-    }
+    // public function listOrphanCours()
+    // {
+    //     $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+    //     $sql = 'SELECT cours ';
+    //     $sql .= 'FROM '.PFX.'cours ';
+    //     $sql .= "WHERE (cours NOT IN (SELECT SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1) FROM ".PFX.'elevesCours) ';
+    //     $sql .= "AND   (cours NOT IN (SELECT SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1) FROM ".PFX.'profsCours))) ';
+    //     $resultat = $connexion->query($sql);
+    //     $listeCours = array();
+    //     if ($resultat) {
+    //         while ($ligne = $resultat->fetch()) {
+    //             $cours = $ligne['cours'];
+    //             $listeCours[$cours] = $cours;
+    //         }
+    //     }
+    //     Application::DeconnexionPDO($connexion);
+    //
+    //     return $listeCours;
+    // }
 
     /**
      * retourne le nombre de classes dans l'école.

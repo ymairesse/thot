@@ -103,8 +103,8 @@ function eraseCookie(name) {
             var idTravail = $('.btnShowTravail.active').data('idtravail');
             $.post('inc/casiers/delTravailFile.inc.php', {
                 idTravail: idTravail
-            },
-            function(resultat){
+            }, function(resultat){
+                // resultat = idTravail si tout s'est bien passé, sinon -1
                 if (parseInt(resultat) != -1) {
                     $.post('inc/casiers/detailsUpload.inc.php', {
                         idTravail: idTravail
@@ -166,7 +166,6 @@ function eraseCookie(name) {
             function(resultat){
                 if (resultat != '') {
                     $('#detailsTravail').html(resultat);
-                    // $("#myDropZone").dropzone(Dropzone.options.myDropZone);
                     }
             })
         })
@@ -193,7 +192,7 @@ function eraseCookie(name) {
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
         maxFiles: nbFichiersMax,
-        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf",
+        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3",
         url: "inc/upload.inc.php",
         accept: function(file, done) {
             done();

@@ -595,6 +595,12 @@ tr.nonLu td{
     color: black !important;
 }
 
+.jdcShared {
+    background-image: linear-gradient(45deg, #fcb6c3 25%, #9cd4f7 25%, #9cd4f7 50%, #fcb6c3 50%, #fcb6c3 75%, #9cd4f7 75%, #9cd4f7 100%);
+    background-size: 19.80px 19.80px;
+    color: black !important;
+}
+
 .gras {
     font-weight: bold;
     color: blue;

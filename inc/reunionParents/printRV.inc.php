@@ -21,6 +21,7 @@ $listeRV = $Application->getRVeleve($matricule, $date);
 $listeAttente = $Application->getListeAttenteEleve($matricule, $date);
 $listeProfs = $Application->listeProfsCoursEleve($matricule);
 $listePeriodes = $Application->getListePeriodes($date);
+$listeEducs = $User->getEducsEleve();
 
 require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
 $smarty = new Smarty();
@@ -32,6 +33,7 @@ $smarty->assign('eleve', $identiteEleve);
 $smarty->assign('listeRV', $listeRV);
 $smarty->assign('listeAttente', $listeAttente);
 $smarty->assign('listeProfs', $listeProfs);
+$smarty->assign('listeEducs', $listeEducs);
 $smarty->assign('listePeriodes', $listePeriodes);
 $smarty->assign('entete', sprintf('%s %s',ECOLE, ADRESSEECOLE));
 $smarty->assign('date', $date);

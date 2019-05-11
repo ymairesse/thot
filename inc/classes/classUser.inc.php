@@ -296,6 +296,41 @@ class user
     }
 
     /**
+     * retourne la liste détaillée des éducateurs de l'élève utilisateur (ou du parent)
+     *
+     * @param void
+     *
+     * @return array
+     */
+    public function getEducsEleve(){
+        $groupe = $this->getClasse();
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT edcl.acronyme, sexe, nom, prenom, mail, titre, groupe ';
+        $sql .= 'FROM '.PFX.'educsClasses AS edcl ';
+        $sql .= 'JOIN '.PFX.'profs AS profs ON profs.acronyme = edcl.acronyme ';
+        $sql .= 'WHERE groupe = :groupe ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':groupe', $groupe, PDO::PARAM_STR, 5);
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $acronyme = $ligne['acronyme'];
+                $sexe = $ligne['sexe'];
+                $ligne['prenom'] = mb_substr($ligne['prenom'], 0, 1, 'UTF-8').'. ';
+                $ligne['adresse'] = ($sexe == 'M') ? 'M. ' : 'Mme';
+                $liste[$acronyme] = $ligne;
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
      * retourne le nom de l'application; permet de ne pas confondre deux applications
      * différentes qui utiliseraient la variable de SESSION pour retenir MDP et USERNAME
      * de la même façon.

@@ -2539,4 +2539,34 @@ class Application
         return $anScol;
     }
 
+    /**
+     * retourne l'identité d'un élève dont on fournit le matricule
+     *
+     * @param int $matricule
+     *
+     * @return array
+     */
+    public function getIdentiteEleve($matricule){
+        $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT nom, prenom, groupe ';
+        $sql .= 'FROM '.PFX.'eleves ';
+        $sql .= 'WHERE matricule = :matricule ';
+
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $identite = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $identite = $requete->fetch();
+        }
+
+
+        Application::deconnexionPDO($connexion);
+
+        return $identite;
+    }
+
 }

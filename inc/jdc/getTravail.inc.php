@@ -38,7 +38,10 @@ if ($id != null) {
         case 'Perso':
             $travail = $Jdc->getNotePerso($id);
             $pj = Null;
-
+            break;
+        case 'Shared':
+            $travail = $Jdc->getShared($id);
+            $pj = Null;
             break;
         default:
             $travail = $Jdc->getTravail($id);
@@ -47,11 +50,18 @@ if ($id != null) {
         }
 
     if (isset($travail['proprietaire']) && $travail['proprietaire'] != '') {
-        $acronyme = $travail['proprietaire'];
-        $identite = $Application->identiteProf($acronyme);
-        $adresse = ($identite['sexe'] == 'F') ? 'Mme' : 'M.';
-        $nom = sprintf('%s %s. %s', $adresse, mb_substr($identite['prenom'], 0, 1, 'UTF-8'), $identite['nom']);
-        $titus = $nom;
+        if ($type == 'Shared') {
+            $matricule = $travail['proprietaire'];
+            $identite = $Application->getIdentiteEleve($matricule);
+            $nom = sprintf('%s %s, %s', $identite['prenom'], $identite['nom'], $identite['groupe']);
+        }
+        else {
+            $acronyme = $travail['proprietaire'];
+            $identite = $Application->identiteProf($acronyme);
+            $adresse = ($identite['sexe'] == 'F') ? 'Mme' : 'M.';
+            $nom = sprintf('%s %s. %s', $adresse, mb_substr($identite['prenom'], 0, 1, 'UTF-8'), $identite['nom']);
+            $titus = $nom;
+        }
     }
 
     require_once INSTALL_DIR.'/smarty/Smarty.class.php';
@@ -67,6 +77,10 @@ if ($id != null) {
             break;
         case 'Perso':
             $smarty->display('jdc/notePerso.tpl');
+            break;
+        case 'Shared':
+            $smarty->assign('nom', $nom);
+            $smarty->display('jdc/shared.tpl');
             break;
         default:
             $smarty->assign('matricule', $matricule);

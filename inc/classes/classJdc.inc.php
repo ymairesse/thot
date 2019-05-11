@@ -115,6 +115,7 @@ class Jdc
                     'allDay' => 0,
                     'destinataire' => $matricule,
                     'cours' => $ligne['acronyme'],
+                    'type' => 'regular',
                     );
             }
         }
@@ -132,7 +133,7 @@ class Jdc
      *
      * @return array
      */
-    public function retreivePersonnalEvents($start, $end, $matricule) {
+    public function retreivePersonnalEvents($start, $end, $matricule, $startEditable = false) {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT id, matricule, idCategorie, title, enonce, startDate, endDate, allDay, lastModif ';
         $sql .= 'FROM '.PFX.'thotJdcEleve AS jdceEleve ';
@@ -157,6 +158,9 @@ class Jdc
                     'start' => $ligne['startDate'],
                     'end' => $ligne['endDate'],
                     'allDay' => ($ligne['allDay'] != 0) ? true : false,
+                    'type' => 'personnal',
+                    'startEditable' => $startEditable,
+                    'durationEditable' => $startEditable,
                     );
             }
         }
@@ -165,6 +169,54 @@ class Jdc
         return $liste;
     }
 
+    /**
+     * retrouve la liste des événements personnels partagés avec l'utilisateur
+     *
+     * @param string $start : date de début
+     * @param string $end : date de fin
+     * @param int $matricule
+     * @param boolean $startEditable = false : l'événement peut être modifié dans FC
+     *
+     * @return array
+     */
+    public function retreiveSharedEvents ($start, $end, $matricule, $startEditable = false) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT idJdc, matricule, idCategorie, title, enonce, startDate, endDate, allDay, lastModif, proprietaire ';
+        $sql .= 'FROM '.PFX.'thotJdcPartage AS partage ';
+        $sql .= 'JOIN '.PFX.'thotJdcEleve AS tjdc ON tjdc.id = partage.idJdc ';
+        $sql .= 'WHERE categorie = "classe" AND destinataire IN (SELECT groupe FROM '.PFX.'eleves WHERE matricule = :matricule) ';
+        $sql .= 'OR categorie = "eleve" AND destinataire = :matricule ';
+        $sql .= 'OR categorie = "coursGrp" AND destinataire IN (SELECT coursGrp FROM '.PFX.'elevesCours WHERE matricule = :matricule) ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':start', $start, PDO::PARAM_STR, 20);
+        $requete->bindParam(':end', $end, PDO::PARAM_STR, 20);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $liste[] = array(
+                    'id' => 'Shared_'.$ligne['idJdc'],
+                    'title' => $ligne['title'],
+                    'enonce' => mb_strimwidth(strip_tags(html_entity_decode($ligne['enonce'])), 0, 200,'...'),
+                    'className' => 'jdcShared',
+                    'start' => $ligne['startDate'],
+                    'end' => $ligne['endDate'],
+                    'allDay' => ($ligne['allDay'] != 0) ? true : false,
+                    'proprietaire' => $ligne['proprietaire'],
+                    'type' => 'shared',
+                    'startEditable' => $startEditable,
+                );
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
 
     /**
      * retrouve une notification dont on fournit l'identifiant.
@@ -287,6 +339,36 @@ class Jdc
     }
 
     /**
+     * retrouve la note partagée avec l'utilisateur dont on fournt l'identifiant
+     *
+     * @param int $id : identifiant de la note partagée
+     *
+     * @return array
+     */
+    public function getShared($id){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT id, matricule, idCategorie, title, enonce, DATE_FORMAT(startDate,"%d/%m/%Y") AS startDate, ';
+        $sql .= 'DATE_FORMAT(startDate,"%H:%i") AS heure, endDate, DATE_FORMAT(TIMEDIFF(endDate, startDate), "%H:%i") AS duree, allDay, proprietaire ';
+        $sql .= 'FROM '.PFX.'thotJdcEleve AS tjdce ';
+        $sql .= 'JOIN '.PFX.'thotJdcPartage AS partage ON partage.idJdc = tjdce.id ';
+        $sql .= 'WHERE id = :id ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':id', $id, PDO::PARAM_INT);
+
+        $travail = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $travail = $requete->fetch();
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $travail;
+    }
+
+    /**
      * retrouve les PJ liées au JDC dont on fournit l'identifiant $idJdc
      *
      * @param int $idJdc : l'identifiant du journal de classe
@@ -311,6 +393,42 @@ class Jdc
             while ($ligne = $requete->fetch()){
                 $shareId = $ligne['shareId'];
                 $liste[$shareId] = $ligne;
+            }
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * renvoie la liste des partages pour un JDC dont on fournit l'identifiant
+     *
+     * @param int $idJdc : identifiant du JDC personnel
+     * @param int $matricule : matricule du propriétaire (sécurité)
+     *
+     * @return array
+     */
+    public function getPartages($idJdc, $matricule){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT idPartage, idJdc, categorie, destinataire, title, enonce ';
+        $sql .= 'FROM '.PFX.'thotJdcPartage AS partage ';
+        $sql .= 'JOIN '.PFX.'thotJdcEleve AS jdce ON jdce.id = partage.idJdc ';
+        $sql .= 'WHERE idJdc = :idJdc AND proprietaire = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':idJdc', $idJdc, PDO::PARAM_INT);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+
+                Application::afficher($ligne);
+                $idPartage = $ligne['idPartage'];
+                $liste[$idPartage] = $ligne;
             }
         }
 

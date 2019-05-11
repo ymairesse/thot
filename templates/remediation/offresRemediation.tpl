@@ -22,8 +22,8 @@
             data-placement="top"
             data-html="true">
             <td>{$data.date|truncate:5:''}</td>
-            <td>{$data.duree|truncate:5:''}</td>
             <td>{$data.heure}</td>
+            <td>{$data.duree|truncate:5:''}</td>
             <td>{$data.title}</td>
             <td>{if $data.sexe == 'F'}Mme{else}M.{/if} {$data.initiale}. {$data.nom}</td>
             <td>{if $data.type == 'ecole'}

@@ -83,4 +83,6 @@ $user = (array) $User->getIdentite();
 $smarty->assign('user', $user);
 
 $listeProfs = $Bulletin->listeProfsDeListeCoursGrp($listeCoursGrp);
+$listeEducs = $User->getEducsEleve();
 $smarty->assign('listeProfs', $listeProfs);
+$smarty->assign('listeEducs', $listeEducs);

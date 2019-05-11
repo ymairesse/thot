@@ -1,10 +1,12 @@
 <p>Nom du fichier: <span id="fileName">
-    {if trim($detailsTravail.fileInfos.fileName) == ''}
+    {if trim($detailsTravail.fileInfos.fileName) == null}
+
         {if $detailsTravail.statut == termine}
             <strong>Non remis </strong>
             {else}
             <strong>En attente </strong>
         {/if}
+
         {else}
 
         <a href="download.php?type=tr&amp;idTravail={$detailsTravail.idTravail}&amp;fileName={$detailsTravail.fileInfos.fileName}"

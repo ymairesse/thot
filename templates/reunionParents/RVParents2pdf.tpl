@@ -80,6 +80,7 @@
         </tbody>
     </table>
 
+
     <page_footer>
     Date d'impression: {$smarty.now|date_format:'%d/%m/%Y %H:%M'}
     </page_footer>
