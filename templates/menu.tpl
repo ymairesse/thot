@@ -34,6 +34,7 @@
 			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)" id="menuJdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC<b class="caret"></b></a>
 				<ul class="dropdown-menu">
 					<li><a href="index.php?action=jdc" id="linkJdc">Mon JDC</a></li>
+					<li><a href="index.php?action=jdc&amp;mode=horaire">Mon horaire journalier</a></li>
 					<li><a href="index.php?action=jdc&amp;mode=perso">Notes personnelles</a></li>
 				</ul>
 			</li>

@@ -29,7 +29,7 @@ if (($noBulletin <= $dernier) && ($noBulletin >= 0) && ($matricule != '')) {
     // ********************************************************
     // sélection du bulletin en fonction de la section
     $bulletinTQ = array('TQ');
-    $bullISND = array('GT', 'TT', 'S');
+    $bullISND = array('GT', 'TT', 'S', '');
     if (in_array($section, $bullISND)) {
         include 'inc/bulletin/bulletinGTTT.inc.php';
     } else {

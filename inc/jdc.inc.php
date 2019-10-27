@@ -23,6 +23,13 @@ switch ($mode) {
         $smarty->assign('corpsPage', 'jdc/jdcPerso');
         break;
 
+    case 'horaire':
+        $directory = INSTALL_ZEUS.'/edt/eleves/';
+        $src = $Jdc->getHoraire($directory, $matricule);
+        $smarty->assign('src', $src);
+        $smarty->assign('corpsPage', 'jdc/horaire');
+        break;
+
     default:
         $smarty->assign('corpsPage', 'jdc');
         break;

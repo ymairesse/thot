@@ -401,56 +401,54 @@ class Jdc
         return $liste;
     }
 
-    /**
-     * renvoie la liste des partages pour un JDC dont on fournit l'identifiant
-     *
-     * @param int $idJdc : identifiant du JDC personnel
-     * @param int $matricule : matricule du propriétaire (sécurité)
-     *
-     * @return array
-     */
-    public function getPartages($idJdc, $matricule){
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT idPartage, idJdc, categorie, destinataire, title, enonce ';
-        $sql .= 'FROM '.PFX.'thotJdcPartage AS partage ';
-        $sql .= 'JOIN '.PFX.'thotJdcEleve AS jdce ON jdce.id = partage.idJdc ';
-        $sql .= 'WHERE idJdc = :idJdc AND proprietaire = :matricule ';
-        $requete = $connexion->prepare($sql);
+    // /**
+    //  * renvoie la liste des partages pour un JDC dont on fournit l'identifiant
+    //  *
+    //  * @param int $idJdc : identifiant du JDC personnel
+    //  * @param int $matricule : matricule du propriétaire (sécurité)
+    //  *
+    //  * @return array
+    //  */
+    // public function getPartages($idJdc, $matricule){
+    //     $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+    //     $sql = 'SELECT idPartage, idJdc, categorie, destinataire, title, enonce ';
+    //     $sql .= 'FROM '.PFX.'thotJdcPartage AS partage ';
+    //     $sql .= 'JOIN '.PFX.'thotJdcEleve AS jdce ON jdce.id = partage.idJdc ';
+    //     $sql .= 'WHERE idJdc = :idJdc AND proprietaire = :matricule ';
+    //     $requete = $connexion->prepare($sql);
+    //
+    //     $requete->bindParam(':idJdc', $idJdc, PDO::PARAM_INT);
+    //     $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+    //
+    //     $liste = array();
+    //     $resultat = $requete->execute();
+    //     if ($resultat){
+    //         $requete->setFetchMode(PDO::FETCH_ASSOC);
+    //         while ($ligne = $requete->fetch()){
+    //             $idPartage = $ligne['idPartage'];
+    //             $liste[$idPartage] = $ligne;
+    //         }
+    //     }
+    //
+    //     Application::deconnexionPDO($connexion);
+    //
+    //     return $liste;
+    // }
 
-        $requete->bindParam(':idJdc', $idJdc, PDO::PARAM_INT);
-        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
-
-        $liste = array();
-        $resultat = $requete->execute();
-        if ($resultat){
-            $requete->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $requete->fetch()){
-
-                Application::afficher($ligne);
-                $idPartage = $ligne['idPartage'];
-                $liste[$idPartage] = $ligne;
-            }
-        }
-
-        Application::deconnexionPDO($connexion);
-
-        return $liste;
-    }
-
-    /**
-     * vérification du caractère "éditable" d'une note au JDC rédigée par un élève
-     * la note est éditable si elle vient du formulaire 'write', quelle a été rédigée par l'élève $matricule
-     * et que le prof ne l'a pas encore approuvée
-     *
-     * @param array $travail
-     * @param int $redacteur : matricule de l'élève rédacteur
-     * @param string $origine
-     *
-     * @return bool
-     */
-    public function editable($travail, $redacteur, $origine) {
-        return ($travail['proprietaire'] == '') && ($travail['matricule'] = $redacteur) && ($origine == 'write');
-    }
+    // /**
+    //  * vérification du caractère "éditable" d'une note au JDC rédigée par un élève
+    //  * la note est éditable si elle vient du formulaire 'write', quelle a été rédigée par l'élève $matricule
+    //  * et que le prof ne l'a pas encore approuvée
+    //  *
+    //  * @param array $travail
+    //  * @param int $redacteur : matricule de l'élève rédacteur
+    //  * @param string $origine
+    //  *
+    //  * @return bool
+    //  */
+    // public function editable($travail, $redacteur, $origine) {
+    //     return ($travail['proprietaire'] == '') && ($travail['matricule'] = $redacteur) && ($origine == 'write');
+    // }
 
     /**
      * retourne les différentes catégories de travaux disponibles (interro, devoir,...).
@@ -479,37 +477,37 @@ class Jdc
         return $liste;
     }
 
-    /**
-     * retourne true si l'élève dont on indique le matricule est en charge du JDC à la date actuelle
-     *
-     * @param int $matricule
-     *
-     * @return boolean
-     */
-    public function isChargeJDC($matricule) {
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT dateDebut, dateFin, NOW() AS today ';
-        $sql .= 'FROM '.PFX.'thotJdcEleves ';
-        $sql .= 'WHERE matricule = :matricule ';
-
-        $requete = $connexion->prepare($sql);
-
-        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
-        $enCharge = false;
-        $resultat = $requete->execute();
-        if ($resultat) {
-            $ligne = $requete->fetch();
-            $dateDebut = isset($ligne['dateDebut']) ? $ligne['dateDebut'] : Null;
-            $dateFin = isset($ligne['dateFin']) ? $ligne['dateFin'] : Null;
-            $today = $ligne['today'];
-            if (($dateDebut != Null && $dateFin != Null) && (($dateDebut <= $today) && ($dateFin >= $today)))
-                $enCharge = true;
-        }
-
-        Application::DeconnexionPDO($connexion);
-
-        return $enCharge;
-    }
+    // /**
+    //  * retourne true si l'élève dont on indique le matricule est en charge du JDC à la date actuelle
+    //  *
+    //  * @param int $matricule
+    //  *
+    //  * @return boolean
+    //  */
+    // public function isChargeJDC($matricule) {
+    //     $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+    //     $sql = 'SELECT dateDebut, dateFin, NOW() AS today ';
+    //     $sql .= 'FROM '.PFX.'thotJdcEleves ';
+    //     $sql .= 'WHERE matricule = :matricule ';
+    //
+    //     $requete = $connexion->prepare($sql);
+    //
+    //     $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+    //     $enCharge = false;
+    //     $resultat = $requete->execute();
+    //     if ($resultat) {
+    //         $ligne = $requete->fetch();
+    //         $dateDebut = isset($ligne['dateDebut']) ? $ligne['dateDebut'] : Null;
+    //         $dateFin = isset($ligne['dateFin']) ? $ligne['dateFin'] : Null;
+    //         $today = $ligne['today'];
+    //         if (($dateDebut != Null && $dateFin != Null) && (($dateDebut <= $today) && ($dateFin >= $today)))
+    //             $enCharge = true;
+    //     }
+    //
+    //     Application::DeconnexionPDO($connexion);
+    //
+    //     return $enCharge;
+    // }
 
     /**
      * renvoie la liste des heures de cours données dans l'école.
@@ -641,32 +639,32 @@ class Jdc
         return $id;
     }
 
-    /**
-     * Vérifie si la note d'identifiant $id a bien été rédigée par le rédacteur $matricule
-     *
-     * @param int $id : identifiant de la note au Jdc
-     * @param int $matricule : de l'élève
-     *
-     * @return int l'identifiant s'il correspond au critère, sinon -1
-     */
-    public function verifIdRedacteur($id, $matricule) {
-        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT id, redacteur ';
-        $sql .= 'FROM '.PFX.'thotJdc ';
-        $sql .= "WHERE id='$id' AND redacteur = '$matricule' ";
-
-        $id = -1;
-        $resultat = $connexion->query($sql);
-        if ($resultat){
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            $ligne = $resultat->fetch();
-            $id = $ligne['id'];
-        }
-
-        Application::deconnexionPDO($connexion);
-
-        return $id;
-    }
+    // /**
+    //  * Vérifie si la note d'identifiant $id a bien été rédigée par le rédacteur $matricule
+    //  *
+    //  * @param int $id : identifiant de la note au Jdc
+    //  * @param int $matricule : de l'élève
+    //  *
+    //  * @return int l'identifiant s'il correspond au critère, sinon -1
+    //  */
+    // public function verifIdRedacteur($id, $matricule) {
+    //     $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+    //     $sql = 'SELECT id, redacteur ';
+    //     $sql .= 'FROM '.PFX.'thotJdc ';
+    //     $sql .= "WHERE id='$id' AND redacteur = '$matricule' ";
+    //
+    //     $id = -1;
+    //     $resultat = $connexion->query($sql);
+    //     if ($resultat){
+    //         $resultat->setFetchMode(PDO::FETCH_ASSOC);
+    //         $ligne = $resultat->fetch();
+    //         $id = $ligne['id'];
+    //     }
+    //
+    //     Application::deconnexionPDO($connexion);
+    //
+    //     return $id;
+    // }
 
     /**
      * suppression d'une notification au journal de classe.
@@ -821,6 +819,38 @@ class Jdc
         Application::deconnexionPDO($connexion);
 
         return $resultat;
+    }
+
+    /**
+     * retourne l'image en base64 de l'horaire de l'élève $matricule depuis le répertoire $directory
+     *
+     * @param string $directory : le répertoire où se trouve l'image
+     * @param int $matricule
+     *
+     * @return string
+     */
+    public function getHoraire($directory, $matricule){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT nomImage, nomSimple ';
+        $sql .= 'FROM '.PFX.'EDTeleves ';
+        $sql .= 'WHERE matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $src = '';
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $ligne = $requete->fetch();
+            echo $sligne;
+            $image = $directory.'/'.$ligne['nomImage'];
+            $imageData = base64_encode(file_get_contents($image));
+            $src = 'data: '.mime_content_type($image).';base64,'.$imageData;
+            }
+
+        Application::deconnexionPDO($connexion);
+
+        return $src;
     }
 
 }

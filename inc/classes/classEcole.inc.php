@@ -233,12 +233,13 @@ class ecole
         Application::DeconnexionPDO($connexion);
     }
 
-    /***
+    /**
      * retourne la liste des classes d'un niveau donné
-     * @param $niveau
-     * @param $entite : groupe (regroupement de plusieurs classes) ou classe
-     * @param $sections : tableau des sections concernées
-     * @return $listeClasses
+     * @param int $niveau
+     * @param string $entite : groupe (regroupement de plusieurs classes) ou classe
+     * @param string $sections : tableau des sections concernées
+     *
+     * @return array
      */
     public function listeClassesNiveau($niveau, $entite = 'groupe', $sections = null)
     {
