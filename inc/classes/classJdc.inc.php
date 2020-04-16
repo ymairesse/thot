@@ -25,26 +25,19 @@ class Jdc
     public function retreiveEvents($start, $end, $niveau, $classe, $matricule, $listeCoursString, $redacteur=Null)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, redacteur, title, enonce, class, allDay, startDate, endDate ';
+        $sql = 'SELECT id, destinataire, idCategorie, type, proprietaire, title, enonce, class, allDay, startDate, endDate ';
         $sql .= 'FROM '.PFX.'thotJdc ';
         $sql .= 'WHERE startDate BETWEEN :start AND :end ';
-        if ($redacteur == Null) {
-            $sql .= "AND destinataire in ($listeCoursString) OR destinataire = :classe ";
-            $sql .= "OR destinataire = :matricule OR destinataire = 'all' OR destinataire = :niveau ";
-        }
-        else {
-            $sql .= 'AND redacteur = :redacteur ';
-        }
+        $sql .= 'AND destinataire in ('.$listeCoursString.') OR destinataire = :classe ';
+        $sql .= 'OR destinataire = :matricule OR type = "ecole" OR destinataire = :niveau ';
+
+
         $requete = $connexion->prepare($sql);
 
-        if ($redacteur == Null) {
-            $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
-            $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
-            $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
-        }
-        else {
-            $requete->bindParam(':redacteur', $redacteur, PDO::PARAM_INT);
-        }
+        $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
+
         $requete->bindParam(':start', $start, PDO::PARAM_STR, 20);
         $requete->bindParam(':end', $end, PDO::PARAM_STR, 20);
 
@@ -69,7 +62,8 @@ class Jdc
                     'end' => $ligne['endDate'],
                     'allDay' => ($ligne['allDay'] != 0),
                     'destinataire' => $destinataire,
-                    'cours' => $cours
+                    'cours' => $cours,
+                    'type' => $ligne['type'], // cours , classe, groupe, ecole,...
                     );
             }
         }
@@ -115,7 +109,7 @@ class Jdc
                     'allDay' => 0,
                     'destinataire' => $matricule,
                     'cours' => $ligne['acronyme'],
-                    'type' => 'regular',
+                    'type' => 'remediation',
                     );
             }
         }
@@ -209,6 +203,60 @@ class Jdc
                     'proprietaire' => $ligne['proprietaire'],
                     'type' => 'shared',
                     'startEditable' => $startEditable,
+                );
+            }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
+     * retrouve la liste des événements liés à du soutien scolaire (coaching)
+     * @param  string $start : date de début
+     * @param  string $end : date de fin
+     * @param  int $matricule : matricule de l'élève
+     * @return array            liste des évenements
+     */
+    public function retreiveCoachingEvents($start, $end, $matricule) {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT id, matricule, proprietaire, dp.nom, dp.prenom, dp.sexe, dp.mail, ';
+        $sql .= 'date, heure, duree, jdc ';
+        $sql .= 'FROM '.PFX.'athena AS da ';
+        $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = da.proprietaire ';
+        $sql .= 'WHERE matricule = :matricule AND jdc = 1 ';
+        $sql .= 'AND date BETWEEN :start AND :end ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':start', $start, PDO::PARAM_STR, 20);
+        $requete->bindParam(':end', $end, PDO::PARAM_STR, 20);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $sexe = $ligne['sexe'];
+                $initiale = substr($ligne['prenom'], 0, 1);
+                $formule = ($sexe == 'M') ? 'Monsieur' : 'Madame';
+                $nomCoach = sprintf('%s %s. %s', $formule, $initiale, $ligne['nom']);
+                $startDate = sprintf('%s %s', $ligne['date'], $ligne['heure']);
+                $endTime = new DateTime($ligne['date']);
+                $endTime->add(new DateInterval('PT'.$ligne['duree'].'M'));
+                $endDate = $endTime->format('Y-m-d H:i');
+                $liste[] = array (
+                    'id' => 'Coach_'.$ligne['id'],
+                    'title' => 'Soutien scolaire',
+                    'enonce' => 'RV avec '.$nomCoach,
+                    'className' => 'coaching',
+                    'start' => $startDate,
+                    'end' => $endDate,
+                    'allDay' => 0,
+                    'destinataire' => $matricule,
+                    'cours' => 'Soutien scolaire',
+                    'type' => 'coaching',
                 );
             }
         }
@@ -367,6 +415,39 @@ class Jdc
 
         return $travail;
     }
+
+    /**
+     * retrouve les informations sur le RV de coaching dont on fournit l'identifiant
+     *
+     * @param int $id : identifiant du RV coaching dans didac_athena
+     *
+     * @return array
+     */
+     public function getCoaching($id){
+         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+         $sql = 'SELECT id, matricule, DATE_FORMAT(date,"%d/%m/%Y") AS startDate, DATE_FORMAT(heure,"%H:%i") AS heureDebut, ';
+         $sql .= 'duree, proprietaire, sexe, nom, prenom ';
+         $sql .= 'FROM '.PFX.'athena AS da ';
+         $sql .= 'LEFT JOIN '.PFX.'profs AS de ON de.acronyme = proprietaire ';
+         $sql .= 'WHERE id = :id ';
+         $requete = $connexion->prepare($sql);
+
+         $requete->bindParam(':id', $id, PDO::PARAM_INT);
+
+         $travail = array();
+         $resultat = $requete->execute();
+         if ($resultat){
+             $requete->setFetchMode(PDO::FETCH_ASSOC);
+             $travail = $requete->fetch();
+             $travail['nomProf'] = ($travail['sexe'] == 'F') ? 'Mme ' : 'M. ';
+             $travail['nomProf'] .= mb_substr($travail['prenom'], 0, 1, 'UTF-8').'. '.$travail['nom'];
+             $travail['enonce'] = 'Travail avec '.$travail['nomProf'];
+         }
+
+         Application::DeconnexionPDO($connexion);
+
+         return $travail;
+     }
 
     /**
      * retrouve les PJ liées au JDC dont on fournit l'identifiant $idJdc
@@ -842,7 +923,6 @@ class Jdc
         $resultat = $requete->execute();
         if ($resultat) {
             $ligne = $requete->fetch();
-            echo $sligne;
             $image = $directory.'/'.$ligne['nomImage'];
             $imageData = base64_encode(file_get_contents($image));
             $src = 'data: '.mime_content_type($image).';base64,'.$imageData;

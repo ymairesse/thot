@@ -9,7 +9,7 @@
 			<span class="icon-bar"></span>
 		</button>
 
-		<a class="navbar-brand" href="index.php"><i class="fa fa-home"></i></a>
+		<a class="navbar-brand" href="index.php"><i class="fa fa-home"></i></a> 
 
 	</div>
 	<!-- navbar-header -->
@@ -18,7 +18,7 @@
 
 		<ul class="nav navbar-nav">
 			<li><a href="index.php?action=annonces"><i class="fa fa-info-circle" style="color:orange"></i> Annonces</a></li>
-			<li><a href="index.php?action=documents"><i class="fa fa-folder-open-o" style="color:red"></i> ISND <br>Docs</a></li>
+			<li><a href="index.php?action=documents"><i class="fa fa-folder-open-o" style="color:red"></i> Thot <br>Docs</a></li>
 			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(01)"><i class="fa fa-graduation-cap" style="color:blue"></i> Résultats<br>scolaires <b class="caret"></b></a>
 				<ul class="dropdown-menu">
 					<li><a href="index.php?action=bulletin">Bulletins</a></li>
@@ -37,6 +37,10 @@
 					<li><a href="index.php?action=jdc&amp;mode=horaire">Mon horaire journalier</a></li>
 					<li><a href="index.php?action=jdc&amp;mode=perso">Notes personnelles</a></li>
 				</ul>
+			</li>
+
+			<li>
+				<a href="index.php?action=forums"><i class="fa fa-comment" style="color:#cc0"></i> Forums</a>
 			</li>
 
 			{if $userType == 'eleve'}

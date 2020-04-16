@@ -12,8 +12,7 @@
 			<th>Acc. lecture</th>
 		</tr>
 		{foreach from=$listeAnnonces key=id item=dataAnnonce name=n}
-			<tr
-				data-id="{$id}"
+			<tr data-id="{$id}"
 				data-accuse="
 					{if ($dataAnnonce.accuse == 1)}
 					 	{if $dataAnnonce.flags.dateHeure == Null}
@@ -24,15 +23,17 @@
 					{else}
 					0
 					{/if}"
-
 				class="notification {$dataAnnonce.type}{if (!(isset($dataAnnonce.flags)) || $dataAnnonce.flags.lu == 0 )} nonLu{/if}">
 				<td>{$smarty.foreach.n.iteration}</td>
 				<td>{if $dataAnnonce.dateEnvoi != Null}{$dataAnnonce.dateEnvoi|truncate:16:'':true}{else}Inconnue{/if}</td>
 				<td>{$dataAnnonce.dateDebut}</td>
 				<td data-id="{$id}" class="texteAnnonce">{$dataAnnonce.objet}</td>
-				<td>{if ($dataAnnonce.PJ|@count > 0)}<i class="fa fa-paperclip"></i>{else}&nbsp;{/if}</td>
+				<td>{if ($dataAnnonce.PJ != Null)}<i class="fa fa-paperclip"></i>{else}&nbsp;{/if}</td>
 				<td>{$dataAnnonce.proprietaire}</td>
-				<td>
+
+				<td data-toogle="popover"
+					title="test"
+					data-content="bidouille">
 					{if $dataAnnonce.destinataire == $matricule}
 						<i class="fa fa-user text-success" title="{$dataAnnonce.pourQui}"></i>
 						{else}
@@ -95,7 +96,7 @@
 				backdrop: false
 			});
 
-		$('#listeAnnonces tr').click(function(){
+		$('.notification').click(function(){
 			var ligne = $(this);
 			var notifId = $(this).data('id');
 			// marquer l'annonce lue
@@ -135,7 +136,6 @@
 						$('#modalLecture').modal('show');
 					}
 			})
-
 		})
 
 		$('#modalAccuseLecture').on('hide.bs.modal', function (e) {

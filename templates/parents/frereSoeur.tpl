@@ -12,14 +12,16 @@
                 <h3>Ajouter un membre de la famille</h3>
             </div>
             <div class="panel-body">
+                <p>Dans ce cadre, vous allez pouvoir ajouter des membres de la famille.<br>
+                    Pour cela, indiquez votre <strong>identifiant de "parent"</strong> pour un autre enfant et votre mot de passe correspondant à cet identifiant "parent". Cet identifiant se termine par les chiffres du matricule de votre enfant. Exemple: votre enfant est "okenobi5678", votre identifiant sera peut-être "princesseLeia5678". C'est bien votre identifiant et votre mot de passe <strong>de parent</strong> qu'il faut utiliser.</p>
                 <form id="formAddFratrie">
                     <div class="form-group">
-                        <label for="user">Nom d'utilisateur</label>
+                        <label for="user">Nom d'utilisateur "parent"</label>
                         <input type="text" name="userName" id="userName" value="" class="form-control">
                         <span class="help-block">Votre nom d'utilisateur pour cet élève</span>
                     </div>
                     <div class="form-group">
-                        <label for="passwd">Mot de passe de cet utilisateur</label>
+                        <label for="passwd">Mot de passe de cet utilisateur "parent"</label>
                         <input type="password" name="passwd" id="passwd" value="" class="form-control">
                         <span class="help-block">Votre mot de passe pour cet élève</span>
                     </div>

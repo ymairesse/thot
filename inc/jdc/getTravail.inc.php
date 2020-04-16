@@ -43,6 +43,10 @@ if ($id != null) {
             $travail = $Jdc->getShared($id);
             $pj = Null;
             break;
+        case 'Coach':
+            $travail = $Jdc->getCoaching($id);
+            $pj = Null;
+            break;
         default:
             $travail = $Jdc->getTravail($id);
             $pj = $Jdc->getPj($id);
@@ -81,6 +85,9 @@ if ($id != null) {
         case 'Shared':
             $smarty->assign('nom', $nom);
             $smarty->display('jdc/shared.tpl');
+            break;
+        case 'Coach':
+            $smarty->display('jdc/unCoaching.tpl');
             break;
         default:
             $smarty->assign('matricule', $matricule);

@@ -1,6 +1,6 @@
 <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 
-<h3>Contacter un professeur</h3>
+<h3>Contacter un professeur ou un éducateur</h3>
 
 <form action="index.php" method="POST" name="contact" id="contact" role="form" class="form-vertical">
 
@@ -55,7 +55,7 @@
                         {/foreach}
                         {foreach from=$listeEducs key=acronyme item=data}
                         <option value="{$acronyme}">
-                            {$data.adresse} {$data.prenom} {$data.nom} -> éducateur référent de {$data.groupe}
+                            {$data.adresse} {$data.prenom} {$data.nom} -> {if $data.sexe == 'F'}Éducatrice référente{else}Éducateur référent{/if} de {$data.groupe}
                         </option>
                         {/foreach}
                     </select>

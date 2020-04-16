@@ -14,7 +14,7 @@
 			{else}
 			<h3>Journal de classe de {$identite.prenomEl} {$identite.nomEl}: {$identite.groupe}</h3>
 			{/if}
-
+            <p class="discret">Attention! Internet Explorer pose problème pour le JDC. Utilisez plutôt un autre navigateur.</p>
 			<div id="calendar"></div>
 
 		</div>
@@ -73,6 +73,11 @@
 
 	$(document).ready(function() {
 
+        var fcView = Cookies.get('fc-view');
+        var views = ['month', 'agendaWeek', 'agendaDay', 'listMonth', 'listWeek'];
+        if (!(views.includes(fcView)))
+            fcView = 'agendaWeek';
+
         $('#dateStart, #dateEnd, #coursGrpClasse, #categories').change(function(){
             var formulaire = $('#selectDatesCours').serialize();
             $.post('inc/jdc/jdcJournalier.inc.php', {
@@ -115,12 +120,31 @@
             todayHighlight: true
             });
 
+        // cookie sur le type de vue retenu pour le JDC
+        $('#calendar').on('click', '.fc-button', function(){
+            if ($(this).hasClass('fc-month-button')) {
+                Cookies.set('fc-view', 'month', { expires: 7 });
+                }
+                else if ($(this).hasClass('fc-agendaWeek-button')) {
+                    Cookies.set('fc-view', 'agendaWeek', { expires: 7 });
+                }
+                else if ($(this).hasClass('fc-agendaDay-button')) {
+                    Cookies.set('fc-view', 'agendaDay', { expires: 7 });
+                }
+                else if ($(this).hasClass('fc-listMonth-button')) {
+                    Cookies.set('fc-view', 'listMonth', { expires: 7 });
+                }
+                else if ($(this).hasClass('fc-listWeek-button')) {
+                    Cookies.set('fc-view', 'listWeek', { expires: 7 });
+                }
+        })
+
 		$("#calendar").fullCalendar({
 			events: {
 				url: 'inc/events.json.php'
 			},
 			eventLimit: 2,
-            defaultView: 'agendaWeek',
+            defaultView: fcView,
             weekends: false,
             weekNumbers: true,
             navLinks: true,
@@ -136,7 +160,6 @@
                 list: 'Liste Jour'
             },
 			eventClick: function(calEvent, jsEvent, view) {
-                console.log(calEvent);
 				var id = calEvent.id; // l'id de l'événement
                 $('.popover').hide();
 				$.post('inc/jdc/getTravail.inc.php', {
@@ -151,13 +174,36 @@
 				)
 			},
     		eventRender: function(event, element) {
-                if (event.cours == '')
-                    titre = "<i class='fa fa-info fa-lg'></i> Information";
-                    else if (event.type == 'personnal')
-                        titre = "<i class='fa fa-user fa-lg'></i> Note personnelle";
-                        else if (event.type == 'shared')
-                            titre = "<i class='fa fa-user-circle-o'></i> Note partagée";
-                            else titre = event.cours;
+                switch (event.type) {
+                    case 'cours':
+                        titre = '<i class="fa fa-info fa-lg"></i> Matière ' + event.destinataire;
+                        break;
+                    case 'coursGrp':
+                        titre = '<i class="fa fa-info fa-lg"></i> Cours ' + event.destinataire;
+                        break;
+                    case 'classe':
+                        titre = '<i class="fa fa-info fa-lg"></i> Classe ' + event.destinataire;
+                        break;
+                    case 'niveau':
+                        titre = '<i class="fa fa-info fa-lg"></i> Élèves de ' + event.destinataire + 'e année';
+                        break;
+                    case 'ecole':
+                        titre = '<i class="fa fa-info fa-lg"></i> Tous les élèves';
+                        break;
+                    case 'coaching':
+                        titre = '<i class="fa fa-info fa-lg"></i> Soutien scolaire'
+                        break;
+                    case 'remediation':
+                        titre = '<i class="fa fa-info fa-lg"></i> Remédiation';
+                        break;
+                    case 'shared':
+                        titre = '<i class="fa fa-user-circle-o"></i> Note partagée';
+                        break;
+                    case 'personnal':
+                        titre = '<i class="fa fa-user fa-lg"></i> Note personnelle';
+                        break;
+                }
+
                 element.html('<strong>' + titre + '</strong><br>' + event.title),
                 element.popover({
                     title: event.title,

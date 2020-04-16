@@ -13,6 +13,7 @@
                             style="overflow: hidden; text-overflow: ellipsis"
                             data-idtravail="{$id}"
                             title="{$unTravail.titre}">
+                        {if $unTravail.fileInfo.fileName != Null}<i class="fa fa-star"></i>{/if}
                         {$unTravail.dateDebut|truncate:5:''} - {$unTravail.titre}
                     </button>
                 </div>
@@ -20,7 +21,7 @@
             {/foreach}
         </ul>
     </div>
-
+	<p class="micro">Un document a été remis pour les travaux marqués <i class="fa fa-star"></i>.</p>
 </div>
 
 
@@ -36,17 +37,17 @@
         <ul class="list-unstyled">
             {foreach from=$listeArchives key=id item=unTravail}
 
-                <div class="input-group">
+				<div class="input-group" style="display: block">
                     <button
                             type="button"
                             class="btn btn-default btn-block btnShowTravail{if $id == $idTravail} active{/if} {$unTravail.statut}"
-                            style="width: 18em; overflow: hidden; text-overflow: ellipsis"
+                            style="overflow: hidden; text-overflow: ellipsis"
                             data-idtravail="{$id}"
                             title="{$unTravail.titre}">
-
+						{if $unTravail.fileInfo.fileName != Null}<i class="fa fa-star"></i>{/if}
                         {$unTravail.dateDebut|truncate:5:''} - {$unTravail.titre}
                     </button>
-                </div>
+				</div>
 
             {/foreach}
         </ul>

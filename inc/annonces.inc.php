@@ -9,11 +9,13 @@ $Application->delPerimes();
 $classe = $User->getClasse();
 $niveau = substr($classe,0,1);
 $listeCoursEleve = $User->listeCoursEleve();
+$listeMatieresEleve = $User->getListeMatieresEleve($listeCoursEleve);
+// Application::afficher($listeMatieresEleve);
 $nomEleve = $User->getNom();
 
 // création de la liste des annonces pour l'élève, fonction de son matricule, de sa classe
 // -et donc de son niveau d'étude- et de sa liste de cours pour chacune des catégories: élève, cours, classe, niveau, école
-$listeAnnonces = $Application->listeAnnonces($matricule, $classe, $listeCoursEleve, $User->getNom());
+$listeAnnonces = $Application->listeAnnonces($matricule, $classe, $listeCoursEleve, $listeMatieresEleve, $User->getNom());
 
 $listeFlagsAnnonces = $Application->listeFlagsAnnonces(array_keys($listeAnnonces), $matricule);
 $listePJ = $Application->getPJ4notifs($listeAnnonces, $matricule);

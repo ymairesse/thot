@@ -192,7 +192,7 @@ function eraseCookie(name) {
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
         maxFiles: nbFichiersMax,
-        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3",
+        acceptedFiles: "image/jpeg,image/png,image/gif,application/pdf,.psd,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.odg,.csv,.txt,.pdf,.zip,.7z,.ggb,.mm,.xcf,.sb2,.sb3,.otp",
         url: "inc/upload.inc.php",
         accept: function(file, done) {
             done();

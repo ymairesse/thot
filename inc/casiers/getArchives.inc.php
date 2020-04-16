@@ -24,7 +24,7 @@ $coursGrp = isset($_POST['coursGrp']) ? $_POST['coursGrp'] : null;
 // vérifier que l'élève fait bien partie du coursGrp
 $listeCours = $User->listeCoursEleve();
 if (in_array($coursGrp, $listeCours)) {
-    $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
+    $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'), $matricule);
 
     require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
     $smarty = new Smarty();

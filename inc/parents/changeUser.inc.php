@@ -6,8 +6,6 @@ require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
 $Application = new Application();
 session_start();
 
-// Application::afficher($_SESSION[APPLICATION], true);
-
 if (!(isset($_SESSION[APPLICATION]))) {
     echo "<script type='text/javascript'>document.location.replace('".BASEDIR."');</script>";
     exit;
@@ -20,8 +18,8 @@ $User->delogger();
 
 $newUser = (isset($_POST['newUser'])) ? $_POST['newUser'] : null;
 
-if ($User->checkSameFratrie($oldUser, $newUser) == 0)
-    die('tricheur');
+// if ($User->checkSameFratrie($oldUser, $newUser) == 0)
+//     die();
 
 $User = new user($newUser, 'parent');
 $userName = $User->getUserName();

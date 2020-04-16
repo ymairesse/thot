@@ -19,10 +19,9 @@
 
 
 			<div class="modal-footer">
-                <p>Je confirme que j'ai bien lu,
+                Je confirme que j'ai bien lu,
 				<input type="checkbox" id='cbConfirmation' value="1"><span> je coche la case...</span>
 				<button type="button" class="btn btn-primary" id="modalConfirmationLecture" disabled>et je clique sur le bouton</button>
-            </p>
 			</div>
 
 		</div>

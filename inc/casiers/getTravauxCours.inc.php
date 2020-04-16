@@ -22,8 +22,8 @@ $Files = new Files();
 $coursGrp = isset($_POST['coursGrp']) ? $_POST['coursGrp'] : Null;
 $idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
 
-$listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
-$listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
+$listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'), $matricule);
+$listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'), $matricule);
 
 require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
 $smarty = new Smarty();

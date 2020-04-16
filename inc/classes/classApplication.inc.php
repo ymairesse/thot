@@ -81,7 +81,7 @@ class Application
      * */
     static function afficher($data, $die = false)
     {
-        if (count($data) == 0) {
+        if (($data == Null)) {
             echo 'Tableau vide';
         } else {
             echo '<pre>';
@@ -359,7 +359,7 @@ class Application
     {
         switch ($userType) {
             case 'eleve':
-                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement');
+                $permis = array('bulletin', 'repertoire', 'remediation', 'documents', 'casiers', 'anniversaires', 'jdc', 'parents', 'logoff', 'annonces', 'contact', 'info', 'mails', 'comportement', 'forums');
                 if (!(in_array($action, $permis))) {
                     $action = null;
                 }
@@ -614,20 +614,24 @@ class Application
     /**
      * retourne la liste structurée des annonces destinées à l'élève dont on donne le matricule et la classe.
      *
-     * @param $matricule
-     * @param $classe
+     * @param int $matricule
+     * @param string $classe
+     * @param array $listeCours
+     * @param array $listeMatieres
+     * @param string $nomEleve ??????????
      *
      * @return array
      */
-    public function listeAnnonces($matricule, $classe, $listeCours, $nomEleve)
+    public function listeAnnonces($matricule, $classe, $listeCours, $listeMatieres, $nomEleve)
     {
         $niveau = substr($classe, 0, 1);
         $listeCoursString = "'".implode('\',\'', $listeCours)."'";
+        $listeMatieresString = "'".implode('\',\'', $listeMatieres)."'";
         $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT dtn.id, type, proprietaire, destinataire, objet, texte, dateDebut, dateFin, dtn.mail, accuse, dp.nom, dp.sexe, dateEnvoi ';
         $sql .= 'FROM '.PFX.'thotNotifications AS dtn ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = dtn.proprietaire ';
-        $sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole', $listeCoursString) ";
+        $sql .= "WHERE destinataire IN ('$matricule', '$classe', '$niveau', 'ecole', $listeCoursString, $listeMatieresString) ";
         $sql .= 'AND (dateFin > NOW() AND dateDebut <= NOW()) ';
         $sql .= 'ORDER BY dateEnvoi DESC, dateDebut DESC ';
 

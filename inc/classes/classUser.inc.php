@@ -166,6 +166,35 @@ class user
      *
      * @return array
      */
+    public function listeCoursGrpEleve()
+    {
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $matricule = $this->getMatricule();
+        $sql = 'SELECT coursGrp FROM '.PFX.'elevesCours ';
+        $sql .= 'WHERE matricule = :matricule ';
+        $connexion = $requete->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_STR, 6);
+        $liste = array();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                $liste[] = $ligne['coursGrp'];
+            }
+        }
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+
+    /**
+     * Renvoie la liste des coursGrp suivis par l'utilisateur.
+     *
+     * @param void
+     *
+     * @return array
+     */
     public function listeCoursEleve()
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
@@ -183,6 +212,23 @@ class user
         Application::deconnexionPDO($connexion);
 
         return $liste;
+    }
+
+    /**
+     * renvoie la liste des matières suivies par un élève dont on fournit
+     * la liste des cours
+     *
+     * @param array $listeCours
+     *
+     * @return array
+     */
+    public function getListeMatieresEleve($listeCours){
+        $listeMatieres = array();
+        foreach ($listeCours as $unCours) {
+            $matiere = explode('-', $unCours)[0];
+            $listeMatieres[] = $matiere;
+        }
+        return $listeMatieres;
     }
 
     /**

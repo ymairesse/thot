@@ -20,7 +20,7 @@ require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
 $Jdc = new Jdc();
 
 $categories = $Jdc->categoriesTravaux();
-// Application::afficher($categories);
+
 $heure = isset($_POST['heure']) ? $_POST['heure'] : null;
 $startDate = isset($_POST['startDate']) ? $_POST['startDate'] : null;
 

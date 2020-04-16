@@ -17,16 +17,20 @@ $User = unserialize($_SESSION[APPLICATION]);
 
 $matricule = $User->getMatricule();
 
-require_once INSTALL_DIR."/inc/classes/classJdc.inc.php";
-$Jdc = new Jdc();
+$idCategorie = isset($_POST['idCategorie']) ? $_POST['idCategorie'] : Null;
+$idSujet = isset($_POST['idSujet']) ? $_POST['idSujet'] : Null;
+$postId = isset($_POST['postId']) ? $_POST['postId'] : Null;
 
-$id = isset($_POST['id']) ? $_POST['id'] : null;
-$liste = $Jdc->listeDislikes ($id) ;
+// définition de la class Forum
+require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
+$Forum = new ThotForum();
+
+$postAncien = $Forum->getInfoPost($idCategorie, $idSujet, $postId);
 
 require_once INSTALL_DIR.'/smarty/Smarty.class.php';
 $smarty = new Smarty();
 $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
-$smarty->assign('dislikes', $liste);
-$smarty->display('jdc/dislikesList.tpl');
+$smarty->assign('postAncien', $postAncien);
+$smarty->display('forums/modal/modalModifyPost.tpl');

@@ -1074,12 +1074,13 @@ class Bulletin
                 $coteCert = 0;
                 $maxCert = 0;
                 foreach ($lesCompetences as $idComp => $lesCotes) {
-                    $coteForm += $this->sansVirg($lesCotes['form']['cote']);
+                    if (is_numeric($this->sansVirg($lesCotes['form']['cote'])))
+                        $coteForm += $this->sansVirg($lesCotes['form']['cote']);
                     if (($lesCotes['form']['cote'] != '') && (is_numeric($this->sansVirg($lesCotes['form']['cote'])))) {
                         $maxForm += $this->sansVirg($lesCotes['form']['maxForm']);
                     }
-
-                    $coteCert += $this->sansVirg($lesCotes['cert']['cote']);
+                    if (is_numeric($this->sansVirg($lesCotes['cert']['cote'])))
+                        $coteCert += $this->sansVirg($lesCotes['cert']['cote']);
                     if (($lesCotes['cert']['cote'] != '') && (is_numeric($this->sansVirg($lesCotes['cert']['cote'])))) {
                         $maxCert += $this->sansVirg($lesCotes['cert']['maxCert']);
                     }

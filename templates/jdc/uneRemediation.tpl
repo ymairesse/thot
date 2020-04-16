@@ -1,7 +1,7 @@
 {if $travail == Null}
     Cette remédiation a été supprimée.
 {else}
-<div class="panel day-highlight dh-{$travail.class}">
+<div class="panel day-highlight">
 
     <span id="delClass"></span>
     <div class="panel-heading">

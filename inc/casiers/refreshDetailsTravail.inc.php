@@ -21,7 +21,7 @@ $coursGrp = $Application->postOrCookie('coursGrp');
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
+$listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'), $matricule);
 
 if (in_array($idTravail, array_keys($listeTravauxCours))) {
     $detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);

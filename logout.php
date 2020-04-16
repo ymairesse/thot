@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_destroy();
 ?>
 <!DOCTYPE html>
@@ -8,7 +8,7 @@ session_destroy();
 	<title>Déconnexion</title>
 	<link type="text/css" rel="stylesheet" media="all" href="screen.css">
 	<link type="text/css" rel="stylesheet" media="screen" href="js/blockUI.css">
-	<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 	<script type="text/javascript" src="js/jquery.blockUI.js"></script>
 
 <script type="text/javascript">

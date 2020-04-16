@@ -22,6 +22,9 @@ $listeRetenues = $EleveAdes->getListeRetenuesEleve($matricule);
 $listeTypesFaits = $EleveAdes->GETlisteTypesFaits();
 $descriptionChamps = $EleveAdes->listeChamps();
 
+$userType = $User->getUserType();
+$smarty->assign('userType', $userType);
+
 $smarty->assign('listeFaits', $listeFaits);
 $smarty->assign('listeRetenues', $listeRetenues);
 $smarty->assign('listeTypesFaits', $listeTypesFaits);

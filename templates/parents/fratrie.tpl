@@ -3,6 +3,8 @@
         <h3>Frères et sœurs: <span id="nomEleve">{$nomEleve}</span></h3>
     </div>
     <div class="panel-body">
+        <p>Dans ce panneau figurent tous les élèves membres de la famille et que vous avez déjà déclarés.</p>
+        <p>Pour passer d'un profil d'élève à l'autre, il vous suffit de cliquer sur le nom de l'enfant correspondant.</p>
         <ul class="list-unstyled">
 
             {foreach from=$eleves key=matricule item=data}

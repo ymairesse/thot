@@ -27,13 +27,13 @@ if (count($listeCoursAvecTravaux) > 0) {
 
     // pour le cours sélectionné,
     // retrouver les travaux pour ce cours (sauf les 'hidden' et les 'archive')
-    $listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'));
+    $listeTravauxCours = $Files->getTravaux4Cours($coursGrp, array('readonly', 'readwrite', 'termine'), $matricule);
 
     // si aucun travail n'a été sélectionné, on prend le premier, s'il existe pour ce cours
     if ($idTravail == Null)
         if (count($listeTravauxCours) > 0)
             $idTravail = array_keys($listeTravauxCours)[0];
-    $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'));
+    $listeArchives = $Files->getTravaux4Cours($coursGrp, array('archive'), $matricule);
     }
     else {
         $listeTravauxCours = Null;

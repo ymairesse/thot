@@ -285,7 +285,7 @@ class Files
         $sql .= 'OR (groupe IN ('.$listeCoursString.') AND destinataire = "all") ';
         $sql .= 'OR groupe = "ecole" ';
         $requete = $connexion->prepare($sql);
-// echo $sql;
+
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
         $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
@@ -642,10 +642,11 @@ class Files
      *
      * @return array
      */
-    public function getTravaux4Cours($coursGrp, $listeStatuts=Null) {
+    public function getTravaux4Cours($coursGrp, $listeStatuts = Null, $matricule) {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT idTravail, acronyme, coursGrp, titre, consigne, dateDebut, dateFin, statut ';
-        $sql .= 'FROM '.PFX.'thotTravaux ';
+        $sql = 'SELECT tr.idTravail, acronyme, coursGrp, titre, consigne, dateDebut, dateFin, statut, remis ';
+        $sql .= 'FROM '.PFX.'thotTravaux AS tr ';
+        $sql .= 'LEFT JOIN '.PFX.'thotTravauxRemis AS ttr ON tr.idTravail = ttr.idTravail ';
         $sql .= 'WHERE coursGrp=:coursGrp ';
         if ($listeStatuts != Null) {
             $listeStatutsString = "'".implode("','", $listeStatuts)."'";
@@ -663,6 +664,8 @@ class Files
                 $idTravail = $ligne['idTravail'];
                 $ligne['dateDebut'] = Application::datePHP($ligne['dateDebut']);
                 $ligne['dateFin'] = Application::datePHP($ligne['dateFin']);
+                $ligne['fileInfo'] = $this->getFileInfos($matricule, $idTravail, $acronyme);
+                $liste[$idTravail] = $ligne;
                 $liste[$idTravail] = $ligne;
             }
         }
@@ -684,7 +687,7 @@ class Files
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT tt.idTravail, tt.acronyme, nom, prenom, coursGrp, tt.titre, consigne, dateDebut, dateFin, tt.statut, ';
-        $sql .= 'cote, max, evaluation, remarque, libelle, nbheures ';
+        $sql .= 'tr.remis, cote, max, evaluation, remarque, libelle, nbheures ';
         $sql .= 'FROM '.PFX.'thotTravaux AS tt ';
         $sql .= 'JOIN '.PFX.'thotTravauxRemis AS tr ON tt.idTravail = tr.idTravail ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = tt.acronyme ';
@@ -895,6 +898,6 @@ class Files
      */
     public function delTravailFile($acronyme, $idTravail, $matricule, $fileName)
     {
-        Application::afficher(array($acronyme, $idTravail, $matricule, $fileName), true);
+        Application::afficher(array($acronyme, $idTravail, $matricule, $fileName));
     }
 }

@@ -225,7 +225,7 @@ $(document).ready(function(){
 
     $("#editJdc").validate({
         rules: {
-            categorie: {
+            idCategorie: {
                 required: true
                 },
             destinataire: {

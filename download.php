@@ -151,11 +151,15 @@ if ($download_hook['download'] == true) {
 
     /* You can write your logic before proceeding to download */
     // enregistrement du suivi de téléchargement pour le document
+    if (isset($shareId))
     $spyInfo = $Files->getSpyInfo4ShareId($shareId);
+
     // il y a un espion sur le fichier ou le répertoire
     if (!(empty($spyInfo))) {
         $spyId = $spyInfo['spyId'];
         $path = (isset($downloadedFileInfo['path'])) ? $downloadedFileInfo['path'] : Null;
+        // suppression des doubles "/" éventuels
+        $path = preg_replace('~/+~', '/', $path);
         $fileName = (isset($downloadedFileInfo['fileName'])) ? $downloadedFileInfo['fileName'] : Null;
         $Files->setSpiedDownload($userName, $userType, $spyId, $path, $fileName);
     }

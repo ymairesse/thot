@@ -418,9 +418,10 @@ p.event-inverse, a.event-inverse {
 }
 
 .texte {
-    background-color: #ffb;
+    background-color: #ffbbde;
     border: 1px solid #555;
     padding: 0.5em 1em;
+    font-size: 16pt;
 }
 
 .readwrite {
@@ -601,7 +602,129 @@ tr.nonLu td{
     color: black !important;
 }
 
+.coaching {
+	background: turquoise !important;
+	color: #111 !important;
+}
+
 .gras {
     font-weight: bold;
     color: blue;
+}
+
+/* Treeview */
+
+div.panel:first-child {
+    margin-top:20px;
+}
+
+div.treeview, div.treeviewPost {
+    min-width: 100px;
+    min-height: 100px;
+    max-height: 256px;
+    overflow:auto;
+    padding: 4px;
+    margin-bottom: 20px;
+    color: #369;
+    border: solid 1px;
+    border-radius: 4px;
+}
+
+div.treeview ul:first-child:before, .treeviewPost ul:first-children:before {
+    display: none;
+}
+
+.treeview, .treeview ul, .treeviewPost, .treeviewPost ul {
+    margin:0;
+    padding:0;
+    list-style:none;
+    color: #369;
+}
+.treeview ul, .treeviewPost {
+    margin-left:1em;
+    position:relative
+}
+
+.treeview ul ul, .treeviewPost ul ul {
+    margin-left:.5em
+}
+
+.treeview ul:before, .treeviewPost ul:before {
+    content:"";
+    display:block;
+    width:0;
+    position:absolute;
+    top:0;
+    left:0;
+    border-left:1px solid;
+    bottom:15px;
+}
+
+.treeview li, .treeviewPost li {
+    margin:0;
+    padding:0 0 0 1em;
+    line-height:2em;
+    position:relative;
+}
+
+.treeview ul li:before, .treeviewPost ul li:before {
+    content:"";
+    display:block;
+    width:10px;
+    height:0;
+    border-top:1px solid;
+    margin-top:-1px;
+    position:absolute;
+    top:1em;
+    left:0
+}
+
+.tree-indicator {
+    margin-right:5px;
+    cursor:pointer;
+}
+
+.treeview li a , .treeviewPost li a {
+    text-decoration: underline;
+    color:inherit;
+    font-weight: bold !important;
+    cursor:pointer;
+}
+
+.treeview li a.active, .treeviewPost li a.active {
+    background-color: #f4d186;
+    color: black;
+    padding: 0 1em 0 0;
+}
+
+.repondre {
+    background-color: #aacfff;
+}
+
+.postForum {
+    border: 1px solid #333;
+    padding: 0.5em;
+}
+
+.supprime {
+	text-decoration: line-through;
+	color: #999;
+}
+
+.postForum.active {
+    background-color: #ee5;
+    color: blue;
+}
+
+#listeSujets button.active{
+    background: #f66;
+    color: #222;
+}
+
+.fbLike {
+    font-size: 10pt;
+}
+
+.toolip  {
+    background-color: red;
 }

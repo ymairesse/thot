@@ -798,28 +798,60 @@ class ecole
      *
      * @return array : liste des cours avec caractéristiques: nbheures, statut, libelle
      */
-    public function listeCoursGrpEleves($listeEleves)
-    {
-        if (is_array($listeEleves)) {
-            $listeElevesString = implode(',', array_keys($listeEleves));
-        } else {
-            $listeElevesString = $listeEleves;
-        }
+    // public function listeCoursGrpEleves($listeEleves)
+    // {
+    //     if (is_array($listeEleves)) {
+    //         $listeElevesString = implode(',', array_keys($listeEleves));
+    //     } else {
+    //         $listeElevesString = $listeEleves;
+    //     }
+    //     $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+    //     $sql = 'SELECT DISTINCT cours, statut, libelle, nbheures ';
+    //     $sql .= 'FROM '.PFX.'elevesCours ';
+    //     $sql .= 'JOIN '.PFX.'cours ON ('.PFX."cours.cours = SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1 )) ";
+    //     $sql .= 'JOIN '.PFX.'statutCours ON ('.PFX.'statutCours.cadre = '.PFX.'cours.cadre) ';
+    //     $sql .= "WHERE matricule IN ($listeElevesString) ";
+    //     $sql .= 'ORDER BY nbheures DESC, statut, cours ';
+    //     $resultat = $connexion->query($sql);
+    //     $listeCours = array();
+    //     if ($resultat) {
+    //         $resultat->setFetchMode(PDO::FETCH_ASSOC);
+    //         while ($ligne = $resultat->fetch()) {
+    //             $cours = $ligne['cours'];
+    //             unset($ligne['cours']);
+    //             $listeCours[$cours] = $ligne;
+    //         }
+    //     }
+    //     Application::DeconnexionPDO($connexion);
+    //
+    //     return $listeCours;
+    // }
+
+    /**
+     * retourne la liste des coursGrp d'un élève dont on fournit le matricule
+     *
+     * @param int $matricule
+     *
+     * @return array
+     */
+    public function getListeCoursGrp4eleve($matricule) {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT DISTINCT cours, statut, libelle, nbheures ';
-        $sql .= 'FROM '.PFX.'elevesCours ';
-        $sql .= 'JOIN '.PFX.'cours ON ('.PFX."cours.cours = SUBSTR(coursGrp, 1, LOCATE('-',coursGrp)-1 )) ";
-        $sql .= 'JOIN '.PFX.'statutCours ON ('.PFX.'statutCours.cadre = '.PFX.'cours.cadre) ';
-        $sql .= "WHERE matricule IN ($listeElevesString) ";
-        $sql .= 'ORDER BY nbheures DESC, statut, cours ';
-        $resultat = $connexion->query($sql);
-        $listeCours = array();
-        if ($resultat) {
-            $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            while ($ligne = $resultat->fetch()) {
-                $cours = $ligne['cours'];
-                unset($ligne['cours']);
-                $listeCours[$cours] = $ligne;
+        $sql = 'SELECT coursGrp, nbheures, libelle, cours.cadre, section, statut, nbHeures ';
+        $sql .= 'FROM '.PFX.'elevesCours AS ec ';
+        $sql .= 'JOIN '.PFX.'cours AS cours ON cours.cours = SUBSTR(coursGrp, 1, LOCATE("-",coursGrp)-1 ) ';
+        $sql .= 'JOIN '.PFX.'statutCours AS statut ON statut.cadre = cours.cadre ';
+        $sql .= 'WHERE matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $listeCours = Null;
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()){
+                $coursGrp = $ligne['coursGrp'];
+                $listeCours[$coursGrp] = $ligne;
             }
         }
         Application::DeconnexionPDO($connexion);
@@ -1622,6 +1654,23 @@ class ecole
     }
 
     /**
+     * renvoie la liste des matières correspondant à une liste de $coursGrp
+     *
+     * @param array $listeCoursGrp
+     *
+     * @return array
+     */
+    public function getListeMatieresEleve($listeCoursGrp){
+        $listeCours = Null;
+        foreach ($listeCoursGrp as $unCoursGrp) {
+            $unCours = explode('-', $unCoursGrp)[0];
+            $listeCours[$unCours] = $unCours;
+        }
+
+        return $listeCours;
+    }
+
+    /**
      * retourne la liste des cours effectivement suivis par chacun des élèves d'une classe.
      *
      * @param $classe string: la classe de ces élèves
@@ -2250,4 +2299,5 @@ class ecole
 
         return $liste;
     }
+
 }

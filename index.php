@@ -79,6 +79,9 @@ switch ($action) {
     case 'info':
         require_once 'inc/info.inc.php';
         break;
+    case 'forums':
+        require_once 'inc/forums/gestForums.php';
+        break;
     default:
         require_once 'inc/annonces.inc.php';
         break;

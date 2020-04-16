@@ -15,5 +15,5 @@ $notifId = isset($_POST['notifId']) ? $_POST['notifId'] : Null;
 
 if ($notifId != Null) {
     $Application->marqueLu($matricule, $notifId);
-    return $id;
+    return $notifId;
 }
