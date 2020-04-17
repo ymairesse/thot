@@ -662,10 +662,10 @@ class Files
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             while ($ligne = $requete->fetch()){
                 $idTravail = $ligne['idTravail'];
+                $acronyme = $ligne['acronyme'];
                 $ligne['dateDebut'] = Application::datePHP($ligne['dateDebut']);
                 $ligne['dateFin'] = Application::datePHP($ligne['dateFin']);
                 $ligne['fileInfo'] = $this->getFileInfos($matricule, $idTravail, $acronyme);
-                $liste[$idTravail] = $ligne;
                 $liste[$idTravail] = $ligne;
             }
         }
