@@ -14,7 +14,8 @@
 	<link rel="stylesheet" href="js/bootstrapDatepicker/css/datepicker3.css" media="all">
 	<link rel="stylesheet" href="js/boostrapTimepicker/css/bootstrap-timepicker.css" media="screen">
 
-	<script type="text/javascript" src="js/jquery-3.5.0.min.js"></script>
+	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+
 	<script src="js/jquery-ui_1.12.1_.min.js"></script>
 	<script type="text/javascript">
 		// Change JQueryUI plugin names to fix name collision with Bootstrap.
@@ -40,6 +41,10 @@
 
 	<link rel="stylesheet" href="fc2/fullcalendar.css" media="screen">
 	<link rel="stylesheet" href="css/animate/animate.min.css">
+
+	<link rel="stylesheet" href="summernote/summernote.min.css">
+	<script src="summernote/summernote.min.js"></script>
+	<script src="summernote/lang/summernote-fr-FR.min.js"></script>
 
 </head>
 

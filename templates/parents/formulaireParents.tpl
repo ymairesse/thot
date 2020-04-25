@@ -5,6 +5,7 @@
         <form autocomplete="off" name="parent" id="parent" method="POST" action="index.php" role="form" class="form-vertical">
 
             <div class="panel panel-info">
+                
                 <div class="panel-heading">
                     <h3 class="panel-title">Ajouter un parent</h3>
                 </div>

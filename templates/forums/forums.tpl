@@ -36,7 +36,8 @@
             <div class="panel-heading" id="libelle" data-defaulttext="Liste des contributions">
                 <span id="titreSujet">Liste des contributions</span>
                 <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-success btn-xs" id="btn-hideRepondre">Cacher les boutons</button>
+                    <button type="button" class="btn btn-success btn-xs" id="btn-hideRepondre" title="Cacher les boutons"><i class="fa fa-eye-slash"></i> </button>
+                    <button type="button" class="btn btn-warning btn-xs" id="btn-allText" title="Texte continu"><i class="fa fa-text-height"></i></button>
                     <button type="button" class="btn btn-info btn-xs" id="btn-date" disabled><i class="fa fa-calendar"></i> <span id="laDate">Date</span></button>
                 </div>
             </div>
@@ -69,6 +70,13 @@
                 $('#modal').html(resultat);
                 $('#modalDate').modal('show');
             })
+        })
+
+        $('#btn-allText').click(function(){
+            $('.postForum').toggleClass('em8');
+            if ((Cookies.get('texteSuivi') == undefined) || (Cookies.get('texteSuivi') == "false"))
+                Cookies.set('texteSuivi', "true", { expires : 7 })
+                else Cookies.set('texteSuivi', "false", { expires : 7 })
         })
 
         $('#modal').on('click', '#btn-confirmDate', function(){
@@ -210,6 +218,10 @@
                 if (dateForum != undefined) {
                     var dateForum = dateForum.substr(0,5);
                     $('.postForum[data-date="' + dateForum +'"]').addClass('active');
+                }
+                var texteSuivi = Cookies.get('texteSuivi');
+                if (texteSuivi == "false"){
+                    $('.postForum').addClass('em8');
                 }
             })
         })

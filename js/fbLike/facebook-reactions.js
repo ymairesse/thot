@@ -114,7 +114,7 @@
 					var postId = dataJson['postId'];
 					var idCategorie = dataJson['idCategorie'];
 					var idSujet = dataJson['idSujet'];
-console.log(emoji);
+
 					// mise à jour des statistiques pour ce post
 					$.post('inc/forums/getFBstats4postId.inc.php', {
 						idCategorie: idCategorie,

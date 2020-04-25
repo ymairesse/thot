@@ -3,7 +3,6 @@
 session_start();
 
 require_once 'config.inc.php';
-// require_once('inc/fonctions.inc.php');
 
 // définition de la class Application
 require_once INSTALL_DIR.'/inc/classes/classApplication.inc.php';
@@ -20,6 +19,7 @@ $userType = isset($_POST['userType']) ? $_POST['userType'] : null;
 
 // Les données userName et mdp ont été postées dans le formulaire de la page accueil.php
 if (!empty($userName) && (!empty($mdp)) && !(empty($userType))) {
+
     // recherche de toutes les informations sur l'utilisateur et les applications activées
     $User = new user($userName, $userType);
 

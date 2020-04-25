@@ -13,20 +13,20 @@ if (!(isset($_SESSION[APPLICATION]))) {
 
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
-$oldUser = $User->getUserName();
-$User->delogger();
 
 $newUser = (isset($_POST['newUser'])) ? $_POST['newUser'] : null;
 
-// if ($User->checkSameFratrie($oldUser, $newUser) == 0)
-//     die();
-
 $User = new user($newUser, 'parent');
-$userName = $User->getUserName();
+
+$identite = $User->getIdentite();
+
+$matricule = $User->getMatricule();
+$nomEleve = $User->getNomEleve();
 
 $_SESSION[APPLICATION] = serialize($User);
 
 $User->logger($User);
 
 $nomEleve = $User->getNomEleve();
+
 echo $nomEleve;

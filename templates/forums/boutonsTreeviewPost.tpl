@@ -1,7 +1,6 @@
 {assign var=postId value={$post.postId}}
 <div class="postForum"
     id="post_{$postId}"
-    style="max-height:8em; overflow: auto;"
     data-postid="{$postId}"
     data-date="{$post.ladate}">
     {if $post.post == ''}
@@ -39,6 +38,8 @@
         <i class="fa fa-times"></i>
         </button>
         {/if}
+
+        {* Boutons Like *}
         <span class="fbReactions" data-postid="{$postId}">
             <a class="FB_reactions"
                 data-reactions-type="horizontal"
@@ -50,7 +51,7 @@
             	<span>{$likes4user.$postId|default:'J\'aime'}</span>
             </a>
         </span>
-
+        {* Statistiques Like *}
         <span class="listeFBlikes"
             data-postid="{$post.postId}"
             data-toggle="tooltip"

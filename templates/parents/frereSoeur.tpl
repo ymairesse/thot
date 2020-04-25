@@ -138,7 +138,7 @@
                 newUser: newUser
             }, function(resultat){
                 $('#nomEleve').html(resultat);
-                bootbox.alert('Vous êtes maintenant sur le profil de ' + resultat);
+                bootbox.alert('Vous êtes maintenant sur le profil de <strong>' + resultat + '</strong>');
                 $.post('inc/parents/getFratrie.inc.php', {
                     }, function(resultat){
                     $("#fratrie").html(resultat);

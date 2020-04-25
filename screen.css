@@ -728,3 +728,8 @@ div.treeview ul:first-child:before, .treeviewPost ul:first-children:before {
 .toolip  {
     background-color: red;
 }
+
+.postForum.em8 {
+    max-height:8em;
+    overflow: auto;
+}

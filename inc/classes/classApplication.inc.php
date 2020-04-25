@@ -1082,24 +1082,40 @@ class Application
         if ($passwd != '') {
             $passwd2 = $post['passwd2'];
             if ($passwd == $passwd2) {
-                $passwd = md5($passwd);
-                $sqlPasswd = ",md5pwd='$passwd' ";
+                $md5pwd = md5($passwd);
+                $sqlPasswd = ",md5pwd = :md5pwd ";
             } else {
                 $ok = false;
             }
         }
-        $resultat = 0;
+        $nb = 0;
         if ($ok == true) {
             $connexion = self::connectPDO(SERVEUR, BASE, NOM, MDP);
             $sql = 'UPDATE '.PFX.'thotParents ';
-            $sql .= "SET formule='$formule', nom='$nom', prenom='$prenom', mail='$mail', lien='$lien' ";
-            $sql .= $sqlPasswd;
-            $sql .= "WHERE userName = '$userName' ";
-            $resultat = $connexion->exec($sql);
+            $sql .= 'SET formule = :formule, nom = :nom, prenom = :prenom, mail = :mail, lien = :lien ';
+            if (isset($md5pwd))
+                $sql .= ',md5pwd = :sqlPasswd ';
+            $sql .= 'WHERE userName = :userName ';
+            $requete = $connexion->prepare($sql);
+
+            $requete->bindParam(':formule', $formule, PDO::PARAM_STR, 4);
+            $requete->bindParam(':nom', $nom, PDO::PARAM_STR, 50);
+            $requete->bindParam(':prenom', $prenom, PDO::PARAM_STR, 50);
+            $requete->bindParam(':mail', $mail, PDO::PARAM_STR, 60);
+            $requete->bindParam(':lien', $lien, PDO::PARAM_STR, 20);
+            $requete->bindParam(':userName', $userName, PDO::PARAM_STR, 25);
+
+            if (isset($md5pwd))
+                $requete->bindParam(':md5pwd', $md5pwd, PDO::PARAM_STR, 40);
+
+            $resultat = $requete->execute();
+
+            $nb = $requete->rowCount();
+
             self::DeconnexionPDO($connexion);
         }
 
-        return $resultat;
+        return $nb;
     }
 
     /**

@@ -27,7 +27,9 @@ class user
     /**
      * recherche toutes les informations de la table des utilisateurs pour l'utilisateur actif et les reporte dans l'objet User.
      *
-     * @param $userType : parent ou eleve
+     * @param string $userType : parent ou eleve
+     *
+     * @return void
      */
     public function setIdentite($userType)
     {
@@ -42,10 +44,12 @@ class user
                 break;
 
             case 'parent':
-                $sql = "SELECT 'parent' AS type, formule, userName, tp.matricule, tp.nom, tp.prenom, lien, mail, classe, groupe, section, md5pwd, ";
+                $sql = "SELECT 'parent' AS type, formule, userName, tp.matricule, tp.nom, tp.prenom, ";
+                $sql .= 'lien, mail, classe, groupe, section, tp.md5pwd, ';
                 $sql .= 'de.nom AS nomEl, de.prenom AS prenomEl ';
                 $sql .= 'FROM '.PFX.'thotParents AS tp ';
                 $sql .= 'JOIN '.PFX.'eleves AS de ON de.matricule = tp.matricule ';
+                $sql .= 'JOIN '.PFX.'passwd AS pwd ON pwd.matricule = tp.matricule ';
                 $sql .= "WHERE userName = '$userName' LIMIT 1 ";
                 break;
 
@@ -57,7 +61,10 @@ class user
         $resultat = $connexion->query($sql);
         if ($resultat) {
             $resultat->setFetchMode(PDO::FETCH_ASSOC);
-            $this->identite = $resultat->fetch();
+            $ligne = $resultat->fetch();
+
+            $this->identite = $ligne;
+
         }
         Application::DeconnexionPDO($connexion);
     }
@@ -77,7 +84,7 @@ class user
     /**
      * renvoie le amtricule de l'utilisateur actif.
      *
-     * @param void()
+     * @param void
      *
      * @return string
      */
@@ -671,31 +678,33 @@ class user
      * @return array
      */
      public function getEleve4Parent($fratrie){
-         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-         $fratrieString = "'".implode("','", $fratrie)."'";
-         $sql = 'SELECT DISTINCT de.matricule, de.nom, de.prenom, groupe ';
-         $sql .= 'FROM '.PFX.'eleves AS de ';
-         $sql .= 'JOIN '.PFX.'thotParents AS parents ON parents.matricule = de.matricule ';
-         $sql .= 'WHERE de.matricule IN (SELECT matricule FROM '.PFX.'thotParents WHERE userName IN ('.$fratrieString.')) ';
-         $requete = $connexion->prepare($sql);
+     		$connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+     		$fratrieString = "'".implode("','", $fratrie)."'";
+     		$sql = 'SELECT DISTINCT de.matricule, de.nom, de.prenom, groupe, pwd.user, parents.userName ';
+     		$sql .= 'FROM '.PFX.'eleves AS de ';
+     		$sql .= 'JOIN '.PFX.'thotParents AS parents ON parents.matricule = de.matricule ';
+     		$sql .= 'JOIN '.PFX.'passwd AS pwd ON pwd.matricule = de.matricule ';
+     		$sql .= 'WHERE de.matricule IN (SELECT matricule FROM '.PFX.'thotParents WHERE userName IN ('.$fratrieString.')) ';
+     		$requete = $connexion->prepare($sql);
 
-         $resultat = $requete->execute();
+             $resultat = $requete->execute();
 
-         $eleve = array();
-         if ($resultat) {
-             while ($ligne = $requete->fetch()) {
-                 $matricule = $ligne['matricule'];
-                 $eleve[$matricule] = array(
-                     'userName' => $fratrie[$matricule],
-                     'nom' => sprintf('%s %s [%s]', $ligne['nom'], $ligne['prenom'], $ligne['groupe'])
-                 );
-             }
-         }
+              $eleve = array();
+              if ($resultat) {
+     			 $requete->setFetchMode(PDO::FETCH_ASSOC);
+                  while ($ligne = $requete->fetch()) {
+                      $matricule = $ligne['matricule'];
+                      $eleve[$matricule] = array(
+                          'userName' => $ligne['user'],
+                          'nom' => sprintf('%s %s [%s]', $ligne['nom'], $ligne['prenom'], $ligne['groupe'])
+                      );
+                  }
+              }
 
-         Application::deconnexionPDO($connexion);
+              Application::deconnexionPDO($connexion);
 
-         return $eleve;
-     }
+              return $eleve;
+          }
 
     /**
      * vérifie si oldUser et newUser font partie de la même fratrie (sécurité au moment de changer d'utilisateur)

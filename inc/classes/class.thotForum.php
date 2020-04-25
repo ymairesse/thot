@@ -309,7 +309,9 @@ class ThotForum
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             $ligne = $requete->fetch();
             if ($ligne) {
-                $ligne['post'] = strip_tags($ligne['post'],'<http>');
+                $ligne['post'] = strip_tags($ligne['post'],'<a><b><u><span><iframe><img><table><tbody><tr><td><ul><li><br><p><strike>');
+                $ligne['post'] = nl2br($ligne['post']);
+
                 $userStatus = $ligne['userStatus'];
                 if ($ligne['userStatus'] == 'prof') {
                     $appel = ($ligne['sexeProf'] == 'M') ? 'M.' : 'Mme';
@@ -564,7 +566,7 @@ class ThotForum
             while ($ligne = $requete->fetch()){
                 $postId = $ligne['postId'];
 
-                $ligne['post'] = strip_tags($ligne['post'],'<a>');
+                $ligne['post'] = strip_tags($ligne['post'],'<a><b><u><span><iframe><img><table><tbody><tr><td><ul><li><br><p><strike>');
                 $ligne['post'] = nl2br($ligne['post']);
 
                 if ($ligne['userStatus'] == 'prof') {

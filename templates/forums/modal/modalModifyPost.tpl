@@ -34,6 +34,24 @@
             $('#myPost').val('');
         })
 
+        $('#myPost').summernote({
+			lang: 'fr-FR', // default: 'en-US'
+			height: null, // set editor height
+			minHeight: 150, // set minimum height of editor
+			focus: true, // set focus to editable area after initializing summernote
+            toolbar: [
+              ['style', ['style']],
+              ['font', ['bold', 'underline', 'italic', 'clear']],
+              ['font', ['strikethrough', 'superscript', 'subscript']],
+              ['fontname', ['fontname']],
+              ['color', ['color']],
+              ['para', ['ul', 'ol', 'paragraph']],
+              ['table', ['table']],
+              ['insert', ['link', 'picture']],
+              ['view', ['fullscreen', 'codeview', 'help']],
+            ],
+		});
+
         $('#formModalModify').validate({
             rules: {
                 myPost: {
