@@ -254,7 +254,7 @@ class ThotForum
      */
     public function getInfoSujet($idCategorie, $idSujet){
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT sujets.idCategorie, idsujet, sujet, acronyme, dateCreation, libelle ';
+        $sql = 'SELECT sujets.idCategorie, idsujet, sujet, acronyme, dateCreation, libelle, fbLike ';
         $sql .= 'FROM '.PFX.'thotForumsSujets AS sujets ';
         $sql .= 'JOIN '.PFX.'thotForums AS forums ON forums.idCategorie = sujets.idCategorie ';
         $sql .= 'WHERE idSujet = :idSujet AND sujets.idCategorie = :idCategorie ';
