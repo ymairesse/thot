@@ -10,26 +10,48 @@
             <div class="panel panel-warning">
 
                 <div class="panel-heading">
-                    <p>Merci de vérifier vos coordonnées</p>
+                    {if $userType == 'parent'}
+                        <p>Merci de vérifier vos coordonnées</p>
+                    {else}
+                        <p style="color:red">Merci de ne pas abuser de ce mode de communication. <strong>Beaucoup de professeurs ont plus de 100 élèves</strong>. Ils pourraient donc ne pas avoir la possibilité de répondre à chacun.</p>
+                    {/if}
                 </div>
                 <div class="panel-body">
-                    <p>Vous êtes:</p>
-                    <p>
-                        <strong>{$user.formule} {$user.prenom} {$user.nom}</strong>
-                    </p>
-                    <p>Votre adresse mail est:</p>
-                    <p>
-                        <strong><a href="mailto:{$user.mail}">{$user.mail}</a></strong>
-                    </p>
-                    <p>Une copie de votre message sera envoyée à cette adresse.</p>
 
-                    <p>Votre enfant est </p>
-                    <p>
-                        <strong>{$user.prenomEl} {$user.nomEl}</strong> en classe de
-                        <strong>{$user.classe}</strong>
-                    </p>
+                    {if $userType == 'parent'}
+                        <p>Vous êtes: </p>
+                        <p>
+                            <strong>{$user.formule} {$user.prenom} {$user.nom}</strong>
+                        </p>
+                        <p>Votre adresse mail est:</p>
+                        <p>
+                            <strong><a href="mailto:{$user.mail}">{$user.mail}</a></strong>
+                        </p>
+                        <p>Une copie de votre message sera envoyée à cette adresse.</p>
 
+                        <p>Votre enfant est </p>
+                        <p>
+                            <strong>{$user.prenomEl} {$user.nomEl}</strong> en classe de
+                            <strong>{$user.classe}</strong>
+                        </p>
+                    {else}
 
+                        <p>
+                            Tu es <strong>{$user.prenom} {$user.nom} de {$user.groupe}</strong>
+                        </p>
+                        <p>Ton adresse mail est:</p>
+                        <p>
+                            <strong><a href="mailto:{$user.mail}">{$user.mail}</a></strong>
+                        </p>
+                        <p>
+                            Une copie de ton message sera envoyée à cette adresse. <br>
+                            Le professeur ou l'éducateur répondra à cette adresse.
+                        </p>
+                        <p>Pour t'y connecter: <a href="http://mail.isnd.be" target="_blank">http://mail.isnd.be</a> (Roundcube) ou <br>
+                        <a href="https://isnd.be/mail" target="_blank">https://isnd.be/mail</a> (Rainloop)<br>
+                        en indiquant <strong>Ton adresse mail complète</strong> comme indiqué ci-dessus et ton mot de passe.</p>
+
+                    {/if}
                 </div>
 
             </div>
@@ -72,7 +94,9 @@
             </div>
 
             <p>
-                <input type="text" name="objet" id="objet" placeholder="Objet" class="form-control" value="À propos de {$user.prenomEl} {$user.nomEl} de {$user.classe}">
+                <input type="text" name="objet" id="objet" placeholder="Objet" class="form-control"
+                    value="{if $userType == 'parent'}À propos de {$user.prenomEl} {$user.nomEl} de {$user.classe}
+                        {else}Une question de {$user.prenom} {$user.nom} de {$user.groupe}{/if}">
             </p>
             <textarea name="texte" id="texte" cols="30" rows="10" class="ckeditor form-control" placeholder="Frappez votre texte ici"></textarea>
 
@@ -81,8 +105,11 @@
 
     </div>
     <!-- row -->
-
-    <input type="hidden" name="userName" value="{$user.userName}">
+    {if $userType == 'eleve'}
+        <input type="hidden" name="userName" value="{$user.user}">
+        {else}
+        <input type="hidden" name="userName" value="{$user.userName}">
+    {/if}
     <input type="hidden" name="action" value="{$action}">
     <input type="hidden" name="mode" value="envoyer">
 </form>

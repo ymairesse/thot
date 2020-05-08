@@ -9,7 +9,7 @@
 			<span class="icon-bar"></span>
 		</button>
 
-		<a class="navbar-brand" href="index.php"><i class="fa fa-home"></i></a> 
+		<a class="navbar-brand" href="index.php"><i class="fa fa-home"></i></a>
 
 	</div>
 	<!-- navbar-header -->
@@ -31,7 +31,10 @@
 			{/if}
 			<li><a href="index.php?action=casiers"><i class="fa fa-inbox"></i> Casiers<br>Virtuels</a></li>
 
-			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)" id="menuJdc"><i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC<b class="caret"></b></a>
+			<li class="dropdown">
+				<a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(0)" id="menuJdc">
+					<i class="fa fa-newspaper-o" style="color:#4AB23A"></i> JDC<b class="caret"></b>
+				</a>
 				<ul class="dropdown-menu">
 					<li><a href="index.php?action=jdc" id="linkJdc">Mon JDC</a></li>
 					<li><a href="index.php?action=jdc&amp;mode=horaire">Mon horaire journalier</a></li>
@@ -44,26 +47,41 @@
 			</li>
 
 			{if $userType == 'eleve'}
-			<li><a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a></li>
+			<li>
+				<a href="index.php?action=parents"><i class="fa fa-users" style="color:#EAA6B1"></i> Parents</a>
+			</li>
 			{/if}
 
-			<li><a href="index.php?action=comportement"><i class="fa fa-pencil" style="color:#55aaaa"></i> Comportement</a></li>
+			<li>
+				<a href="index.php?action=comportement"><i class="fa fa-pencil" style="color:#55aaaa"></i> Comportement</a>
+			</li>
 
 			{if $userType == 'eleve'}
 			<li><a href="index.php?action=mails"><i class="fa fa-send-o"></i> Communiquer</a></li>
 			{/if}
 
 			{if $userType == 'parent'}
-			<li class="dropdown"><a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(01)"><i class="fa fa-user" style="color:blue"></i> Profil<b class="caret"></b></a>
+			<li class="dropdown">
+				<a class="dropdown-toogle" data-toggle="dropdown" href="javascript:void(01)"><i class="fa fa-user" style="color:blue"></i> Profil<b class="caret"></b></a>
 				<ul class="dropdown-menu">
 					<li><a href="index.php?action=profil"><i class="fa fa-user" style="color:#EAA6B1"></i> Profil personnel</a></li>
 					<li><a href="index.php?action=frereSoeur"><i class="fa fa-users" style="color:#666"></i> Frères et sœurs</a></li>
 				</ul>
-
-		</li>
-			<li><a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a></li>
-			<li><a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a></li>
+			</li>
 			{/if}
+
+			{if ($userType == 'parent') || ($identite.user == 'jsparrow1234')}
+			<li>
+				<a href="index.php?action=contact"><i class="fa fa-envelope-o" style="color:#ff0000"></i> Contact</a>
+			</li>
+			{/if}
+
+			{if $userType == 'parent'}
+			<li>
+				<a href="index.php?action=reunionParents"><i class="fa fa-calendar" style="color:#16931b"></i> Réunion de parents</a>
+			</li>
+			{/if}
+
 			<li><a href="index.php?action=info" title="Informations"><i class="fa fa-info-circle" style="color:blue"></i></a></li>
 		</ul>
 
@@ -71,7 +89,7 @@
 
 			<li class="dropdown">
 				<a href="#" data-toggle="dropdown">
-					<span id="leNom">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b>
+					<span id="leNom" data-user="{$identite.user}">{$identite.prenom} {$identite.nom}</span> <b class="caret"></b>
 				</a>
 
 				<ul class="dropdown-menu">

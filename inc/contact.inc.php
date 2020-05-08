@@ -55,6 +55,7 @@ switch ($mode) {
                 'texte' => $texte,
                 'urgence' => $urgence,
                 );
+ 
         $smarty->assign('message', $message);
         // break;  pas de break;
     default:
@@ -79,7 +80,8 @@ foreach ($listeCours as $cours => $data) {
 }
 $smarty->assign('titus', $titus);
 
-$user = (array) $User->getIdentite();
+$user = (array) $User->getIdentite($userType);
+
 $smarty->assign('user', $user);
 
 $listeProfs = $Bulletin->listeProfsDeListeCoursGrp($listeCoursGrp);

@@ -51,6 +51,18 @@
 <body>
 	<div class="container-fluid">
 
+		{if (isset($message))}
+		<div class="alert alert-dismissable alert-{$message.urgence|default:'info'}
+			{if (!(in_array($message.urgence,array('danger','warning'))))} auto-fadeOut{/if}">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<h4><span class="glyphicon
+				{if in_array($message.urgence,array('success','info'))}glyphicon-ok{/if}
+				{if in_array($message.urgence,array('danger','warning'))}glyphicon-exclamation-sign{/if}
+				"></span> {$message.title}</h4>
+			<p>{$message.texte}</p>
+		</div>
+		{/if}
+
 		{include file="entete.tpl"}
 		{include file="menu.tpl"}
 
@@ -70,6 +82,12 @@
 	{include file="footer.tpl"}
 
 	<script type="text/javascript">
+
+	window.setTimeout(function() {
+	    $(".auto-fadeOut").fadeTo(500, 0).slideUp(500, function(){
+	        $(this).remove();
+		    });
+		}, 3000);
 
 		$(document).ready(function() {
 

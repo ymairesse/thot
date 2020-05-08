@@ -61,54 +61,50 @@
 
         <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
             {foreach from=$listeDocs.coursGrp key=libelle item=data name=boucle}
-            <li>
-                <a href="#{$libelle|replace:' ':'_'}" data-toggle="tab" {if $smarty.foreach.boucle.iteration==1 }class="active" {/if}>
+            <li {if $smarty.foreach.boucle.iteration==1 }class="active"{/if}>
+                <a href="#{$libelle|replace:' ':'_'}" data-toggle="tab">
                     {$libelle} <span class="badge">{$listeDocs.coursGrp.$libelle|count}</span>
                 </a>
             </li>
             {/foreach}
         </ul>
 
-
-        <div id="my-tab-content" class="tab-content">
+        <div class="tab-content">
 
             {foreach from=$listeDocs.coursGrp key=libelle item=dataBranche name=boucle}
+                <div class="tab-pane{if $smarty.foreach.boucle.iteration == 1} active{/if}" id="{$libelle|replace:' ':'_'}">
 
-            <div class="tab-pane{if $smarty.foreach.boucle.iteration == 1} active{/if}" id="{$libelle|replace:' ':'_'}">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Commentaire</th>
+                                <th>Professeur</th>
+                            </tr>
+                        </thead>
 
-                <table class="table table-condensed">
-                    <thead>
+                        {foreach from=$dataBranche key=fileId item=dataDoc}
                         <tr>
-                            <th>Document</th>
-                            <th>Commentaire</th>
-                            <th>Professeur</th>
+                            <td>
+                                {if $dataDoc.dirOrFile == 'file'}
+                                <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
+                                <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$dataDoc.commentaire}">
+                                    <i class="fa fa-folder-open"></i> Dossier: {$dataDoc.commentaire|truncate:40}
+                                </button>
+                                {/if}
+                            </td>
+                            <td>{$dataDoc.commentaire}</td>
+                            <td>{if $dataDoc.sexe == 'F'}Mme{else}M.{/if} {$dataDoc.prenom|substr:0:1}. {$dataDoc.nom}</td>
                         </tr>
-                    </thead>
+                        {/foreach}
+                    </table>
 
-                    {foreach from=$dataBranche key=fileId item=dataDoc}
-                    <tr>
-                        <td>
-                            {if $dataDoc.dirOrFile == 'file'}
-                            <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
-                            <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$dataDoc.commentaire}">
-                                <i class="fa fa-folder-open"></i> Dossier: {$dataDoc.commentaire|truncate:40}
-                            </button>
-                            {/if}
-                        </td>
-                        <td>{$dataDoc.commentaire}</td>
-                        <td>{if $dataDoc.sexe == 'F'}Mme{else}M.{/if} {$dataDoc.prenom|substr:0:1}. {$dataDoc.nom}</td>
-                    </tr>
-                    {/foreach}
-                </table>
-
-            </div>
-
+                </div>
             {/foreach}
 
         </div>
 
-        {/if}
-        <!-- isset($listeDocs.coursGrp) -->
+        {/if}  {* isset($listeDocs.coursGrp) *}
 
     </div>
 

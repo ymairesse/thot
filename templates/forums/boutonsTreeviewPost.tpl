@@ -39,6 +39,7 @@
         </button>
         {/if}
 
+        {if $infoSujet.fbLike == 1}
         {* Boutons Like *}
         <span class="fbReactions" data-postid="{$postId}">
             <a class="FB_reactions"
@@ -60,6 +61,7 @@
                {include file="forums/statsFbLikes.tpl"}
 
         </span>
+        {/if}
 
      <span class="pull-right discret">{$post.ladate} - {$post.heure}</span>
 </div>

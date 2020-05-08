@@ -37,7 +37,8 @@ class user
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         switch ($userType) {
             case 'eleve':
-                $sql = "SELECT 'eleve' AS type, el.matricule, nom, prenom, classe, groupe, section, mailDomain, md5pwd ";
+                $sql = 'SELECT "eleve" AS type, el.matricule, nom, prenom, classe, groupe, section, ';
+                $sql .= 'mailDomain, md5pwd, user, CONCAT(user,"@",mailDomain) AS mail ';
                 $sql .= 'FROM '.PFX.'eleves AS el ';
                 $sql .= 'JOIN '.PFX.'passwd AS ppw ON ppw.matricule = el.matricule ';
                 $sql .= "WHERE ppw.user = '$userName' LIMIT 1 ";

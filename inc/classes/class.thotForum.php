@@ -62,8 +62,9 @@ class ThotForum
                 $cible = $ligne['cible'];
                 $libelle = $ligne['libelle'];
                 $idCategorie = $ligne['idCategorie'];
+                $idSujet = $ligne['idSujet'];
                 $ligne['nomProf'] = $this->nomProf($ligne['sexe'], $ligne['prenom'], $ligne['nom']);
-                $liste[$type][$cible][$idCategorie] = $ligne;
+                $liste[$type][$cible][$idCategorie][$idSujet] = $ligne;
             }
         }
 

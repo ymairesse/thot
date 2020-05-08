@@ -13,6 +13,7 @@ if ($userType == 'parent') {
 else $userName = Null;
 
 $smarty->assign('userName', $userName);
+$smarty->assign('identite', $User->getIdentite());
 $smarty->assign('matricule', $matricule);
 $smarty->assign('nom', $User->getNom());
 $smarty->assign('nomEleve', $User->getNomEleve());

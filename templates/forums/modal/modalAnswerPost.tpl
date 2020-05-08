@@ -1,4 +1,5 @@
 <div id="modalAnswerPost" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalAnswerPostLabel" aria-hidden="true">
+
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -14,8 +15,8 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <strong>{$postAncien.from} écrivait:</strong>
                 {if isset($postAncien.from)}
+                    <strong>{$postAncien.from} écrivait:</strong>
                     <div style="height:5em; overflow:auto; border: 1px solid #aaa; background-color: #eee; padding: 0.5em; margin-bottom :1em;">
                         {$postAncien.post}
                     </div>

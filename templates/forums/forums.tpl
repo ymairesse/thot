@@ -1,26 +1,34 @@
+
 <div class="row">
 
     <div class="col-md-3 col-xs-12" style="min-height:15em; overflow: auto;" id="listeSujets">
-
+        {* Pour chaque catégorie *}
         {foreach from=$listeTypes key=type item=nomDuType}
             {if isset($listeSujets.$type)}
-                <h3>{$nomDuType}</h3>
-                {foreach from=$listeSujets.$type key=wtf item=listeData}
-                    <h4>{$wtf}</h4>
-                    {foreach from=$listeData key=idCategorie item=dataSujet}
-                        <button type="button"
-                            class="btn btn-primary btn-block btn-{$type} btn-sujet pop"
-                            data-idcategorie="{$dataSujet.idCategorie}"
-                            data-idsujet="{$dataSujet.idSujet}"
-                            data-content="{$dataSujet.sujet}"
-                            data-container="body"
-                            data-placement="top"
-                            data-sujet="{$dataSujet.sujet}"
-                            data-title="{$dataSujet.libelle}"
-                            data-type="{$type}">
-                            <strong>[{$dataSujet.libelle}]<br></strong> {$dataSujet.sujet}<br>
-                        {$dataSujet.nomProf} Le {$dataSujet.ladate} à {$dataSujet.heure}
-                        </button>
+                <h3>Diffusé à {$nomDuType}</h3>
+                {foreach from=$listeSujets.$type key=groupeDiffusion item=listeData}
+                    <h4>Groupe {$groupeDiffusion}</h4>
+
+                    {foreach from=$listeData key=idCategorie item=dataSujets}
+
+                        {foreach from=$dataSujets key=idSujet item=leSujet}
+
+                            <button type="button"
+                                class="btn btn-primary btn-block btn-{$type} btn-sujet pop"
+                                data-idcategorie="{$leSujet.idCategorie}"
+                                data-idsujet="{$leSujet.idSujet}"
+                                data-content="{$leSujet.sujet}"
+                                data-container="body"
+                                data-placement="top"
+                                data-sujet="{$leSujet.sujet}"
+                                data-title="{$leSujet.libelle}"
+                                data-type="{$type}">
+                                <strong>[{$leSujet.libelle}]<br></strong> {$leSujet.sujet}<br>
+                            {$leSujet.nomProf} Le {$leSujet.ladate} à {$leSujet.heure}
+                            </button>
+
+                        {/foreach}
+                        
                     {/foreach}
 
                 {/foreach}
@@ -30,7 +38,7 @@
 
     </div>
 
-    <div class="col-md-9 col-sm-12">
+    <div class="col-md-9 col-xs-12">
 
         <div class="panel panel-info">
             <div class="panel-heading" id="libelle" data-defaulttext="Liste des contributions">
@@ -41,6 +49,7 @@
                     <button type="button" class="btn btn-info btn-xs" id="btn-date" disabled><i class="fa fa-calendar"></i> <span id="laDate">Date</span></button>
                 </div>
             </div>
+            <div class="clearfix"></div>
 
             <div id="listePosts" style="min-height:35em; overflow: auto;">
 

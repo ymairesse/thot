@@ -733,3 +733,13 @@ div.treeview ul:first-child:before, .treeviewPost ul:first-children:before {
     max-height:8em;
     overflow: auto;
 }
+
+.btn {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#modalLecture img {
+    margin: 0.5em;
+}
