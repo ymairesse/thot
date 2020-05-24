@@ -27,5 +27,5 @@ $smarty->assign('listeTypes', $listeTypes);
 
 $listeSujets = $Forum->getListeSujets4eleve($matricule, $classe, $niveau, $listeMatieres, $listeCoursGrp);
 $smarty->assign('listeSujets', $listeSujets);
-
+// Application::afficher($listeSujets);
 $smarty->assign('corpsPage', 'forums/forums');

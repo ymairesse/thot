@@ -199,7 +199,7 @@
                     case 'shared':
                         titre = '<i class="fa fa-user-circle-o"></i> Note partagée';
                         break;
-                    case 'personnal':
+                    case 'eleve':
                         titre = '<i class="fa fa-user fa-lg"></i> Note personnelle';
                         break;
                 }
