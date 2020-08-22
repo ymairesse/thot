@@ -1,31 +1,31 @@
 <?php
 
-$date = isset($_POST['date'])?$_POST['date']:Null;
-$acronyme = isset($_POST['acronyme'])?$_POST['acronyme']:Null;
-$periode = isset($_POST['periode'])?$_POST['periode']:Null;
+$idRP = isset($_POST['idRP']) ? $_POST['idRP'] : Null;
+$acronyme = isset($_POST['acronyme']) ? $_POST['acronyme'] : Null;
+$periode = isset($_POST['periode']) ? $_POST['periode'] : Null;
 
 if (($periode < 1) || ($periode > 3))
     die("Cette période $periode n'existe pas");
 if (!($Application->profExiste($acronyme)))
-    die("Ce prof n'existe pas");
+    die("Ce professeur n'existe pas");
 
 $identite = $User->getIdentite();
 
 $matricule = $identite['matricule'];
 $userName = $identite['userName'];
 
-if ($date != Null) {
+if ($idRP != Null) {
     // la liste des dates possibles
     $listeDates = $Application->listeDatesReunion();
-    if (in_array($date, $listeDates)) {
+    if (in_array($idRP, array_keys($listeDates))) {
         // rechercher les informations sur la RP
-        $infoRp = $Application->getInfoRp($date);
+        $infoRP = $Application->getInfoRp($idRP);
         // la RP est-elle ouverte?
-        if ($infoRp['generalites']['ouvert'] == 1) {
+        if ($infoRP['generalites']['ouvert'] == 1) {
             // la date est-elle compatible avec l'id
-            if ($Application->validDate($date)) {
+            if ($Application->validDate($idRP)) {
 
-                $resultat = $Application->setListeAttenteEleve($userName, $matricule, $acronyme, $date, $periode);
+                $resultat = $Application->setListeAttenteEleve($userName, $matricule, $acronyme, $idRP, $periode);
                 if ($resultat == 1) {
                     $texteMessage = "<i class='fa fa-warning fa-thumbs-up fa-2x'></i> Votre inscription en liste d'attente est enregistrée";
                     $niveau = 'success';

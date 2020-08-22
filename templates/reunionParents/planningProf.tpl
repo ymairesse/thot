@@ -1,4 +1,3 @@
-
 <table class="table table-condensed">
     <thead>
         <tr>
@@ -7,13 +6,13 @@
         </tr>
     </thead>
     <tbody>
-    {foreach from=$planningProf key=id item=unRV}
+    {foreach from=$planningProf key=idRV item=unRV}
         <tr{if $unRV.dispo == 0} class="indisponible"{/if}>
             <td>{$unRV.heure}</td>
             <td style="text-align:center">{if $unRV.dispo == 1}
                 <input type="radio"
-                name="rv"
-                value="{$id}"
+                name="idRV"
+                value="{$idRV}"
                 class="radioRv" required>
                 {else}
                 indisponible

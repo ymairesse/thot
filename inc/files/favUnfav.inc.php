@@ -11,21 +11,16 @@ if (!(isset($_SESSION[APPLICATION]))) {
     exit;
 }
 
-// définition de la class USER utilisée en variable de SESSION
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
+
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : null;
+$shareId = isset($_POST['shareId']) ? $_POST['shareId'] : null;
 
-if ($Files->verifEleve4Travail($matricule, $idTravail)) {
-    $details = $Files->getDetailsTravail($idTravail, $matricule);
-    $acronyme = $details['acronyme'];
-    $fileInfos = $Files->getFileInfos($matricule, $idTravail, $acronyme);
-    $fileName = $fileInfos['fileName'];
-    $size = $fileInfos['size'];
-    echo json_encode(array('fileName' => $fileName, 'size' => $size));
-}
+$fav = $Files->favUnfav($shareId, $matricule);
+
+echo $fav;

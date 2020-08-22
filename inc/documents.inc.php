@@ -18,7 +18,12 @@ $listeDocs = $Files->listeElevesShares($matricule, $classe, $niveau, $listeCours
 if (isset($listeDocs['coursGrp']))
     $listeDocs['coursGrp'] = $Files->sortByCours($listeDocs['coursGrp']);
 
+$listeFavoris = $Files->getListeFavs($matricule);
+// Application::afficher($listeFavoris);
+
 $smarty->assign('matricule', $matricule);
 $smarty->assign('listeDocs', $listeDocs);
+$smarty->assign('listeFavoris', $listeFavoris);
+
 
 $smarty->assign('corpsPage', 'documents');

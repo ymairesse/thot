@@ -12,18 +12,14 @@ if (!(isset($_SESSION[APPLICATION]))) {
 }
 
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
-$User = unserialize($_SESSION[APPLICATION]);
+$User = unserialize($_SESSION['THOT']);
+
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$idTravail = $Application->postOrCookie('idTravail');
-
-// détails du travail et liste des fichiers déposés
-$detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
-$listeCotes = $Files->getCotesTravail($idTravail, $matricule);
-$totalTravail = $Files->totalisation($listeCotes);
+$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : null;
 
 require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
 $smarty = new Smarty();
@@ -31,8 +27,4 @@ $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
 $smarty->assign('idTravail', $idTravail);
-$smarty->assign('detailsTravail', $detailsTravail);
-$smarty->assign('listeCotes', $listeCotes);
-$smarty->assign('totalTravail', $totalTravail);
-
-$smarty->display('casiers/detailsUpload.inc.tpl');
+$smarty->display('casiers/modal/modalCasier.tpl');

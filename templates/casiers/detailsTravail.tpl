@@ -10,7 +10,7 @@
         <h3>Consignes [{$detailsTravail.titre}]</h3>
         <div class="panel panel-info">
             <div class="panel-body">
-                <div id="blocConsignes" class="form-control-static texte">
+                <div id="blocConsignes" class="form-control-static texte" style="max-height:15em; overflow:auto;">
                     {$detailsTravail.consigne}
                 </div>
             </div>
@@ -22,15 +22,19 @@
         <div class="panel panel-success">
             <div class="panel-body">
                 <div class="col-md-9 col-xs-12">
-                    <div id="fileInfos">
+                    <div id="casier">
+
                         {include file='casiers/detailsUpload.inc.tpl'}
+
                     </div>
                 </div>
 
                 <div class="col-md-3 col-xs-12">
                     {* bouton dépôt ou pas? *}
-                    {if $detailsTravail.fileInfos.fileName == '' && $detailsTravail.statut == 'readwrite'}
-                      <button type="button" class="btn btn-success btn-lg btn-block" id="callDropZone"><i class="fa fa-envelope-o fa-2x" style="float:left"></i> Déposer <br>mon travail</button>
+                    {if ($detailsTravail.statut == 'readwrite') && ($detailsTravail.fileInfos|@count) < $detailsTravail['nbPJ']}
+                      <button type="button" class="btn btn-success btn-lg btn-block" id="callDropZone"><i class="fa fa-envelope-o fa-2x" style="float:left"></i> Déposer <br>un document (max {$detailsTravail.nbPJ})</button>
+                      {else}
+                      <p class="bg-danger">Le nombre maximum de documents joints à ce travail est atteint</p>
                     {/if}
                 </div>
 

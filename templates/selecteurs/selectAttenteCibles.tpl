@@ -1,7 +1,7 @@
-<select id="selectRV" name="selectRV" class="form-control">
+<select id="selectAttente" name="selectAttente" class="form-control">
     
     <option value="">Sélectionner un enseignant</option>
-    {foreach from=$listeEncadrement key=acronyme item=data}
+    {foreach from=$listeProfs key=acronyme item=data}
         <option
             value="{$acronyme}"
             data-nomprof="{$data.nom} {$data.prenom}">

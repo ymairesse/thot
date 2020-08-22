@@ -13,18 +13,25 @@
                 </tr>
             </thead>
             <tbody>
-                {foreach from=$listeAttente item=data}
+                {foreach from=$listeAttente key=n item=data}
                 {assign var=periode value=$data.periode}
-                <tr class="attente{$periode}">
+                <tr class="attente{$periode}" data-acronyme="{$data.acronyme}" data-periode="{$periode}">
                     <td>{$listePeriodes.$periode.min} à {$listePeriodes.$periode.max}</td>
-                    {assign var=acronyme value=$data.acronyme} {assign var=sexe value=$listeEncadrement.$acronyme.sexe}
-                    <td>{if $sexe == 'F'}Mme{else}M.{/if} {$listeEncadrement.$acronyme.prenom} {$listeEncadrement.$acronyme.nom}</td>
+                    {assign var=acronyme value=$data.acronyme}
+                    {assign var=sexe value=$data.sexe}
+
+                    <td>{if $sexe == 'F'}Mme{else}M.{/if} {$data.prenomProf} {$data.nomProf}</td>
                     <td>{$data.formule} {$data.prenomParent} {$data.nomParent}</td>
                     <td>
-                        {if ($ACTIVE == 1) && ($OUVERT == 1)}
-                        <button type="button" class="btn btn-danger btn-xs delAttente" data-nomprof="{if $sexe == 'F'}Mme{else}M.{/if} {$listeEncadrement.$acronyme.prenom} {$listeEncadrement.$acronyme.nom}" data-acronyme="{$acronyme}" data-periode="{$periode}" data-heures="{$listePeriodes.$periode.min} à {$listePeriodes.$periode.max}"
+
+                        <button type="button"
+                            class="btn btn-danger btn-xs delAttente"
+                            data-nomprof="{if $sexe == 'F'}Mme{else}M.{/if} {$data.prenomProf} {$data.nomProf}"
+                            data-acronyme="{$acronyme}"
+                            data-periode="{$periode}"
+                            data-heures="{$listePeriodes.$periode.min} à {$listePeriodes.$periode.max}"
                             title="Effacer"><i class="fa fa-undo"></i></button>
-                        {else} &nbsp; {/if}
+
                     </td>
                 </tr>
                 {/foreach}

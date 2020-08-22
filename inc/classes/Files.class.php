@@ -207,12 +207,13 @@ class Files
     public function listeElevesShares($matricule, $classe, $niveau, $listeCoursString)
     {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'SELECT files.fileId, shareId, type, groupe, destinataire, commentaire, path, fileName, ';
-        $sql .= 'files.acronyme, nom, prenom, sexe, libelle, dirOrFile ';
+        $sql = 'SELECT files.fileId, share.shareId, type, groupe, destinataire, commentaire, path, fileName, ';
+        $sql .= 'files.acronyme, nom, prenom, sexe, libelle, dirOrFile, fav.matricule AS fav ';
         $sql .= 'FROM '.PFX.'thotShares AS share ';
         $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = share.fileId ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = files.acronyme ';
-        $sql .= 'LEFT JOIN didac_cours AS dc ON SUBSTR(share.groupe, 1, LOCATE("-",share.groupe)-1) = dc.cours ';
+        $sql .= 'LEFT JOIN '.PFX.'cours AS dc ON SUBSTR(share.groupe, 1, LOCATE("-",share.groupe)-1) = dc.cours ';
+        $sql .= 'LEFT JOIN '.PFX.'thotSharesFav AS fav ON fav.shareId = share.shareId ';
         $sql .= "WHERE destinataire = :matricule ";
         $sql .= "OR (groupe = :classe AND destinataire = 'all') ";
         $sql .= "OR groupe IN ($listeCoursString) AND (destinataire = 'all') ";
@@ -289,7 +290,7 @@ class Files
         $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
         $requete->bindParam(':classe', $classe, PDO::PARAM_STR, 6);
         $requete->bindParam(':niveau', $niveau, PDO::PARAM_INT);
-// Application::afficher(array($matricule, $classe, $niveau), true);
+
         $resultat = $requete->execute();
         $liste = array();
         if ($resultat) {
@@ -425,7 +426,7 @@ class Files
                 $coursGrp = $ligne['coursGrp'];
                 $idTravail = $ligne['idTravail'];
                 $acronyme = $ligne['acronyme'];
-                $fileInfos = $this->getFileInfos($matricule, $idTravail, $acronyme);
+                $fileInfos = $this->getMultiFileInfos($matricule, $idTravail, $acronyme);
                 $ligne['dateDebut'] = Application::datePHP($ligne['dateDebut']);
                 $ligne['dateFin'] = Application::datePHP($ligne['dateFin']);
                 $ligne['fileInfos'] = $fileInfos;
@@ -595,28 +596,54 @@ class Files
      *
      * @return array
      */
-    public function getFileInfos($matricule, $idTravail, $acronyme)
+    public function getFileInfos($matricule, $idTravail, $fileName, $acronyme)
     {
         $ds = DIRECTORY_SEPARATOR;
         $dir = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule;
-        $infos = array('fileName' => null, 'size' => '', 'dateRemise' => '');
+        $infos = array('fileName' => Null, 'size' => '', 'dateRemise' => '');
         $files = @scandir($dir);
-        // ce répertoire est-il défini?
-        if ($files != null) {
-            $files = array_diff($files, array('..', '.'));
-            // le premier fichier significatif est le numéro 2 (.. et . ont été supprimés)
-            if (isset($files[2])) {
-                $file = $files[2];
-                $infos = array(
-                    'fileName' => $file,
-                    'size' => $this->unitFilesize(filesize($dir.'/'.$file)),
-                    'dateRemise' => strftime('%x %X', filemtime($dir.'/'.$file)),
-                );
-            }
+        // Le fichier existe-t-il dans ce répertoire?
+        if (in_array($fileName, $files)) {
+            $infos = array(
+                'fileName' => $fileName,
+                'size' => $this->unitFilesize(filesize($dir.'/'.$fileName)),
+                'dateRemise' => strftime('%x %X', filemtime($dir.'/'.$fileName)),
+            );
         }
 
         return $infos;
     }
+
+    /**
+    * recherche les détails relatifs à tous les fichiers déposés
+    * par l'élève $matricule pour un $idTravail donné.
+    *
+    * @param $matricule
+    * @param $idTravail
+    *
+    * @return array
+    */
+   public function getMultiFileInfos($matricule, $idTravail, $acronyme) {
+       $ds = DIRECTORY_SEPARATOR;
+       $dir = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule;
+       $infos = array('fileName' => null, 'size' => '', 'dateRemise' => '');
+       $files = @scandir($dir);
+       // ce répertoire est-il défini?
+       if ($files != Null) {
+           $listeInfos = array();
+           $files = array_diff($files, array('..', '.'));
+           foreach ($files as $oneFile) {
+               $detailOneFile = array(
+                   'fileName' => $oneFile,
+                   'size' => $this->unitFilesize(filesize($dir.'/'.$oneFile)),
+                   'dateRemise' => strftime('%x %X', filemtime($dir.'/'.$oneFile)),
+               );
+               $listeInfos[] = $detailOneFile;
+           }
+       }
+
+       return $listeInfos;
+   }
 
     /**
      * convertit les tailles de fichiers en valeurs usuelles avec les unités.
@@ -665,7 +692,7 @@ class Files
                 $acronyme = $ligne['acronyme'];
                 $ligne['dateDebut'] = Application::datePHP($ligne['dateDebut']);
                 $ligne['dateFin'] = Application::datePHP($ligne['dateFin']);
-                $ligne['fileInfo'] = $this->getFileInfos($matricule, $idTravail, $acronyme);
+                $ligne['fileInfo'] = $this->getMultiFileInfos($matricule, $idTravail, $acronyme);
                 $liste[$idTravail] = $ligne;
             }
         }
@@ -678,34 +705,39 @@ class Files
     /**
      * retourne les détails d'un travail dont on fournit l'idTravail et le matricule de l'élève.
      *
-     * @param $idTravail
-     * @param $matricule
+     * @param int $idTravail
+     * @param int $matricule
      *
      * @return array
      */
-    public function getDetailsTravail($idTravail, $matricule)
-    {
+    public function getDetailsTravail($idTravail, $matricule) {
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT tt.idTravail, tt.acronyme, nom, prenom, coursGrp, tt.titre, consigne, dateDebut, dateFin, tt.statut, ';
-        $sql .= 'tr.remis, cote, max, evaluation, remarque, libelle, nbheures ';
+        $sql .= 'tr.remis, cote, max, evaluation, remarque, libelle, nbheures, nbPJ ';
         $sql .= 'FROM '.PFX.'thotTravaux AS tt ';
         $sql .= 'JOIN '.PFX.'thotTravauxRemis AS tr ON tt.idTravail = tr.idTravail ';
         $sql .= 'JOIN '.PFX.'profs AS dp ON dp.acronyme = tt.acronyme ';
         $sql .= 'JOIN '.PFX."cours AS dc ON (dc.cours = SUBSTR(coursGrp, 1, LOCATE('-', coursGrp)-1)) ";
         $sql .= 'WHERE tt.idTravail=:idTravail AND matricule=:matricule ';
         $requete = $connexion->prepare($sql);
-        $data = array(':idTravail' => $idTravail, ':matricule' => $matricule);
+
+        $requete->bindParam(':idTravail', $idTravail, PDO::PARAM_INT);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
         $details = array();
-        $resultat = $requete->execute($data);
+        $resultat = $requete->execute();
         if ($resultat) {
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             $details = $requete->fetch();
-            $acronyme = $details['acronyme'];
-            $details['dateDebut'] = Application::datePHP($details['dateDebut']);
-            $details['dateFin'] = Application::datePHP($details['dateFin']);
-            $fileInfos = $this->getFileInfos($matricule, $idTravail, $acronyme);
+            if ($details != Null) {
+                $acronyme = $details['acronyme'];
+                $details['dateDebut'] = Application::datePHP($details['dateDebut']);
+                $details['dateFin'] = Application::datePHP($details['dateFin']);
 
-            $details['fileInfos'] = $fileInfos;
+                $fileInfos = $this->getMultiFileInfos($matricule, $idTravail, $acronyme);
+
+                $details['fileInfos'] = $fileInfos;
+            }
         }
 
         Application::DeconnexionPDO($connexion);
@@ -889,15 +921,246 @@ class Files
     }
 
     /**
-     * Supprime un fichier correspondant à un travail $idTravail appartenant à l'élève $matricule.
+     * met en favori ou supprime le statut de favori pour le fichier $shareId
+     * de l'élève $matricule
      *
-     * @param $idTravail
-     * @param $matricule
+     * @param int $shareId : shareid du fichier
+     * @param int $matricle : matricule de l'élève
      *
-     * @return int : nombre de fichiers supprimés
+     * @return bool : true si favori marqué, false si favori retiré
      */
-    public function delTravailFile($acronyme, $idTravail, $matricule, $fileName)
-    {
-        Application::afficher(array($acronyme, $idTravail, $matricule, $fileName));
+    public function favUnfav($shareId, $matricule){
+        // recherche du statut actuel
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT matricule, shareId ';
+        $sql .= 'FROM '.PFX.'thotSharesFav ';
+        $sql .= 'WHERE shareId = :shareId AND matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':shareId', $shareId, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+        if ($resultat){
+            $ligne = $requete->fetch();
+            $temp = $ligne['shareId'];
+        }
+        // si la valeur retournée est bien $shareId, l'enregistrement existe
+        if ($temp == $shareId){
+            // alors on le supprime
+            $sql = 'DELETE FROM '.PFX.'thotSharesFav ';
+            $sql .= 'WHERE shareId = :shareId AND matricule = :matricule ';
+            $requete = $connexion->prepare($sql);
+            }
+            else {
+                // sinon, on l'ajoute
+                $sql = 'INSERT INTO '.PFX.'thotSharesFav ';
+                $sql .= 'SET shareId = :shareId, matricule = :matricule ';
+                $requete = $connexion->prepare($sql);
+            }
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':shareId', $shareId, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+
+        Application::DeconnexionPDO($connexion);
+
+        return ($temp == $shareId);
     }
+
+    /**
+     * retourne les informations détaillées sur un cours/groupe donné ou le cours correspondant
+     * s'il s'agit d'un coursGrp, on ne prend que la partie avant le "-".
+     *
+     * @param string $coursGrp/$cours
+     *
+     * @return array
+     */
+    public function detailsCours($coursGrp)
+    {
+        $pattern = '/([0-9])( {0,1}[A-Z]*):([A-Z]*)[0-9a-z]*/';
+        $ligne = array();
+
+        if (preg_match($pattern, $coursGrp, $matches)) {
+            $cours = $matches[0];
+            $annee = $matches[1];
+            $forme = $matches[2];
+            $code = $matches[3];
+
+            $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+            $sql = 'SELECT cours, nbheures, libelle, statut, c.cadre, section ';
+            $sql .= 'FROM '.PFX.'cours AS c ';
+            $sql .= 'JOIN '.PFX.'statutCours ON ('.PFX.'statutCours.cadre = c.cadre) ';
+            $sql .= 'WHERE cours = :cours ';
+            $requete = $connexion->prepare($sql);
+
+            $requete->bindParam(':cours', $cours, PDO::PARAM_STR, 17);
+
+            $ligne = array();
+            $resultat = $requete->execute();
+            if ($resultat) {
+                $requete->setFetchMode(PDO::FETCH_ASSOC);
+                $ligne = $requete->fetch();
+                $ligne['forme'] = $forme;
+                $ligne['annee'] = $annee;
+                $ligne['code'] = $code;
+            }
+            Application::DeconnexionPDO($connexion);
+        }
+
+        return $ligne;
+    }
+
+    /**
+     * retourne les détails concernant la matière $cours indiquée (ne pas confondre avec coursGrp)
+     *
+     * @param string $cours
+     *
+     * @return array
+     */
+    public function getDetailsMatiere($cours){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT cours, nbheures, libelle, statut, c.cadre, section ';
+        $sql .= 'FROM '.PFX.'cours AS c ';
+        $sql .= 'JOIN '.PFX.'statutCours AS statut ON (statut.cadre = c.cadre) ';
+        $sql .= 'WHERE cours = :cours ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':cours', $cours, PDO::PARAM_STR, 17);
+
+        $details = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $details = $requete->fetch();
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $details;
+    }
+
+    /**
+     * retourne les informations essentielles concernant un élève: nom, prenom, classe
+     *
+     * @param int $matricule
+     *
+     * @return array
+     */
+    public function getMinDetailsEleve($matricule){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT matricule, nom, prenom, classe, groupe ';
+        $sql .= 'FROM '.PFX.'eleves ';
+        $sql .= 'WHERE matricule = :matricule ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $npc = array();
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $npc = $requete->fetch();
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $npc;
+    }
+
+    /**
+     * retrouve le véritable destinataire d'une notification dont on fournit
+     * le $type et le $destinataire pour la notification donnée
+     *
+     * @param string $type
+     * @param string $destinataire
+     * @param array $uneNotification
+     *
+     * @return string
+     */
+    public function getTrueDestinataire($type, $destinataire){
+        switch ($type) {
+            case 'ecole':
+                $destinataire = 'Tous les élèves';
+                break;
+            case 'niveau':
+                $niveau = $destinataire;
+                $destinataire = sprintf('Élèves de %de année', $niveau);
+                break;
+            case 'classes':
+                $classe = $destinataire;
+                $destinataire = sprintf('Élèves de %s', $classe);
+                break;
+            case 'cours':
+                $cours = $destinataire;
+                $details = $this->getDetailsMatiere($cours);
+                $destinataire = sprintf('[%s] %s %dh', $details['cours'], $details['libelle'], $details['nbheures']);
+                break;
+            case 'coursGrp':
+                $coursGrp = $destinataire;
+                $details = $this->detailsCours($coursGrp);
+                if ($details != Null)
+                    $destinataire = sprintf('[%s] %s %s %dh', $coursGrp, $details['statut'], $details['libelle'], $details['nbheures']);
+                    else $destinataire = Null;
+                break;
+            case 'groupe':
+                $groupe = $destinataire;
+                $details = $this->getData4groupe($groupe);
+                $destinataire = sprintf('[%s] %s', $groupe, $details['intitule']);
+                break;
+            case 'eleves':
+                $matricule = $destinataire;
+                $details = $this->getMinDetailsEleve($matricule);
+                $destinataire = sprintf('%s %s %s', $details['nom'], $details['prenom'], $details['classe']);
+                break;
+        }
+
+        return $destinataire;
+    }
+
+    /**
+     * retourne la liste des favoris pour l'élève $matricule
+     *
+     * @param int $matricule
+     *
+     * @return array
+     */
+    public function getListeFavs($matricule){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT fav.shareId, fav.matricule, shares.fileId, dirOrFile, ';
+        $sql .= 'files.acronyme, sexe, nom, prenom, commentaire, type, groupe, destinataire, ';
+        $sql .= 'path, fileName, dirOrFile ';
+        $sql .= 'FROM '.PFX.'thotSharesFav AS fav ';
+        $sql .= 'JOIN '.PFX.'thotShares AS shares ON shares.shareId = fav.shareId ';
+        $sql .= 'JOIN '.PFX.'thotFiles AS files ON files.fileId = shares.fileId ';
+        $sql .= 'LEFT JOIN '.PFX.'profs AS profs ON profs.acronyme = files.acronyme ';
+        $sql .= 'WHERE fav.matricule = :matricule ';
+        $sql .= 'ORDER BY type, groupe, destinataire ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $resultat = $requete->execute();
+
+        $liste = array();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            while ($ligne = $requete->fetch()) {
+                // Application::afficher($ligne);
+                $shareId = $ligne['shareId'];
+                if ($ligne['nom'] != Null) {
+                    $formule = ($ligne['sexe'] == 'F') ? 'Mme' : 'M.';
+                    $ligne['nomProf'] = sprintf('%s %s. %s', $formule, $ligne['prenom'][0], $ligne['nom']);
+                }
+                else $ligne['nomProf'] = $ligne['acronyme'];
+                $liste[$shareId] = $ligne;
+                }
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $liste;
+    }
+
 }

@@ -19,11 +19,10 @@ $matricule = $User->getMatricule();
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : null;
+$idTravail = isset($_POST['idTravail']) ? $_POST['idTravail'] : Null;
+$fileName = isset($_POST['fileName']) ? $_POST['fileName'] : Null;
+
 $dataTravail = $Files->getDetailsTravail($idTravail, $matricule);
-
-
-$fileName = $dataTravail['fileInfos']['fileName'];
 $acronyme = $dataTravail['acronyme'];
 
 $ds = DIRECTORY_SEPARATOR;
@@ -31,8 +30,6 @@ $ds = DIRECTORY_SEPARATOR;
 $path = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule.$ds.$fileName;
 
 if (@unlink($path)) {
-    $dataTravail = $Files->getDetailsTravail($idTravail, $matricule);
-    $Files->travailRemis($idTravail, $matricule, false);
     echo $idTravail;
     }
     else echo -1;

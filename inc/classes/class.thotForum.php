@@ -6,6 +6,8 @@
 class ThotForum
 {
 
+    CONST acceptedTags = "<a><b><i><u><span><iframe><img><div><table><tbody><tr><td><ul><li><br><p><strike><pre><h1><h2><pre><blockquote><sub><sup>";
+
     function __construct()
     {
         // code...
@@ -38,13 +40,14 @@ class ThotForum
 
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
         $sql = 'SELECT access.idCategorie, access.idSujet, type, cible, libelle, forums.parentId, ';
-        $sql .= 'sujet, sujets.acronyme, dateCreation, modifParEleve, modifParAuteur, sexe, nom, prenom, ';
+        $sql .= 'sujet, sujets.acronyme, dateCreation, modifParEleve, modifParAuteur, sexe, nom, prenom, forumActif, ';
         $sql .= 'DATE_FORMAT(dateCreation, "%d/%m/%Y") AS ladate, DATE_FORMAT(dateCreation, "%H:%i") AS heure ';
         $sql .= 'FROM '.PFX.'thotForumsAccess AS access ';
         $sql .= 'JOIN '.PFX.'thotForums AS forums ON forums.idCategorie = access.idCategorie ';
         $sql .= 'JOIN '.PFX.'thotForumsSujets AS sujets ON sujets.idCategorie = access.idCategorie AND sujets.idSujet = access.idSujet ';
         $sql .= 'LEFT JOIN '.PFX.'profs AS dp ON dp.acronyme = sujets.acronyme ';
         $sql .= 'WHERE userStatus = "eleves" AND cible IN ("all", :matricule, :classe, :niveau, '.$listeMatieresString.','.$listeCoursGrpString.') ';
+        $sql .= 'AND forumActif = 1 ';
         $sql .= 'ORDER BY cible ';
 
         $requete = $connexion->prepare($sql);
@@ -310,7 +313,7 @@ class ThotForum
             $requete->setFetchMode(PDO::FETCH_ASSOC);
             $ligne = $requete->fetch();
             if ($ligne) {
-                $ligne['post'] = strip_tags($ligne['post'],'<a><b><u><span><iframe><img><table><tbody><tr><td><ul><li><br><p><strike>');
+                $ligne['post'] = strip_tags($ligne['post'], self::acceptedTags);
                 $ligne['post'] = nl2br($ligne['post']);
 
                 $userStatus = $ligne['userStatus'];
@@ -567,7 +570,8 @@ class ThotForum
             while ($ligne = $requete->fetch()){
                 $postId = $ligne['postId'];
 
-                $ligne['post'] = strip_tags($ligne['post'],'<a><b><u><span><iframe><img><table><tbody><tr><td><ul><li><br><p><strike>');
+                $ligne['post'] = strip_tags($ligne['post'], self::acceptedTags);
+                // $ligne['post'] = strip_tags($ligne['post'],'<a><b><u><span><iframe><img><table><tbody><tr><td><ul><li><br><p><strike>');
                 $ligne['post'] = nl2br($ligne['post']);
 
                 if ($ligne['userStatus'] == 'prof') {
@@ -765,6 +769,73 @@ public function getListeSujets4categorie($idCategorie, $matricule, $classe, $niv
     }
 
     /**
+     * Vérifie si le post $postId du sujet $idSujet et $idCategorie a des enfants
+     *  (auquel cas, il peut être supprimé)
+     *
+     * @param int $idCategorie
+     * @param int $idSujet
+     * @param int $postId
+     *
+     * @return bool
+     */
+    public function hasChildren($idCategorie, $idSujet, $postId){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT idCategorie, idSujet, postId ';
+        $sql .= 'FROM '.PFX.'thotForumsPosts ';
+        $sql .= 'WHERE idCategorie = :idCategorie AND idSujet = :idSujet AND parentId = :postId ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+        $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+        $requete->bindParam(':postId', $postId, PDO::PARAM_INT);
+
+        $ligne = Null;
+        $resultat = $requete->execute();
+        if ($resultat){
+            $requete->setFetchMode(PDO::FETCH_ASSOC);
+            $ligne = $requete->fetch();
+        }
+
+        Application::DeconnexionPDO($connexion);
+
+        return $ligne != Null;
+    }
+
+    /**
+     * Efface le contenu du post $postId de l'utilisateur $matricule pour le sujet
+     * $idSujet de la catégorie $idCategorie
+     *
+     * @param int $matricule
+     * @param int $postId
+     * @param int $idSujet
+     * @param int $idCategorie
+     *
+     * @return int : nombre d'effacements (0 ou 1)
+     */
+    public function clearPost($matricule, $postId, $idSujet, $idCategorie){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'UPDATE '.PFX.'thotForumsPosts ';
+        $sql .= 'SET post = NULL ';
+        $sql .= 'WHERE postId = :postId AND idCategorie = :idCategorie AND idSujet = :idSujet AND auteur = :matricule ';
+        $sql .= 'AND userStatus = "eleve" ';
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+        $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
+        $requete->bindParam(':postId', $postId, PDO::PARAM_INT);
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+
+        $ligne = Null;
+        $resultat = $requete->execute();
+
+        $nb = $requete->rowcount();
+
+        Application::DeconnexionPDO($connexion);
+
+        return $nb;
+    }
+
+    /**
      * Efface le contenu du post $postId de l'utilisateur $matricule pour le sujet
      * $idSujet de la catégorie $idCategorie
      *
@@ -777,8 +848,7 @@ public function getListeSujets4categorie($idCategorie, $matricule, $classe, $niv
      */
     public function delPost($matricule, $postId, $idSujet, $idCategorie){
         $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
-        $sql = 'UPDATE '.PFX.'thotForumsPosts ';
-        $sql .= 'SET post = NULL ';
+        $sql = 'DELETE FROM '.PFX.'thotForumsPosts ';
         $sql .= 'WHERE postId = :postId AND idCategorie = :idCategorie AND idSujet = :idSujet AND auteur = :matricule ';
         $sql .= 'AND userStatus = "eleve" ';
         $requete = $connexion->prepare($sql);
@@ -1002,11 +1072,11 @@ public function getListeSujets4categorie($idCategorie, $matricule, $classe, $niv
         $sql .= 'WHERE likes.idCategorie = :idCategorie AND likes.idSujet = :idSujet AND likes.postId = :postId ';
         $sql .= 'ORDER BY likelevel, nomEleve, nomProf ';
         $requete = $connexion->prepare($sql);
-// echo $sql;
+
         $requete->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
         $requete->bindParam(':idSujet', $idSujet, PDO::PARAM_INT);
         $requete->bindParam(':postId', $postId, PDO::PARAM_INT);
-// Application::afficher(array($idCategorie, $idSujet, $postId));
+
         $liste = array();
         $resultat = $requete->execute();
         if ($resultat){

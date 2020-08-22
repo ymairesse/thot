@@ -2549,6 +2549,44 @@ class Bulletin
     }
 
     /**
+     * renvoie les informations de remarques sur le parcours scolaire pour un élève
+     * dont on founit le matricule pour l'année d'étude en cours (si précisé)
+     * ou pour toutes les années scolaires
+     *
+     * @param int $matricule
+     * @param int Null | $anScol : année scolaire en cours ou rien
+     *
+     * @return array : pour chaque année scolaire, la notice "parcours"
+     */
+    public function getNoticesParcours($matricule, $annee){
+        $connexion = Application::connectPDO(SERVEUR, BASE, NOM, MDP);
+        $sql = 'SELECT parcours, annee ';
+        $sql .= 'FROM '.PFX.'bullParcours ';
+        $sql .= 'WHERE matricule = :matricule ';
+        if ($annee != Null) {
+            $sql .= 'AND annee = :annee ';
+            $sql .= 'ORDER BY annee DESC ';
+        }
+        $requete = $connexion->prepare($sql);
+
+        $requete->bindParam(':matricule', $matricule, PDO::PARAM_INT);
+        $requete->bindParam(':annee', $annee, PDO::PARAM_INT);
+
+        $liste = array();
+        $resultat = $requete->execute();
+        if ($resultat) {
+            while ($ligne = $requete->fetch()) {
+                $annee = $ligne['annee'];
+                $liste[$annee] = $ligne['parcours'];
+            }
+        }
+
+        Application::deconnexionPDO($connexion);
+
+        return $liste;
+    }
+
+    /**
      * création d'une image d'un texte sur base des paramètres.
      *
      * @param $largeur

@@ -16,15 +16,19 @@
                 <div class="modal-footer">
                     <div class="btn-group pull-right">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                        <button type="button"
+                            id="confDelAttente"
+                            data-idrp=""
+                            date-acronyme=""
+                            date-periode=""
+                            class="btn btn-danger">
+                            Confirmer
+                        </button>
                     </div>
                 </div>
             </div>
-            <input type="hidden" name="date" value="{$date}">
-            <input type="hidden" name="acronyme" id="modalAcronymeAttente" value="">
-            <input type="hidden" name="periode" id="modalPeriode" value="">
-            <input type="hidden" name="action" value="{$action}">
-            <input type="hidden" name="mode" value="delAttente">
+
+
         </form>
     </div>
 </div>

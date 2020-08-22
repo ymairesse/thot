@@ -14,14 +14,16 @@ $userName = $identiteParent['userName'];
 $matricule = $identiteParent['matricule'];
 $identiteEleve = $Application->listeElevesMatricules($matricule)[$matricule];
 
-$date = isset($_POST['date'])?$_POST['date']:Null;
-$module = isset($_POST['module'])?$_POST['module']:Null;
+$idRP = isset($_POST['idRP'])?$_POST['idRP']:Null;
+// $module = isset($_POST['module'])?$_POST['module']:Null;
 
-$listeRV = $Application->getRVeleve($matricule, $date);
-$listeAttente = $Application->getListeAttenteEleve($matricule, $date);
+$listeRV = $Application->getRVeleve($matricule, $idRP);
+$listeAttente = $Application->getListeAttenteEleve($matricule, $idRP);
 $listeProfs = $Application->listeProfsCoursEleve($matricule);
-$listePeriodes = $Application->getListePeriodes($date);
+$listePeriodes = $Application->getListePeriodes($idRP);
 $listeEducs = $User->getEducsEleve();
+$infoRP = $Application->getInfoRp($idRP);
+$date = $Application::datePHP($infoRP['date']);
 
 require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
 $smarty = new Smarty();

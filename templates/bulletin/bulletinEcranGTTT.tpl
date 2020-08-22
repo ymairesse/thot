@@ -153,7 +153,6 @@
 	{/if}
 
 	{assign var=laMention value=$mention.$matricule.$ANNEESCOLAIRE.$annee.$bulletin|default:Null}
-	<div class="col-md-6 col-sm-12">
 
 		{if isset($laMention)}
 		<div class="alert alert-info">
@@ -161,46 +160,39 @@
 		</div>
 		{/if}
 
-		<table class="table table-condensed">
-			<thead>
-				<tr>
-					<th>
-						<h3>Avis du titulaire ou du Conseil de Classe</h3>
-					</th>
-				</tr>
-			</thead>
-			<tr>
-				<td>{$remTitu|default:'&nbsp;'}</td>
-			</tr>
-		</table>
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				Avis du titulaire ou du Conseil de Classe
+			</div>
+			<div class="panel-body">
+				{$remTitu|default:'&nbsp;'}
+			</div>
+		</div>
+
+		{if $noticeParcours != Null}
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				Avis sur le parcours scolaire
+			</div>
+			<div class="panel-body">
+				{$noticeParcours}
+			</div>
+		</div>
+		{/if}
 
 		{if isset($noticeDirection)}
-		<table class="table">
-			<tr>
-				<thead>
-					<th>
-						<h3>Informations de la direction et des coordinateurs</h3>
-					</th>
-				</thead>
-			</tr>
-			<tr>
-				<td>{$noticeDirection}</td>
-			</tr>
-		</table>
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				Informations de la direction et des coordinateurs
+			</div>
+			<div class="panel-body">
+				{$noticeDirection}
+			</div>
+		</div>
 		{/if}
-	</div>
 
 </div>
 <!-- row -->
 
 
 {/if} {* if $noBulletin *}
-
-
-<script type="text/javascript">
-	$(document).ready(function() {
-
-
-
-	})
-</script>

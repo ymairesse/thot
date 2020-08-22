@@ -32,6 +32,8 @@
 
     </div>
 
+<div id="modal"></div>
+
 
 {include file='casiers/modal/modalCasier.tpl'}
 
@@ -84,40 +86,41 @@ function eraseCookie(name) {
             $('#btn-archives').removeClass('hidden');
         })
 
-        $('#detailsTravail').on('click', '#btn-delFile', function(){
-            var idTravail = $('.btnShowTravail.active').data('idtravail');
-            $.post('inc/casiers/getFileName.inc.php', {
-                idTravail: idTravail
+        $('#detailsTravail').on('click', '.btn-delFile', function(){
+            var idTravail = $(this).data('idtravail');
+            var fileName = $(this).data('filename');
+            $.post('inc/casiers/verifFileName.inc.php', {
+                idTravail: idTravail,
+                fileName: fileName
             },
             function(resultat){
-                var obj = JSON.parse(resultat);
-                var fileName = obj.fileName;
-                var size = obj.size;
-                $('#modalDelFileName').text(fileName);
-                $('#modalFileSize').text(size);
+                $('#modal').html(resultat);
                 $('#modalDelFile').modal('show');
             })
         })
 
-        $('#modalBtnDel').click(function(){
-            var idTravail = $('.btnShowTravail.active').data('idtravail');
+        $('#modal').on('click', '#modalBtnDel', function(){
+            var idTravail = $(this).data('idtravail');
+            var fileName = $(this).data('filename');
+
             $.post('inc/casiers/delTravailFile.inc.php', {
-                idTravail: idTravail
+                idTravail: idTravail,
+                fileName: fileName
             }, function(resultat){
                 // resultat = idTravail si tout s'est bien passé, sinon -1
                 if (parseInt(resultat) != -1) {
-                    $.post('inc/casiers/detailsUpload.inc.php', {
+                    $.post('inc/casiers/getDetailsTravail.inc.php', {
                         idTravail: idTravail
                     },
                     function(resultat){
-                        $('#fileInfos').html(resultat);
+                        $('#detailsTravail').html(resultat);
                     })
                 }
                 else bootbox.alert({
                         message: "Quelque chose s'est mal passé. Le fichier n'a pas été supprimé.",
                         className: 'bb-alternate-modal'
                     });
-            $('#callDropZone').show().prop('disabled', false);
+            // $('#callDropZone').show().prop('disabled', false);
             $('#modalDelFile').modal('hide');
             })
         })
@@ -180,14 +183,14 @@ function eraseCookie(name) {
                 },
                 function(resultat){
                     $('#detailsTravail').html(resultat);
-                    // $("#myDropZone").dropzone(Dropzone.options.myDropZone);
                 })
         })
 
     })
 
-    var nbFichiersMax = 1;
+    var nbFichiersMax = 2;
     var maxFileSize = 20;
+    var erreur = false;
 
     Dropzone.options.myDropZone = {
         maxFilesize: maxFileSize,
@@ -201,29 +204,29 @@ function eraseCookie(name) {
             this.on("maxfilesexceeded", function(file) {
                     alert("Pas plus de " + nbFichiersMax + " fichier(s) svp!");
                 }),
-                this.on("sending", function(file, xhr, formData) {
-                    var idTravail = $('.btnShowTravail.active').data('idtravail');
-                    formData.append("idTravail", idTravail);
+            this.on("sending", function(file, xhr, formData) {
+                var idTravail = $('.btnShowTravail.active').data('idtravail');
+                formData.append("idTravail", idTravail);
+            }),
+            this.on("error", function(file, response) {
+                alert(response);
+                this.removeAllFiles(true);
                 }),
-                this.on("error", function(file, response) {
-                    alert('Une erreur s\'est produite.');
-                    }),
-                this.on('queuecomplete', function() {
-                    $('#callDropZone').hide().prop('disabled', true);
-                    var idTravail = $('.btnShowTravail.active').data('idtravail');
-                    $.post('inc/casiers/detailsUpload.inc.php',{
-                        idTravail: idTravail
-                    }, function(resultat){
-                        $('#fileInfos').html(resultat);
-
-                    })
-                    var ds = this;
-                    setTimeout(function() {
-                        ds.removeAllFiles();
-                        $('#modalCasier').modal('hide');
-                    }, 3000);
-
+            this.on('success', function() {
+                // $('#callDropZone').hide().prop('disabled', true);
+                var idTravail = $('.btnShowTravail.active').data('idtravail');
+                $.post('inc/casiers/getDetailsTravail.inc.php',{
+                    idTravail: idTravail
+                }, function(resultat){
+                    $('#detailsTravail').html(resultat);
                 })
+                var ds = this;
+                setTimeout(function() {
+                    ds.removeAllFiles();
+                    $('#modalCasier').modal('hide');
+                }, 3000);
+
+            })
         }
     }
 

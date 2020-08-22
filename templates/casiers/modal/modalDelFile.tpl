@@ -7,16 +7,16 @@
       </div>
       <div class="modal-body">
           <div class="alert alert-danger">
-              <p>Veuillez confirmer l'effacement définitif du document <strong id="modalDelFileName"></strong> <br>
-              qui est un fichier de <strong id="modalFileSize"></strong></p>
+              <p>Veuillez confirmer l'effacement définitif du document <strong id="modalDelFileName">{$fileName}</strong> <br>
+              qui est un fichier de <strong id="modalFileSize">{$size}</strong></p>
           </div>
       </div>
       <div class="modal-footer">
           <div class="btn-group pull-right">
             <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-danger" id="modalBtnDel" data-idtravail="">Effacer ce fichier</button>
+            <button type="button" class="btn btn-danger" id="modalBtnDel" data-idtravail="{$idTravail}" data-filename="{$fileName}">Effacer ce fichier</button>
         </div>
       </div>
     </div>
   </div>
-</div>
+</div> 

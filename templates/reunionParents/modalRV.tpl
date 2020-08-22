@@ -23,12 +23,9 @@
                 <div class="modal-footer">
                     <div class="btn-group pull-right">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Confirmer</button>
+                        <button type="button" id="confSetRV" data-idrp="{$idRP}" class="btn btn-primary">Confirmer</button>
                     </div>
                 </div>
-                <input type="hidden" name="action" value="{$action}">
-                <input type="hidden" name="mode" value="saveRV">
-                <input type="hidden" name="date" value="{$date}">
             </form>
         </div>
     </div>

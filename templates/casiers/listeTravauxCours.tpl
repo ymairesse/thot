@@ -13,7 +13,10 @@
                             style="overflow: hidden; text-overflow: ellipsis"
                             data-idtravail="{$id}"
                             title="{$unTravail.titre}">
-                        {if $unTravail.fileInfo.fileName != Null}<i class="fa fa-star"></i>{/if}
+                        {* Il y a au moins un document remis *}
+                        {* {$unTravail.fileInfo|var_dump} *}
+                        {if $unTravail.fileInfo != array()}<i class="fa fa-star"></i>{/if}
+
                         {$unTravail.dateDebut|truncate:5:''} - {$unTravail.titre}
                     </button>
                 </div>

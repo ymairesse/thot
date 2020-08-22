@@ -31,6 +31,11 @@ if ($listeCoursGrp) {
     }
     $tableauAttitudes = $Bulletin->tableauxAttitudes($matricule, $noBulletin);
     $noticeDirection = $Bulletin->noteDirection($anneeEtude, $noBulletin);
+    // la notice sur le parcours n'apparaît que si dernier bulletin de l'année scolaire
+    if (NBPERIODES == $noBulletin) {
+        $noticeParcours = $Bulletin->getNoticesParcours($matricule, $annee);
+        $noticeParcours = ($noticeParcours == Null) ? Null : $noticeParcours[$annee];
+    }
 
     $smarty->assign('noBulletin', $noBulletin);
     $smarty->assign('nomEleve', $nomEleve);
@@ -48,5 +53,6 @@ if ($listeCoursGrp) {
     $smarty->assign('remTitu', $remarqueTitulaire);
     $smarty->assign('mention', $mentions);
     $smarty->assign('noticeDirection', $noticeDirection);
+    $smarty->assign('noticeParcours', $noticeParcours);
     $smarty->assign('corpsPage', 'bulletin/bulletinEcranGTTT');
 }

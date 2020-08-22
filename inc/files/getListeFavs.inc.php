@@ -13,26 +13,19 @@ if (!(isset($_SESSION[APPLICATION]))) {
 
 require_once INSTALL_DIR.'/inc/classes/classUser.inc.php';
 $User = unserialize($_SESSION[APPLICATION]);
+
 $matricule = $User->getMatricule();
 
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
-$idTravail = $Application->postOrCookie('idTravail');
+$listeFavs = $Files->getListeFavs($matricule);
 
-// détails du travail et liste des fichiers déposés
-$detailsTravail = $Files->getDetailsTravail($idTravail, $matricule);
-$listeCotes = $Files->getCotesTravail($idTravail, $matricule);
-$totalTravail = $Files->totalisation($listeCotes);
-
-require_once(INSTALL_DIR.'/smarty/Smarty.class.php');
+require_once INSTALL_DIR.'/smarty/Smarty.class.php';
 $smarty = new Smarty();
 $smarty->template_dir = '../../templates';
 $smarty->compile_dir = '../../templates_c';
 
-$smarty->assign('idTravail', $idTravail);
-$smarty->assign('detailsTravail', $detailsTravail);
-$smarty->assign('listeCotes', $listeCotes);
-$smarty->assign('totalTravail', $totalTravail);
+$smarty->assign('listeFavoris', $listeFavs);
 
-$smarty->display('casiers/detailsUpload.inc.tpl');
+$smarty->display('files/favoris.tpl');

@@ -22,6 +22,7 @@ $Files = new Files();
 $userName = $User->getUserName();
 $userType = $User->getUserType();
 
+
 // téléchargement sur base du fileId ou du nom du fichier et du path?
 $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : null;
 // éventuellement, le $fileId
@@ -87,6 +88,7 @@ switch ($type) {
         $travailData = $Files->getDetailsTravail($idTravail, $matricule);
         $acronyme = $travailData['acronyme'];
         $download_path = INSTALL_ZEUS.$ds.'upload'.$ds.$acronyme.$ds.'#thot'.$ds.$idTravail.$ds.$matricule.$ds;
+        // suppression d'éventuels doubles "/"
         $download_path = preg_replace('~/+~', '/', $download_path);
         break;
 

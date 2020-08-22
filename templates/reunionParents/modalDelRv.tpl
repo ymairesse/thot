@@ -17,12 +17,12 @@
                 <div class="modal-footer">
                     <div class="btn-group pull-right">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                        <button type="button" id="confDelRV" class="btn btn-danger">Confirmer</button>
                     </div>
                 </div>
             </div>
-            <input type="hidden" name="date" value="{$date}">
-            <input type="hidden" name="id" value="" id="modalId">
+            <input type="hidden" name="idRP" value="" id="modalIdRP">
+            <input type="hidden" name="idRV" value="" id="modalIdRV">
             <input type="hidden" name="action" value="{$action}">
             <input type="hidden" name="mode" value="delRv">
         </form>

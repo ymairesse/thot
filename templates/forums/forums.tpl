@@ -1,4 +1,3 @@
-
 <div class="row">
 
     <div class="col-md-3 col-xs-12" style="min-height:15em; overflow: auto;" id="listeSujets">
@@ -28,7 +27,7 @@
                             </button>
 
                         {/foreach}
-                        
+
                     {/foreach}
 
                 {/foreach}
@@ -135,8 +134,12 @@
                 if (resultat == 1) {
                     $('.postForum[data-postid="' + postId + '"]').html("<span class='supprime'>Cette contribution a été supprimée</span>");
                     $('.repondre [data-postid="' + postId + '"].btn-forum').attr('disabled', true);
-                    $('#modalDelPost').modal('hide');
                 }
+                else {
+                    $('.postForum[data-postid="' + postId + '"]').remove();
+                    $('.repondre[data-postid="' + postId + '"]').remove();
+                }
+                $('#modalDelPost').modal('hide');
             })
         })
 

@@ -6,6 +6,8 @@ require_once 'config.inc.php';
 include 'inc/entetes.inc.php';
 
 $matricule = $User->getMatricule();
+$classe = $User->getClasse();
+$annee = SUBSTR($classe, 0, 1);
 $userType = $User->getUserType();
 if ($userType == 'parent') {
     $userName = $User->getUserName();

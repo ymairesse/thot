@@ -29,9 +29,16 @@ require_once INSTALL_DIR.'/inc/classes/class.thotForum.php';
 $Forum = new ThotForum();
 
 $okProprio = $Forum->verifProprio($matricule, $postId, $idSujet, $idCategorie);
+$hasChildren = $Forum->hasChildren($idCategorie, $idSujet, $postId);
 
 if ($okProprio) {
-    $nb = $Forum->delPost($matricule, $postId, $idSujet, $idCategorie);
-    echo $nb;
+    if ($hasChildren == 1) {
+        $nb = $Forum->clearPost($matricule, $postId, $idSujet, $idCategorie);
+        echo 1;
+        }
+        else {
+            $nb = $Forum->delPost($matricule, $postId, $idSujet, $idCategorie);
+            echo 0;
+        }
 }
 else echo "Vous n'êtes par l'auteur de ce post";

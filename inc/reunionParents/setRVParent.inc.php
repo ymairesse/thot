@@ -1,29 +1,31 @@
 <?php
 
-$date = isset($_POST['date'])?$_POST['date']:Null;
-$id = isset($_POST['rv'])?$_POST['rv']:Null;
+$idRP = isset($_POST['idRP']) ? $_POST['idRP'] : Null;
+$idRV = isset($_POST['rv']) ? $_POST['rv'] : Null;
 
 $identite = $User->getIdentite();
 
 $matricule = $identite['matricule'];
 $userName = $identite['userName'];
 
+DEFINE ('MAX', 3);
+
 // vérifier que la date de RP existe
-if ($date != Null) {
+if ($idRP != Null) {
     // la liste des dates possibles
-    $listeDates = $Application->listeDatesReunion();
-    if (in_array($date, $listeDates)) {
+    $listeRP = $Application->listeDatesReunion();
+    if (in_array($idRP, array_keys($listeRP))) {
         // rechercher les informations sur la RP
-        $infoRp = $Application->getInfoRp($date);
+        $infoRP = $Application->getInfoRp($idRP);
         // la RP est-elle ouverte?
-        if ($infoRp['generalites']['ouvert'] == 1) {
+        if ($infoRP['generalites']['ouvert'] == 1) {
             // la date est-elle compatible avec l'id
-            if ($Application->validIdDate($id, $date)) {
+            if ($Application->validIdRpIdRv($idRP, $idRV)) {
                 // l'élève a-t-il déjà un RV à ce prof ($acronyme)?
-                $acronyme = $Application->getInfoRV($id)['acronyme'];
-                if (!($Application->rdvIsDoublon($matricule, $acronyme, $date))) {
+                $acronyme = $Application->getInfoRV($idRP, $idRV)['acronyme'];
+                if (!($Application->rdvIsDoublon($matricule, $acronyme, $idRP))) {
                     // la fonction "inscription" gère le nombre max de RV et la concommiance des RV
-                    $resultat = $Application->inscriptionEleve($id, $matricule, 3, $userName);
+                    $resultat = $Application->inscriptionEleve($idRP, $idRV, $matricule, MAX, $userName);
                     switch ($resultat) {
                         case '1':
                             $texteMessage = "<i class='fa fa-thumbs-up fa-2x'></i>  Votre rendez-vous a été enregistré.";
@@ -70,4 +72,4 @@ if ($date != Null) {
         else {
             $texteMessage = "<i class='fa fa-warning fa-4x'></i> Aucune date de réunion de parents n'a été sélectionnée";
             $niveau = 'danger';
-            }   // date != Null
+        }   // idRP != Null

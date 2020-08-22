@@ -1,16 +1,17 @@
 <?php
+
 require_once("../../config.inc.php");
 
 session_start();
 
-$acronyme = isset($_POST['acronyme'])?$_POST['acronyme']:Null;
-$date = isset($_POST['date'])?$_POST['date']:Null;
+$acronyme = isset($_POST['acronyme']) ? $_POST['acronyme'] : Null;
+$idRP = isset($_POST['idRP']) ? $_POST['idRP'] : Null;
 
 require_once(INSTALL_DIR.'/inc/classes/classApplication.inc.php');
 $Application = new Application();
 
 // récupérer la liste des RV
-$planningProf = $Application->getRvProf($acronyme,$date);
+$planningProf = $Application->getRVProf($acronyme, $idRP);
 
 require_once(INSTALL_DIR."/smarty/Smarty.class.php");
 $smarty = new Smarty();
@@ -19,6 +20,6 @@ $smarty->compile_dir = "../templates_c";
 
 $smarty->assign('planningProf',$planningProf);
 $smarty->assign('acronyme',$acronyme);
-$smarty->assign('date',$date);
+$smarty->assign('idRP',$idRP);
 
 $smarty->display('../../templates/reunionParents/planningProf.tpl');

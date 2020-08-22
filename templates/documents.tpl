@@ -1,5 +1,18 @@
 <link href="css/filetree.css" type="text/css" rel="stylesheet">
 
+<style media="screen">
+
+i.fav.actif, i.favori.actif {
+    color: orange;
+}
+
+i.fav, i.favori {
+    color: #ccc;
+    cursor: pointer;
+}
+
+</style>
+
 <ul class="nav nav-pills">
     <li class="active">
         <a data-toggle="tab" href="#classe">Ma classe
@@ -18,9 +31,15 @@
         <span class="badge">{$listeDocs.ecole|@count|default:0}</span></a>
     </li>
 
+    <li class="pull-right bg-danger">
+        <a data-toggle="tab" href="#favoris">Favoris
+        <span class="badge favori">{$listeFavoris|@count|default:0}</span></a>
+    </li>
+
 </ul>
 
 <div class="tab-content">
+
     <div id="classe" class="tab-pane fade in active" style="min-height:30em; overflow:auto;">
         <h3>Les documents pour ma classe</h3>
         <table class="table table-condensed">
@@ -30,11 +49,12 @@
                     <th>Document</th>
                     <th>Commentaire</th>
                     <th>Professeur</th>
+                    <th>Fav.</th>
                 </tr>
             </thead>
             {if isset($listeDocs.classes)}
                 {foreach from=$listeDocs.classes key=fileId item=data}
-                <tr>
+                <tr data-shareid="{$data.shareId}">
                     <td>{$data.groupe}</td>
                     <td>
                         {if $data.dirOrFile == 'file'}
@@ -47,6 +67,7 @@
                     </td>
                     <td>{$data.commentaire}</td>
                     <td>{if $data.sexe == 'F'}Mme{else}M.{/if} {$data.prenom|substr:0:1}. {$data.nom}</td>
+                    <td><i class="fa fa-star fav{if $data.fav != ''} actif{/if}"></i></td>
                 </tr>
                 {/foreach}
             {/if}
@@ -80,11 +101,12 @@
                                 <th>Document</th>
                                 <th>Commentaire</th>
                                 <th>Professeur</th>
+                                <th>Fav.</th>
                             </tr>
                         </thead>
 
                         {foreach from=$dataBranche key=fileId item=dataDoc}
-                        <tr>
+                        <tr data-shareid="{$dataDoc.shareId}">
                             <td>
                                 {if $dataDoc.dirOrFile == 'file'}
                                 <a href="download.php?type=pId&amp;fileId={$fileId}">{$dataDoc.fileName}</a> {else}
@@ -95,6 +117,7 @@
                             </td>
                             <td>{$dataDoc.commentaire}</td>
                             <td>{if $dataDoc.sexe == 'F'}Mme{else}M.{/if} {$dataDoc.prenom|substr:0:1}. {$dataDoc.nom}</td>
+                            <td><i class="fa fa-star fav{if $dataDoc.fav != ''} actif{/if}"></i>{$dataDoc.fav}</td>
                         </tr>
                         {/foreach}
                     </table>
@@ -116,10 +139,11 @@
                     <th>Document</th>
                     <th>Commentaire</th>
                     <th>Professeur</th>
+                    <th>Fav.</th>
                 </tr>
             </thead>
             {if isset($listeDocs.niveau)} {foreach from=$listeDocs.niveau key=fileId item=data}
-            <tr>
+            <tr data-shareid="{$data.shareId}">
                 <td>
                     {if $data.dirOrFile == 'file'}
                     <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a> {else}
@@ -130,6 +154,7 @@
                 </td>
                 <td>{$data.commentaire}</td>
                 <td>{if $data.sexe == 'F'}Mme{else}M.{/if} {$data.prenom|substr:0:1}. {$data.nom}</td>
+                <td><i class="fa fa-star fav{if $data.fav != ''} actif{/if}"></i></td>
             </tr>
             {/foreach} {/if}
         </table>
@@ -143,10 +168,11 @@
                     <th>Document</th>
                     <th>Commentaire</th>
                     <th>Professeur</th>
+                    <th>Fav.</th>
                 </tr>
             </thead>
             {if isset($listeDocs.ecole)} {foreach from=$listeDocs.ecole key=fileId item=data}
-            <tr>
+            <tr data-shareid="{$data.shareId}">
                 <td>
                     {if $data.dirOrFile == 'file'}
                     <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a>
@@ -158,32 +184,29 @@
                 </td>
                 <td>{$data.commentaire}</td>
                 <td>{if $data.sexe == 'F'}Mme{else}M.{/if} {$data.prenom|substr:0:1}. {$data.nom}</td>
+                <td><i class="fa fa-star fav{if $data.fav != ''} actif{/if}"></i></td>
             </tr>
             {/foreach} {/if}
         </table>
     </div>
 
-    <div id="e-docs" class="tab-pane fade" style="min-height:30em; overflow:auto;">
-        <h3>Mes documents électroniques</h3>
+    <div id="favoris" class="tab-pane fade" style="min-height:30em; overflow: auto;">
+        <h3>Mes favoris</h3>
         <table class="table table-condensed">
             <thead>
                 <tr>
-                    <th>Date</th>
                     <th>Document</th>
+                    <th>Commentaire</th>
+                    <th>Professeur</th>
+                    <th style="width:2em">Fav</th>
                 </tr>
             </thead>
-            {if isset($listeEdocs.$matricule)} {foreach $listeEdocs.$matricule key=wtf item=data}
-            <tr>
-                <td>{$data.date}</td>
-                <td>
-                    {if $data.doc == 'pia'}
-                    <a id="pia" href="javascript:void(0)">Plan individuel d'accompagnement (PIA)</a> {elseif $data.doc == 'competences'}
-                    <a id="competences" href="javascript:void(0)">Rapport de compétences acquises</a> {/if}
-                </td>
-            </tr>
-            {/foreach} {/if}
+            <tbody id="favTable">
+                {include file='files/favoris.tpl'}
+            </tbody>
 
         </table>
+
     </div>
 
 </div>
@@ -199,31 +222,38 @@
 
     $(document).ready(function() {
 
-        $("#pia").click(function() {
-            $.post('e-docs/inc/printDoc.inc.php', {
-                    typeDoc: 'pia'
-                },
-                function(resultat) {
-                    $("#edocReady").html(resultat);
-                    $("#modaleDoc").modal('show');
+        $('.fav').click(function(){
+            var star = $(this);
+            var shareId = $(this).closest('tr').data('shareid');
+            $.post('inc/files/favUnfav.inc.php', {
+                shareId: shareId
+            }, function(resultat){
+                star.toggleClass('actif');
+                $.post('inc/files/getListeFavs.inc.php',{
+                }, function(resultat){
+                    $('#favTable').html(resultat);
+                    var nb = $('#favTable tr').length;
+                    $('.badge.favori').text(nb);
                 })
+            })
         })
 
-        $("#competences").click(function() {
-            $.post('e-docs/inc/printDoc.inc.php', {
-                    typeDoc: 'competences'
-                },
-                function(resultat) {
-                    $("#edocReady").html(resultat);
-                    $("#modaleDoc").modal('show');
-                })
+        // suppression d'un favori dans la liste
+        $('#favoris').on('click', '.favori', function(){
+            var ceci = $(this);
+            var shareId = $(this).closest('tr').data('shareid');
+            $.post('inc/files/favUnfav.inc.php', {
+                shareId: shareId
+            }, function(resultat){
+                ceci.parent().closest('tr').remove();
+                // élimination du favori dans l'onglet original
+                $('table [data-shareid="' + shareId + '"]').find('.fav').removeClass('actif');
+                var nb = $('#favTable tr').length;
+                $('.badge.favori').text(nb);
+            })
         })
 
-        $("#edocReady").click(function() {
-            $("#modaleDoc").modal('hide');
-        })
-
-        $(".btnFolder").click(function() {
+        $(document).on('click', ".btnFolder", function() {
             var fileId = $(this).data('fileid');
             var titre = $(this).data('commentaire');
             $.post('inc/getTree.inc.php', {
@@ -234,6 +264,10 @@
                     $("#treeview").html(resultat);
                     $("#modalTreeView").modal('show');
                 })
+        })
+
+        $(document).on('click', 'tr', function(){
+            $(this).toggleClass('active');
         })
 
         $("#treeview").on('click', '.dirLink', function(event) {
