@@ -2,7 +2,6 @@
 *.js.php
 *.sty.php
 *.html.php
-*.csv
 *.pdf
 *.bak
 *.zip
