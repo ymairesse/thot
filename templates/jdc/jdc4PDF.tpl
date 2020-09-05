@@ -33,7 +33,7 @@
             <th style="width:80%">Note</th>
         </tr>
         {foreach from=$jdcExtract key=id item=data}
-        <tr {if (in_array($data.idCategorie, array('1','2','5')))} style="background:#faa"{/if}">
+        <tr {if (in_array($data.idCategorie, array('1','2','5')))} style="background:#faa"{/if}>
             <td><strong>{$data.categorie}</strong><br>
                 <strong>{$data.dest}</strong> : {$data.proprietaire}<br>
                 {$data.startDate}<br>
