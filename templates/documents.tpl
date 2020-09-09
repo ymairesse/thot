@@ -15,6 +15,11 @@ i.fav, i.favori {
 
 <ul class="nav nav-pills">
     <li class="active">
+        <a data-toggle="tab" href="#eleves">{$identite.prenom} {$identite.nom|substr:0:1}.
+        <span class="badge">{$listeDocs.eleves|@count|default:0}</span></a>
+    </li>
+
+    <li>
         <a data-toggle="tab" href="#classe">Ma classe
         <span class="badge">{$listeDocs.classes|@count|default:0}</span></a>
     </li>
@@ -40,7 +45,39 @@ i.fav, i.favori {
 
 <div class="tab-content">
 
-    <div id="classe" class="tab-pane fade in active" style="min-height:30em; overflow:auto;">
+    <div id="eleves" class="tab-pane fade in active" style="min-height:30em; overflow:auto">
+        <h3>Les documents pour {$identite.prenom}</h3>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Commentaire</th>
+                    <th>Professeur</th>
+                    <th>Fav.</th>
+                </tr>
+            </thead>
+            {if isset($listeDocs.eleves)}
+                {foreach from=$listeDocs.eleves key=fileId item=data}
+                    <tr data-shareid="{$data.shareId}">
+                        <td>
+                            {if $data.dirOrFile == 'file'}
+                            <a href="download.php?type=pId&amp;fileId={$fileId}">{$data.fileName}</a>
+                            {else}
+                            <button type="button" class="btn btn-primary btn-xs btnFolder" data-fileid="{$fileId}" data-commentaire="{$data.commentaire}">
+                                <i class="fa fa-folder-open"></i> Dossier: {$data.commentaire|truncate:40}
+                            </button>
+                            {/if}
+                        </td>
+                        <td>{$data.commentaire}</td>
+                        <td>{if $data.sexe == 'F'}Mme{else}M.{/if} {$data.prenom|substr:0:1}. {$data.nom}</td>
+                        <td><i class="fa fa-star fav{if $data.fav != ''} actif{/if}"></i></td>
+                    </tr>
+                {/foreach}
+            {/if}
+        </table>
+    </div>
+
+    <div id="classe" class="tab-pane fade" style="min-height:30em; overflow:auto;">
         <h3>Les documents pour ma classe</h3>
         <table class="table table-condensed">
             <thead>

@@ -6,7 +6,6 @@ $niveau = substr($classe, 0, 1);
 $listeCoursEleve = $User->listeCoursEleve();
 $listeCoursString = "'".implode("','", $listeCoursEleve)."'";
 
-// définition de la class Chrono
 require_once INSTALL_DIR.'/inc/classes/Files.class.php';
 $Files = new Files();
 
@@ -19,11 +18,9 @@ if (isset($listeDocs['coursGrp']))
     $listeDocs['coursGrp'] = $Files->sortByCours($listeDocs['coursGrp']);
 
 $listeFavoris = $Files->getListeFavs($matricule);
-// Application::afficher($listeFavoris);
 
 $smarty->assign('matricule', $matricule);
 $smarty->assign('listeDocs', $listeDocs);
 $smarty->assign('listeFavoris', $listeFavoris);
-
 
 $smarty->assign('corpsPage', 'documents');
